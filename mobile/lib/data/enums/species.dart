@@ -1,0 +1,4 @@
+enum SpeciesEnum {
+  dog,
+  cat,
+}

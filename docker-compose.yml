@@ -1,0 +1,31 @@
+version: "3.8"
+
+networks:
+  petdex-network:
+
+services:
+  api-java:
+    image: petdex/api-java:main
+
+    networks:
+      - petdex-network
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URI=${DATABASE_URI}
+      - JWT_SECRET=${JWT_SECRET}
+      - BCRYPT_SALT=${BCRYPT_SALT}
+    volumes:
+      - ./uploads:/uploads 
+    restart: always
+
+  api-python:
+    image: petdex/api-python:main
+    networks:
+      - petdex-network
+    ports:
+      - "8083:8083"
+    environment:
+      - API_URL=http://api-java:8080
+      - JWT_SECRET=${JWT_SECRET}
+    restart: always
