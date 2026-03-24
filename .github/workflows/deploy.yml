@@ -44,13 +44,13 @@ jobs:
       - name: 🧹 Remover docker-compose antigo na VM
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: ${{ secrets.AZURE_VM_HOST }}
-          username: ${{ secrets.AZURE_VM_USER }}
-          key: ${{ secrets.AZURE_VM_SSH_KEY }}
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
           script: |
             echo "🔹 Removendo docker-compose antigo..."
-            if [ -f "/home/${{ secrets.AZURE_VM_USER }}/petdex/docker-compose.yml" ]; then
-              rm -f /home/${{ secrets.AZURE_VM_USER }}/petdex/docker-compose.yml
+            if [ -f "/home/${{ secrets.VM_USER }}/petdex/docker-compose.yml" ]; then
+              rm -f /home/${{ secrets.VM_USER }}/petdex/docker-compose.yml
               echo "✅ Arquivo removido com sucesso."
             else
               echo "ℹ️ Nenhum docker-compose.yml encontrado."
@@ -58,7 +58,7 @@ jobs:
 
       - name: 📦 Copiar arquivos para a VM via rsync
         env:
-          SSH_KEY: ${{ secrets.AZURE_VM_SSH_KEY }}
+          SSH_KEY: ${{ secrets.VM_SSH_KEY }}
         run: |
           echo "$SSH_KEY" > key.pem
           chmod 600 key.pem
@@ -67,16 +67,16 @@ jobs:
             docker-compose.yml \
             api-java/ \
             api-python/ \
-            ${{ secrets.AZURE_VM_USER }}@${{ secrets.AZURE_VM_HOST }}:/home/${{ secrets.AZURE_VM_USER }}/petdex/
+            ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/${{ secrets.VM_USER }}/petdex/
       - name: 🚀 Executar deploy via Docker Compose
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: ${{ secrets.AZURE_VM_HOST }}
-          username: ${{ secrets.AZURE_VM_USER }}
-          key: ${{ secrets.AZURE_VM_SSH_KEY }}
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
           script: |
             echo "🚀 Atualizando APIs da PetDex na VM..."
-            cd /home/${{ secrets.AZURE_VM_USER }}/petdex
+            cd /home/${{ secrets.VM_USER }}/petdex
             export TAG=${GITHUB_REF##*/}
             export JWT_SECRET=${{ secrets.JWT_SECRET }}
             export BCRYPT_SALT=${{ secrets.BCRYPT_SALT }}
