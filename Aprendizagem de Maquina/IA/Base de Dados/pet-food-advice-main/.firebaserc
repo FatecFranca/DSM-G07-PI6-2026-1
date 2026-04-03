@@ -1,0 +1,18 @@
+{
+  "projects": {
+    "default": "pet-food-advice"
+  },
+  "targets": {
+    "pet-food-advice": {
+      "hosting": {
+        "main-site": [
+          "pet-food-advice"
+        ],
+        "docs": [
+          "docs-pet-food-advice"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
