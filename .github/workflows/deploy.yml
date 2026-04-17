@@ -55,7 +55,10 @@ jobs:
             else
               echo "ℹ️ Nenhum docker-compose.yml encontrado."
             fi
-
+      - name: 📦 Instalar rsync
+        run: |
+          sudo apt update
+          sudo apt install -y rsync
       - name: 📦 Copiar arquivos para a VM via rsync
         env:
           SSH_KEY: ${{ secrets.VM_SSH_KEY }}
