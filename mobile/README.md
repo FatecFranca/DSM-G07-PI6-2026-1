@@ -123,10 +123,10 @@ cp .env.example .env
 Edite o arquivo `.env` e configure as URLs das APIs:
 
 ```env
-# URL da API Java (servidor Azure - Produção)
+# URL da API Java (servidor Google Cloud - Produção)
 API_JAVA_URL=http://34.24.9.134:8080
 
-# URL da API Python (servidor Azure - Produção)
+# URL da API Python (servidor Google Cloud - Produção)
 API_PYTHON_URL=http://34.24.9.134:8083
 
 # Para desenvolvimento local, use:
@@ -141,7 +141,7 @@ API_PYTHON_URL=http://34.24.9.134:8083
 | `API_JAVA_URL` | URL base da API Java (Spring Boot) | `http://34.24.9.134:8080` |
 | `API_PYTHON_URL` | URL base da API Python (FastAPI) | `http://34.24.9.134:8083` |
 
-**URLs do Servidor Azure (Produção):**
+**URLs do Servidor Google Cloud (Produção):**
 
 - **API Java:** `http://34.24.9.134:8080`
   - Swagger: `http://34.24.9.134:8080/swagger`

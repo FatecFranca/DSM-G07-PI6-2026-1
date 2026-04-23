@@ -257,7 +257,7 @@ Utilizamos o **MongoDB** como banco de dados pela sua alta disponibilidade, flex
 
 ## 🚀 Infraestrutura de Hospedagem
 
-A API está hospedada em um servidor **Microsoft Azure** com as seguintes especificações:
+A API está hospedada em um servidor **Google Cloud** com as seguintes especificações:
 
 - **Sistema Operacional:** Ubuntu
 - **Tipo de Máquina:** Standard B1ms

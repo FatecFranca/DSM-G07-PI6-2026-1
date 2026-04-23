@@ -159,7 +159,7 @@ O PetDex utiliza um conjunto robusto de tecnologias modernas para garantir perfo
 - Sensores: GY-MAX30102, MPU6050, NEO-6M
 
 **DevOps & Cloud:**
-- Microsoft Azure
+- Google Cloud
 - Docker + Docker Compose
 - GitHub Actions (CI/CD)
 
@@ -247,16 +247,16 @@ O PetDex utiliza um conjunto robusto de tecnologias modernas para garantir perfo
 
 #### 3.1.1 Infraestrutura de Nuvem Utilizada
 
-O projeto PetDex está hospedado na **Microsoft Azure**, utilizando uma arquitetura de microsserviços containerizada.
+O projeto PetDex está hospedado na **Google Cloud**, utilizando uma arquitetura de microsserviços containerizada.
 
 <p align="center">
   <img src="imagens/Infraestrutura em Nuvem.jpg" alt="Infraestrutura em Nuvem do PetDex" width="800px" />
 </p>
 
 **Especificações do Servidor:**
-- **Provedor:** Microsoft Azure
+- **Provedor:** Google Cloud
 - **Sistema Operacional:** Ubuntu Server
-- **Tipo de Máquina:** Standard B1ms
+- **Tipo de Máquina:** e2-medium (2 vCPUs, 4 GB de memória)
 - **IP Público:** `34.24.9.134`
 - **Região:** East US
 
@@ -327,60 +327,8 @@ O projeto implementa um pipeline de **CI/CD (Continuous Integration/Continuous D
 **Ferramentas Utilizadas:**
 - **GitHub Actions:** Plataforma de CI/CD integrada ao GitHub
 - **Docker Hub:** Registry para armazenamento de imagens Docker
-- **SSH:** Conexão segura com o servidor Azure
+- **SSH:** Conexão segura com o servidor Google Cloud
 - **rsync:** Sincronização de arquivos
-
-**Pipeline de Deploy:**
-
-```yaml
-# .github/workflows/deploy.yml
-name: Deploy PetDex APIs
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout do repositório
-        uses: actions/checkout@v4
-
-      - name: Login no Docker Hub
-        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-
-      - name: Build e Push da API Java
-        run: |
-          cd api-java
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/api-java:main .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/api-java:main
-
-      - name: Build e Push da API Python
-        run: |
-          cd api-python
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/api-python:main .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/api-python:main
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Copiar arquivos para a VM via rsync
-        run: |
-          rsync -avz docker-compose.yml api-java/ api-python/ ${{ secrets.AZURE_VM_USER }}@${{ secrets.AZURE_VM_HOST }}:/home/${{ secrets.AZURE_VM_USER }}/petdex/
-
-      - name: Executar deploy via Docker Compose
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.AZURE_VM_HOST }}
-          username: ${{ secrets.AZURE_VM_USER }}
-          key: ${{ secrets.AZURE_VM_SSH_KEY }}
-          script: |
-            cd /home/${{ secrets.AZURE_VM_USER }}/petdex
-            docker compose pull
-            docker compose up -d --build
-```
 
 **Etapas do Pipeline:**
 
@@ -388,7 +336,7 @@ jobs:
 2. **Checkout:** GitHub Actions clona o código do repositório
 3. **Build Automático:** Constrói as imagens Docker das APIs Java e Python
 4. **Push para Registry:** Envia as imagens para o Docker Hub
-5. **Sincronização:** Copia arquivos atualizados para o servidor Azure via rsync
+5. **Sincronização:** Copia arquivos atualizados para o servidor Google Cloud via rsync
 6. **Deploy:** Conecta via SSH ao servidor e executa `docker compose up -d --build`
 7. **Verificação:** Containers são iniciados e health checks garantem funcionamento
 
