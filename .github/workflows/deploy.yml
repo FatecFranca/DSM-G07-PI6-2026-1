@@ -69,6 +69,8 @@ jobs:
             export JWT_SECRET=${{ secrets.JWT_SECRET }}
             export BCRYPT_SALT=${{ secrets.BCRYPT_SALT }}
 
+            echo "DEBUG: DATABASE_URI is $DATABASE_URI"
+
             docker compose pull
             docker compose up -d
 
