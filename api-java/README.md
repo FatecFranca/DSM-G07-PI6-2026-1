@@ -41,11 +41,11 @@ A estrutura do projeto é composta por:
 
 A API está hospedada em um servidor **Azure** (Ubuntu, Standard B1ms) e pode ser acessada através do link:
 
-🔗 **API Base:** [http://172.206.27.122:8080](http://172.206.27.122:8080)
+🔗 **API Base:** [http://34.24.9.134:8080](http://34.24.9.134:8080)
 
 A documentação interativa da API, feita com Swagger (OpenAPI), está disponível em:
 
-📘 **Swagger UI:** [http://172.206.27.122:8080/swagger](http://172.206.27.122:8080/swagger)
+📘 **Swagger UI:** [http://34.24.9.134:8080/swagger](http://34.24.9.134:8080/swagger)
 
 ### **🔑 Credenciais de Teste**
 
@@ -131,7 +131,7 @@ O WebSocket permite que o aplicativo mobile receba atualizações instantâneas 
 
 ### **Endpoint de Conexão**
 
-🔗 **WebSocket Endpoint:** `ws://172.206.27.122:8080/ws-petdex`
+🔗 **WebSocket Endpoint:** `ws://34.24.9.134:8080/ws-petdex`
 
 **Para desenvolvimento local:** `ws://localhost:8080/ws-petdex`
 
@@ -146,7 +146,7 @@ A conexão WebSocket também requer autenticação JWT. O token pode ser enviado
 
 2. **Via Query Parameter:**
    ```
-   ws://172.206.27.122:8080/ws-petdex?token=<seu_token_jwt>
+   ws://34.24.9.134:8080/ws-petdex?token=<seu_token_jwt>
    ```
 
 ### **Tópicos de Inscrição**
@@ -260,7 +260,7 @@ A API está hospedada em um servidor **Microsoft Azure** com as seguintes especi
 
 - **Sistema Operacional:** Ubuntu
 - **Tipo de Máquina:** Standard B1ms
-- **IP Público:** 172.206.27.122
+- **IP Público:** 34.24.9.134
 - **Porta:** 8080
 
 Esta infraestrutura garante alta disponibilidade e performance para o processamento dos dados da coleira inteligente em tempo real.

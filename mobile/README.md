@@ -124,10 +124,10 @@ Edite o arquivo `.env` e configure as URLs das APIs:
 
 ```env
 # URL da API Java (servidor Azure - Produção)
-API_JAVA_URL=http://172.206.27.122:8080
+API_JAVA_URL=http://34.24.9.134:8080
 
 # URL da API Python (servidor Azure - Produção)
-API_PYTHON_URL=http://172.206.27.122:8083
+API_PYTHON_URL=http://34.24.9.134:8083
 
 # Para desenvolvimento local, use:
 # API_JAVA_URL=http://localhost:8080
@@ -138,15 +138,15 @@ API_PYTHON_URL=http://172.206.27.122:8083
 
 | Variável | Descrição | Exemplo |
 |:---------|:----------|:--------|
-| `API_JAVA_URL` | URL base da API Java (Spring Boot) | `http://172.206.27.122:8080` |
-| `API_PYTHON_URL` | URL base da API Python (FastAPI) | `http://172.206.27.122:8083` |
+| `API_JAVA_URL` | URL base da API Java (Spring Boot) | `http://34.24.9.134:8080` |
+| `API_PYTHON_URL` | URL base da API Python (FastAPI) | `http://34.24.9.134:8083` |
 
 **URLs do Servidor Azure (Produção):**
 
-- **API Java:** `http://172.206.27.122:8080`
-  - Swagger: `http://172.206.27.122:8080/swagger`
-- **API Python:** `http://172.206.27.122:8083`
-  - Docs: `http://172.206.27.122:8083/docs`
+- **API Java:** `http://34.24.9.134:8080`
+  - Swagger: `http://34.24.9.134:8080/swagger`
+- **API Python:** `http://34.24.9.134:8083`
+  - Docs: `http://34.24.9.134:8083/docs`
 
 ### **4. Instale as Dependências**
 
@@ -327,8 +327,8 @@ Em caso de dúvidas ou problemas:
 2. Certifique-se de que as APIs estão online e acessíveis
 3. Verifique se você tem uma conexão de internet ativa
 4. Consulte a documentação das APIs:
-   - [API Java (Swagger)](http://172.206.27.122:8080/swagger)
-   - [API Python (Docs)](http://172.206.27.122:8083/docs)
+   - [API Java (Swagger)](http://34.24.9.134:8080/swagger)
+   - [API Python (Docs)](http://34.24.9.134:8083/docs)
 
 ---
 

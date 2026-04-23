@@ -155,9 +155,9 @@ Ao identificar um batimento com baixa probabilidade de ocorrência, o tutor é a
 
 A API está hospedada em um servidor **Azure** (Ubuntu, Standard B1ms) e pode ser acessada através do link:
 
-🔗 **API Base:** [http://172.206.27.122:8083](http://172.206.27.122:8083)
+🔗 **API Base:** [http://34.24.9.134:8083](http://34.24.9.134:8083)
 
-📘 **Documentação Interativa (Swagger):** [http://172.206.27.122:8083/docs](http://172.206.27.122:8083/docs)
+📘 **Documentação Interativa (Swagger):** [http://34.24.9.134:8083/docs](http://34.24.9.134:8083/docs)
 
 ### 🔐 Autenticação JWT
 
@@ -282,7 +282,7 @@ Adicione a variável `API_URL` no arquivo `.env` com o endpoint da API Java:
 API_URL=http://localhost:8080
 
 # Para produção (servidor Azure)
-API_URL=http://172.206.27.122:8080
+API_URL=http://34.24.9.134:8080
 ```
 
 **O que é a API_URL?**
@@ -434,7 +434,7 @@ A API está hospedada em um servidor **Microsoft Azure** com as seguintes especi
 
 - **Sistema Operacional:** Ubuntu
 - **Tipo de Máquina:** Standard B1ms
-- **IP Público:** 172.206.27.122
+- **IP Público:** 34.24.9.134
 - **Porta:** 8083
 
 Esta infraestrutura garante alta disponibilidade e performance para o processamento analítico e execução do modelo de IA em tempo real.

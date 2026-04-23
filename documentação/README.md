@@ -257,16 +257,16 @@ O projeto PetDex está hospedado na **Microsoft Azure**, utilizando uma arquitet
 - **Provedor:** Microsoft Azure
 - **Sistema Operacional:** Ubuntu Server
 - **Tipo de Máquina:** Standard B1ms
-- **IP Público:** `172.206.27.122`
+- **IP Público:** `34.24.9.134`
 - **Região:** East US
 
 **Serviços em Produção:**
 
 | Serviço | URL | Documentação | Porta |
 |:--------|:----|:-------------|:------|
-| **API Java** | http://172.206.27.122:8080 | [Swagger](http://172.206.27.122:8080/swagger) | 8080 |
-| **API Python** | http://172.206.27.122:8083 | [Docs](http://172.206.27.122:8083/docs) | 8083 |
-| **WebSocket** | ws://172.206.27.122:8080/ws-petdex | - | 8080 |
+| **API Java** | http://34.24.9.134:8080 | [Swagger](http://34.24.9.134:8080/swagger) | 8080 |
+| **API Python** | http://34.24.9.134:8083 | [Docs](http://34.24.9.134:8083/docs) | 8083 |
+| **WebSocket** | ws://34.24.9.134:8080/ws-petdex | - | 8080 |
 
 #### 3.1.2 Containerização com Docker
 
@@ -536,7 +536,7 @@ Conexão persistente para receber atualizações instantâneas:
 // lib/services/websocket_service.dart
 class WebSocketService {
   void connect(String animalId, String token) {
-    final wsUrl = 'ws://172.206.27.122:8080/ws-petdex?token=$token';
+    final wsUrl = 'ws://34.24.9.134:8080/ws-petdex?token=$token';
     _channel = WebSocketChannel.connect(Uri.parse(wsUrl));
 
     _channel.stream.listen((message) {
@@ -1052,7 +1052,7 @@ A **Coleira Inteligente PetDex** é o componente físico do sistema, responsáve
                              │
                     ┌────────▼────────┐
                     │   API Java      │
-                    │  (172.206.27.122│
+                    │  (34.24.9.134│
                     │     :8080)      │
                     └─────────────────┘
 ```
@@ -1080,7 +1080,7 @@ TinyGPSPlus gps;
 
 const char* ssid = "WIFI_SSID";
 const char* password = "WIFI_PASSWORD";
-const char* apiUrl = "http://172.206.27.122:8080/api/batimentos";
+const char* apiUrl = "http://34.24.9.134:8080/api/batimentos";
 
 void setup() {
   // Inicializar sensores
@@ -1249,7 +1249,7 @@ api-java/
 
 **Documentação Interativa:**
 
-🔗 **Swagger UI:** http://172.206.27.122:8080/swagger
+🔗 **Swagger UI:** http://34.24.9.134:8080/swagger
 
 ### 4.3 API Python (FastAPI)
 
@@ -1323,7 +1323,7 @@ api-python/
 
 **Documentação Interativa:**
 
-🔗 **Swagger UI:** http://172.206.27.122:8083/docs
+🔗 **Swagger UI:** http://34.24.9.134:8083/docs
 
 ### 4.4 Comunicação entre as APIs
 
@@ -1424,7 +1424,7 @@ const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
 const animalId = "68194120636f719fcd5ee5fd";
 
 // Conectar ao WebSocket
-const ws = new WebSocket(`ws://172.206.27.122:8080/ws-petdex?token=${token}`);
+const ws = new WebSocket(`ws://34.24.9.134:8080/ws-petdex?token=${token}`);
 
 // Inscrever-se em tópico do animal
 ws.onopen = () => {
@@ -1511,7 +1511,7 @@ Antes de executar o projeto localmente, certifique-se de ter instalado:
 
 ### 5.2 Configuração e Execução da API Java
 
-> **💡 RECOMENDAÇÃO:** Para a maioria dos usuários, recomendamos utilizar a **API Java em produção** que já está rodando em nossos servidores (http://172.206.27.122:8080). A configuração local é necessária apenas para desenvolvimento ou testes avançados.
+> **💡 RECOMENDAÇÃO:** Para a maioria dos usuários, recomendamos utilizar a **API Java em produção** que já está rodando em nossos servidores (http://34.24.9.134:8080). A configuração local é necessária apenas para desenvolvimento ou testes avançados.
 
 **1. Clone o repositório:**
 
@@ -1595,7 +1595,7 @@ docker run -p 8080:8080 --env-file .env petdex-api-java
 
 ### 5.3 Configuração e Execução da API Python
 
-> **💡 RECOMENDAÇÃO:** Para a maioria dos usuários, recomendamos utilizar a **API Python em produção** que já está rodando em nossos servidores (http://172.206.27.122:8083). A configuração local é necessária apenas para desenvolvimento ou testes avançados.
+> **💡 RECOMENDAÇÃO:** Para a maioria dos usuários, recomendamos utilizar a **API Python em produção** que já está rodando em nossos servidores (http://34.24.9.134:8083). A configuração local é necessária apenas para desenvolvimento ou testes avançados.
 
 **1. Clone o repositório (se ainda não fez):**
 
@@ -1632,7 +1632,7 @@ Edite o arquivo `.env`:
 
 ```env
 # URL da API Java (servidor de produção - RECOMENDADO)
-API_URL=http://172.206.27.122:8080
+API_URL=http://34.24.9.134:8080
 
 # Para desenvolvimento local (não recomendado - requer API Java rodando localmente)
 # API_URL=http://localhost:8080
@@ -1736,8 +1736,8 @@ Edite o arquivo `.env`:
 
 ```env
 # URLs das APIs (servidor de produção - RECOMENDADO)
-API_JAVA_URL=http://172.206.27.122:8080
-API_PYTHON_URL=http://172.206.27.122:8083
+API_JAVA_URL=http://34.24.9.134:8080
+API_PYTHON_URL=http://34.24.9.134:8083
 
 # Para desenvolvimento local (não recomendado - requer APIs rodando localmente)
 # API_JAVA_URL=http://localhost:8080
@@ -1859,8 +1859,8 @@ O aplicativo solicitará as seguintes permissões:
 
 Após instalar o APK, o aplicativo já está configurado para se conectar aos servidores de produção:
 
-- **API Java:** http://172.206.27.122:8080
-- **API Python:** http://172.206.27.122:8083
+- **API Java:** http://34.24.9.134:8080
+- **API Python:** http://34.24.9.134:8083
 
 **Não é necessário configurar nada!** Basta fazer login e começar a usar.
 
@@ -2036,8 +2036,8 @@ O projeto demonstra a aplicação prática de conceitos avançados de:
 - **Repositório GitHub:** https://github.com/FatecFranca/DSM-P4-G07-2025-1
 - **Vídeo do Projeto:** https://www.youtube.com/watch?v=9IwRMAMUHo0
 - **Análise IA PetDex Oficial:** [PDF](../Aprendizagem%20de%20Maquina/Analise%20IA%20PetDex%20Oficial.pdf)
-- **API Java (Swagger):** http://172.206.27.122:8080/swagger
-- **API Python (Docs):** http://172.206.27.122:8083/docs
+- **API Java (Swagger):** http://34.24.9.134:8080/swagger
+- **API Python (Docs):** http://34.24.9.134:8083/docs
 - **Download APK:** [Google Drive](https://drive.google.com/file/d/1qfmFwAp55BwcIVp8BA7cER1gD2TSqYkW/view?usp=sharing)
 
 ---

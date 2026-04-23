@@ -32,8 +32,8 @@ Repositório do **Grupo 07** do Projeto Interdisciplinar do **5º semestre** do 
 ## 🔗 Acesso ao Projeto
 
 * **🎨 FIGMA:** [Protótipo da Interface](https://www.figma.com/design/BZOrhXmiYHgesIZf1Ex3Pw/PetDex.?node-id=0-1&t=8nuIhASiCYaiae4f-1)
-* **🐍 API de Análise (FastAPI - Python):** [http://172.206.27.122:8083/docs](http://172.206.27.122:8083/docs)
-* **☕ API Principal (Java - Spring Boot):** [http://172.206.27.122:8080/swagger](http://172.206.27.122:8080/swagger)
+* **🐍 API de Análise (FastAPI - Python):** [http://34.24.9.134:8083/docs](http://34.24.9.134:8083/docs)
+* **☕ API Principal (Java - Spring Boot):** [http://34.24.9.134:8080/swagger](http://34.24.9.134:8080/swagger)
 * **📱 Download do APK (Android):** [Baixar PetDex APK](https://drive.google.com/file/d/1qfmFwAp55BwcIVp8BA7cER1gD2TSqYkW/view?usp=sharing)
 
 ### **🔑 Credenciais de Teste**
@@ -188,7 +188,7 @@ O projeto PetDex está hospedado na **Microsoft Azure**, utilizando uma máquina
 
 - **Sistema Operacional:** Ubuntu Server
 - **Tipo de Máquina:** Standard B1ms
-- **IP Público:** 172.206.27.122
+- **IP Público:** 34.24.9.134
 - **Região:** East US
 
 ### **🐳 Containerização com Docker**
@@ -266,15 +266,15 @@ O projeto implementa um pipeline de **CI/CD (Continuous Integration/Continuous D
 
 ### **📡 Informações do Servidor**
 
-**IP do Servidor Azure:** `172.206.27.122`
+**IP do Servidor Azure:** `34.24.9.134`
 
 **Endpoints das APIs:**
 
 | Serviço | URL Base | Documentação | Porta |
 |:--------|:---------|:-------------|:------|
-| **API Java** | `http://172.206.27.122:8080` | [Swagger](http://172.206.27.122:8080/swagger) | 8080 |
-| **API Python** | `http://172.206.27.122:8083` | [Docs](http://172.206.27.122:8083/docs) | 8083 |
-| **WebSocket** | `ws://172.206.27.122:8080/ws-petdex` | - | 8080 |
+| **API Java** | `http://34.24.9.134:8080` | [Swagger](http://34.24.9.134:8080/swagger) | 8080 |
+| **API Python** | `http://34.24.9.134:8083` | [Docs](http://34.24.9.134:8083/docs) | 8083 |
+| **WebSocket** | `ws://34.24.9.134:8080/ws-petdex` | - | 8080 |
 
 **Rotas Principais:**
 

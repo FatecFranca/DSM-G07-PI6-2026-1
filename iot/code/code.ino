@@ -24,7 +24,7 @@ bool tokenObtido = false;
 
 // ============================================================
 
-const char* serverName = "http://172.206.27.122:8080";
+const char* serverName = "http://34.24.9.134:8080";
 const String coleiraId = "6819475baa479949daccea94";
 String animalId = "";
 
