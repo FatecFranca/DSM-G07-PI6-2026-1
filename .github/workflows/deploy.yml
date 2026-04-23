@@ -65,6 +65,7 @@ jobs:
 
             export TAG=${TAG}
             export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+            export DATABASE_URI=${{ secrets.DATABASE_URI }}
             export JWT_SECRET=${{ secrets.JWT_SECRET }}
             export BCRYPT_SALT=${{ secrets.BCRYPT_SALT }}
 
