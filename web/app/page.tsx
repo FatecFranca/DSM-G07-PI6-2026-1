@@ -1,14 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import NavBar from "@/components/ui/NavBar";
 import { FaUser } from "react-icons/fa";
 
 export default function Home() {
+  const [index, setIndex] = useState(0);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
+    <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-black pb-[85px]">
+      
+      <main className="flex flex-1 w-full max-w-3xl mx-auto flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
+        
         <Image
           className="dark:invert"
           src="/next.svg"
@@ -20,7 +26,6 @@ export default function Home() {
 
         <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left w-full">
           
-          {/* INPUT */}
           <Input
             label="Nome"
             hintText="Digite seu nome"
@@ -28,7 +33,6 @@ export default function Home() {
             onChange={(v) => console.log(v)}
           />
 
-          {/* BOTÃO */}
           <Button
             text="Meu botão"
             onClick={() => alert("Funcionou 🔥")}
@@ -84,6 +88,9 @@ export default function Home() {
           </a>
         </div>
       </main>
+
+      {/* NAVBAR */}
+      <NavBar currentIndex={index} onChange={setIndex} />
     </div>
   );
 }
