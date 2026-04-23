@@ -17,7 +17,8 @@ Esta é a API RESTful desenvolvida com **Java** e **Spring Boot**, responsável 
 - **WebSocket + STOMP** (Comunicação em Tempo Real)
 - **SockJS** (Fallback para navegadores sem suporte WebSocket)
 - **Swagger/OpenAPI** (Documentação)
-- **Azure** (Hospedagem da API)
+- **Google Cloud** (Hospedagem da API)
+- **Testes**
 
 ---
 
@@ -39,7 +40,7 @@ A estrutura do projeto é composta por:
 
 ## 📡 Endpoints
 
-A API está hospedada em um servidor **Azure** (Ubuntu, Standard B1ms) e pode ser acessada através do link:
+A API está hospedada em um servidor **Google Cloud** (Ubuntu) e pode ser acessada através do link:
 
 🔗 **API Base:** [http://34.24.9.134:8080](http://34.24.9.134:8080)
 
