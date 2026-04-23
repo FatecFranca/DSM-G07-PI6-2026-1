@@ -3,8 +3,13 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
   --color-primary: #F39200;
   --color-primary-active: #BF4904;
+
+  /* NavBar */
+  --color-orange-200: #D89042;
+  --color-sand-900: #F0D37B;
 }
 
 @theme inline {
