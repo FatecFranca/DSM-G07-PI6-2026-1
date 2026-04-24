@@ -9,12 +9,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      mongodb:
-        image: mongo:6.0
-        ports:
-          - 27017:27017
-
     steps:
       - name: 🧩 Checkout do repositório
         uses: actions/checkout@v4
@@ -26,33 +20,11 @@ jobs:
         run: |
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      - name: ☕ Configurar JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-          cache: 'maven'
-
-      - name: 🧪 Executar Testes da API Java
-        env:
-          spring.data.mongodb.uri: mongodb://localhost:27017/test
-          JWT_SECRET: petdex-secret-key-change-in-production
-          BCRYPT_SALT: 10
-        run: |
-          cd api-java
-          chmod +x mvnw
-          ./mvnw test -B -Dspring.autoconfigure.exclude=de.flapdoodle.embed.mongo.spring.autoconfigure.EmbeddedMongoAutoConfiguration
-      
-      - name: 📄 Mostrar logs de erro em caso de falha
-        if: failure()
-        run: |
-          find api-java/target/surefire-reports -name "*.txt" -exec cat {} +
-
       - name: 🏗️ Build e Push da API Java
         run: |
           cd api-java
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/api-java:${BRANCH_NAME} .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/api-java:${BRANCH_NAME}
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/api-java:${{ env.BRANCH_NAME }} .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/api-java:${{ env.BRANCH_NAME }}
 
       - name: 🐍 Build e Push da API Python
         run: |

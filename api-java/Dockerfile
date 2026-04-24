@@ -1,5 +1,8 @@
 FROM maven:3.9.6-eclipse-temurin-21 AS build
 
+# Instala dependências para o MongoDB embarcado (Flapdoodle)
+RUN apt-get update && apt-get install -y libssl-dev && rm -rf /var/lib/apt/lists/*
+
 COPY . .
 
 RUN ./mvnw clean package
