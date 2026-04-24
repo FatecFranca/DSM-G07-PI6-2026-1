@@ -31,7 +31,7 @@ jobs:
         run: |
           cd api-java
           chmod +x mvnw
-          ./mvnw test
+          ./mvnw test -B -Dspring.main.log-startup-info=true
 
       - name: 🏗️ Build e Push da API Java
         run: |
