@@ -9,7 +9,10 @@
 
   /* NavBar */
   --color-orange-200: #D89042;
+  --color-sand-100: #FBFBE1;
   --color-sand-900: #F0D37B;
+  --color-orange-900: #BF4904;
+  --color-brown: #754819;
 }
 
 @theme inline {
