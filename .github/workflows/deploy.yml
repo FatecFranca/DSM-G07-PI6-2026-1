@@ -36,6 +36,11 @@ jobs:
           cd api-java
           chmod +x mvnw
           ./mvnw test -B
+      
+      - name: 📄 Mostrar logs de erro em caso de falha
+        if: failure()
+        run: |
+          find api-java/target/surefire-reports -name "*.txt" -exec cat {} +
 
       - name: 🏗️ Build e Push da API Java
         run: |
