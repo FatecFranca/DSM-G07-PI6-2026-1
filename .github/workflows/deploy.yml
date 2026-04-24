@@ -28,10 +28,14 @@ jobs:
           cache: 'maven'
 
       - name: 🧪 Executar Testes da API Java
+        env:
+          DATABASE_URI: mongodb://localhost:27017/petdex
+          JWT_SECRET: petdex-secret-key-change-in-production
+          BCRYPT_SALT: 10
         run: |
           cd api-java
           chmod +x mvnw
-          ./mvnw test -B -Dspring.main.log-startup-info=true
+          ./mvnw test -B
 
       - name: 🏗️ Build e Push da API Java
         run: |

@@ -2,7 +2,7 @@ FROM maven:3.9.6-eclipse-temurin-21 AS build
 
 COPY . .
 
-RUN ./mvnw clean package
+RUN ./mvnw clean package -DskipTests
 
 FROM eclipse-temurin:21-jdk
 
