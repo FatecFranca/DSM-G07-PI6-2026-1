@@ -9,6 +9,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+
     steps:
       - name: 🧩 Checkout do repositório
         uses: actions/checkout@v4
@@ -29,13 +35,13 @@ jobs:
 
       - name: 🧪 Executar Testes da API Java
         env:
-          DATABASE_URI: mongodb://localhost:27017/petdex
+          spring.data.mongodb.uri: mongodb://localhost:27017/test
           JWT_SECRET: petdex-secret-key-change-in-production
           BCRYPT_SALT: 10
         run: |
           cd api-java
           chmod +x mvnw
-          ./mvnw test -B
+          ./mvnw test -B -Dspring.autoconfigure.exclude=de.flapdoodle.embed.mongo.spring.autoconfigure.EmbeddedMongoAutoConfiguration
       
       - name: 📄 Mostrar logs de erro em caso de falha
         if: failure()
