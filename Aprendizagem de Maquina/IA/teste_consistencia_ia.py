@@ -2,6 +2,13 @@ import pandas as pd
 import json
 import os
 
+# Esse arquivo serve para provar que a otimização funcionou
+# Ele roda o motor de recomendação na base antiga e na base nova.
+# Se os resultados forem iguais, ele prova que conseguimos eficiência
+# (menos dados) com a mesma eficácia (resultado correto).
+
+
+
 # Caminhos dos arquivos
 PATH_OTIMIZADO = os.path.join('Datasets Otimizados', 'base_ia_otimizada.csv')
 PATH_FOOD = os.path.join('pet-food-advice-api-main', 'db-food.json')

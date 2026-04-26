@@ -1,6 +1,13 @@
 import pandas as pd
 import os
 
+# Nesse arquivo ele basicamente é a "faxina" inicial. Ele pega os dados brutos 
+# (em inglês e medidas americanas) e os deixa prontos para o Brasil.
+# Ele converte Libras para Quilos e Milhas para Quilômetros. Além de criar a
+# coluna de porte do animal e calcula a RER (gasto calórico), garantindo que 
+# cães SRD também tenham dados técnicos para serem avaliados
+
+
 PATH_BASES = 'Base de Dados'
 
 try:

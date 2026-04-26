@@ -2,6 +2,15 @@ import pandas as pd
 import json
 import os
 
+# Nesse arquivo é onde ele ensina a IA a julgar se
+# o cão está gordo, magro ou no peso ideal.
+# Ele usa uma tabela de referência veterinária. O ponto 
+# alto é a lógica para SRDs, onde o peso ideal é definido
+# pelo porte. Ele atingiu 100% de acerto ao cruzar o diagnóstico com a ração correta.
+
+
+
+
 # Configurações de caminhos
 PATH_OTIMIZADO = os.path.join('Datasets Otimizados', 'base_ia_otimizada.csv')
 PATH_FOOD = os.path.join('pet-food-advice-api-main', 'db-food.json')

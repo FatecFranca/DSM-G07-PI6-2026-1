@@ -1,6 +1,12 @@
 import pandas as pd
 import os
 
+# Nesse arquivo ele reduz a complexidade. Ele joga fora o que é "ruído" e mantém só o que importa.
+# Foi reduzido o dataset de 21 para 6 colunas essenciais. Isso faz com que a IA processe
+# as informações de forma muito mais rápida (72% de redução de volume) sem perder a inteligência
+
+
+
 # --- DEFINIÇÃO DOS CAMINHOS ---
 # Onde está o arquivo original bruto
 ARQUIVO_ORIGINAL = os.path.join('Base de Dados', 'synthetic_dog_breed_health_data.csv')
@@ -8,7 +14,7 @@ ARQUIVO_ORIGINAL = os.path.join('Base de Dados', 'synthetic_dog_breed_health_dat
 # Onde está o arquivo que tratamos antes
 ARQUIVO_TRATADO = os.path.join('Datasets Tratados', 'dataset_petdex_final_PT.csv')
 
-# Onde vamos salvar a base ultra-enxuta para a IA
+# Onde salva a base ultra-enxuta para a IA
 PASTA_SAIDA = 'Datasets Otimizados'
 
 def otimizar_base():
