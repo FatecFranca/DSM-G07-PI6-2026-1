@@ -17,6 +17,7 @@ from pydantic import BaseModel
 from typing import Optional
 import math
 import os
+from app.services import recomendacao_ia
 
 app = FastAPI(
     title="API PetDex - Estatísticas",
@@ -738,3 +739,30 @@ async def predizer_batimento(
     )
 
     return {"frequencia_prevista": round(frequencia_prevista, 2), "funcao_usada": resultado["funcao_regressao"]}
+
+@app.get("/animal/{animalId}/ia-recomendacao", tags=["IA - Recomendação"])
+async def obter_recomendacao_ia(
+    animalId: str, 
+    credentials: Tuple[str, str] = Depends(get_current_user)
+):
+    """
+    Rota que integra a inteligência de peso ideal com os dados reais do animal.
+    """
+    _, token = credentials
+    
+    # 1. Extrai informações do animal usando a função que já existe no java_api.py
+    dados_animal = await java_api.buscar_dados_animal(animalId, token)
+    
+    if not dados_animal:
+        raise HTTPException(status_code=404, detail="Animal não encontrado na base PetDex.")
+
+    # 2. Chama a inteligência de predição
+    resultado = recomendacao_ia.gerar_sugestao_nutricional(dados_animal)
+    
+    return {
+        "animalId": animalId,
+        "nome": dados_animal.get("nome"),
+        "diagnostico": resultado["status_corporal"],
+        "peso_ideal_esperado": resultado["peso_referencia"],
+        "sugestoes_racao": resultado["recomendacoes"]
+    }
