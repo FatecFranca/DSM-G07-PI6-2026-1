@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import MapView from "./MapView";
 import MapOverlay from "./MapOverlay";
 import MapActions from "./MapActions";
-import {
-  getUltimaLocalizacaoAnimal,
-} from "@/services/locationService";
+import { getUltimaLocalizacaoAnimal } from "@/services/locationService";
 import { authService } from "@/services/authService";
+import {
+  connectWebSocket,
+  subscribe,
+} from "@/services/websocketService";
 
 export default function MapScreen() {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -35,9 +37,7 @@ export default function MapScreen() {
       setLat(location.latitude);
       setLng(location.longitude);
 
-      // 🔜 depois vamos calcular área segura aqui
       setIsOutsideSafeZone(false);
-
     } catch {
       setError("Erro ao carregar localização");
     } finally {
@@ -57,6 +57,25 @@ export default function MapScreen() {
           );
         }
 
+        const token = authService.getToken();
+
+        connectWebSocket();
+
+        subscribe((data) => {
+          if (data.animalId !== animalId) return;
+
+          if (data.tipo === "localizacao") {
+            console.log("📍 Localização atualizada:", data);
+
+            setLat(data.latitude);
+            setLng(data.longitude);
+          }
+
+          if (data.tipo === "batimento") {
+            console.log("❤️ BPM atualizado:", data.frequenciaMedia);
+          }
+        });
+
         await loadLocation();
       } catch (e) {
         console.error("Erro init:", e);
@@ -70,8 +89,6 @@ export default function MapScreen() {
 
   return (
     <div className="w-full h-screen relative overflow-hidden">
-      
-      {/* MAPA */}
       {lat && lng && (
         <MapView
           lat={lat}
@@ -80,7 +97,6 @@ export default function MapScreen() {
         />
       )}
 
-      {/* OVERLAY */}
       <MapOverlay
         isLoaded={isLoaded}
         isLoadingLocation={isLoadingLocation}
@@ -88,7 +104,6 @@ export default function MapScreen() {
         isOutsideSafeZone={isOutsideSafeZone}
       />
 
-      {/* AÇÕES */}
       <div className="absolute right-4 z-40 bottom-[200px] sm:bottom-[160px] md:bottom-28">
         <MapActions onRefresh={loadLocation} />
       </div>
