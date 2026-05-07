@@ -11,7 +11,13 @@ import {
   subscribe,
 } from "@/services/websocketService";
 
-export default function MapScreen() {
+interface MapScreenProps {
+  setLastBpm: (bpm: number) => void;
+}
+
+export default function MapScreen({
+  setLastBpm,
+}: MapScreenProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isLoadingLocation, setIsLoadingLocation] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +33,11 @@ export default function MapScreen() {
       setIsLoadingLocation(true);
       setError(null);
 
+      console.log("📡 Buscando localização inicial...");
+
       const location = await getUltimaLocalizacaoAnimal(animalId);
+
+      console.log("📍 Localização recebida API:", location);
 
       if (!location) {
         setError("Nenhuma localização encontrada");
@@ -38,7 +48,9 @@ export default function MapScreen() {
       setLng(location.longitude);
 
       setIsOutsideSafeZone(false);
-    } catch {
+    } catch (e) {
+      console.error("❌ Erro loadLocation:", e);
+
       setError("Erro ao carregar localização");
     } finally {
       setIsLoadingLocation(false);
@@ -48,37 +60,68 @@ export default function MapScreen() {
   useEffect(() => {
     async function init() {
       try {
+        console.log("🚀 Iniciando MapScreen...");
+
         authService.init();
 
         if (!authService.isAuthenticated()) {
+          console.log("🔐 Fazendo login...");
+
           await authService.login(
             "henriquealmeidaflorentino@gmail.com",
             "senha123"
           );
         }
 
-        const token = authService.getToken();
+        console.log("🔑 Token carregado");
 
         connectWebSocket();
 
         subscribe((data) => {
-          if (data.animalId !== animalId) return;
+          console.log("📩 WS RAW:", data);
 
-          if (data.tipo === "localizacao") {
-            console.log("📍 Localização atualizada:", data);
+          const wsAnimalId =
+            data.animalId ||
+            data.animal ||
+            data?.payload?.animal;
+
+          console.log("🆔 Animal WS:", wsAnimalId);
+          console.log("🆔 Animal esperado:", animalId);
+
+          if (wsAnimalId !== animalId) {
+            console.log("⛔ Ignorado por animalId diferente");
+            return;
+          }
+
+          // LOCALIZAÇÃO
+          if (
+            data.tipo === "localizacao" ||
+            data.latitude
+          ) {
+            console.log("📍 Atualizando mapa realtime");
 
             setLat(data.latitude);
             setLng(data.longitude);
           }
 
-          if (data.tipo === "batimento") {
-            console.log("❤️ BPM atualizado:", data.frequenciaMedia);
+          // BATIMENTO
+          if (
+            data.tipo === "batimento" ||
+            data.frequenciaMedia
+          ) {
+            console.log(
+              "❤️ BPM atualizado realtime:",
+              data.frequenciaMedia
+            );
+
+            setLastBpm(data.frequenciaMedia);
           }
         });
 
         await loadLocation();
       } catch (e) {
-        console.error("Erro init:", e);
+        console.error("❌ Erro init:", e);
+
         setError("Erro ao inicializar");
         setIsLoadingLocation(false);
       }

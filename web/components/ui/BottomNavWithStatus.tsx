@@ -6,31 +6,47 @@ import NavBar from "./NavBar";
 interface Props {
   currentIndex: number;
   onChange: (index: number) => void;
+
+
+  lastBpm?: number | null;
 }
 
 export default function BottomNavWithStatus({
   currentIndex,
   onChange,
+  lastBpm,
 }: Props) {
   return (
     <>
-      {/* 📱 MOBILE (PERFEITO - mantém igual) */}
+      {/* 📱 MOBILE */}
       <div className="fixed bottom-0 left-0 w-full flex flex-col md:hidden z-50">
-        <StatusBar isConnected={true} animalName="Uno" />
-        <NavBar currentIndex={currentIndex} onChange={onChange} />
+        <StatusBar
+          isConnected={true}
+          animalName="Uno"
+          lastBpm={lastBpm ?? undefined}
+        />
+
+        <NavBar
+          currentIndex={currentIndex}
+          onChange={onChange}
+        />
       </div>
 
-      {/* 💻 DESKTOP (CORRIGIDO) */}
+      {/* 💻 DESKTOP */}
       <div className="hidden md:block">
-        
-        {/* STATUS BAR lateral, MAS grudada embaixo */}
         <div className="fixed bottom-[85px] left-0 w-[280px] z-40">
-          <StatusBar isConnected={true} animalName="Uno" />
+          <StatusBar
+            isConnected={true}
+            animalName="Uno"
+            lastBpm={lastBpm ?? undefined}
+          />
         </div>
 
-        {/* NAVBAR embaixo */}
         <div className="fixed bottom-0 left-0 w-full z-50">
-          <NavBar currentIndex={currentIndex} onChange={onChange} />
+          <NavBar
+            currentIndex={currentIndex}
+            onChange={onChange}
+          />
         </div>
       </div>
     </>

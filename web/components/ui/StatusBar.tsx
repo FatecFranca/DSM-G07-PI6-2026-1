@@ -26,7 +26,6 @@ export default function StatusBar({
   lastBpm,
   battery = 96,
 }: StatusBarProps) {
-  console.log("❤️ BPM recebido:", lastBpm);
 
   const [isExpanded, setIsExpanded] = useState(false);
 
