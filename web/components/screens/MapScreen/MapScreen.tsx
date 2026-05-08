@@ -58,6 +58,8 @@ export default function MapScreen({
   }
 
   useEffect(() => {
+    let unsubscribe: (() => void) | undefined;
+
     async function init() {
       try {
         console.log("🚀 Iniciando MapScreen...");
@@ -75,15 +77,18 @@ export default function MapScreen({
 
         console.log("🔑 Token carregado");
 
-        connectWebSocket();
+        connectWebSocket(animalId);
 
-        subscribe((data) => {
+        unsubscribe = subscribe((data) => {
           console.log("📩 WS RAW:", data);
 
+          const payload = data.payload || data;
+
           const wsAnimalId =
+            payload.animalId ||
+            payload.animal ||
             data.animalId ||
-            data.animal ||
-            data?.payload?.animal;
+            data.animal;
 
           console.log("🆔 Animal WS:", wsAnimalId);
           console.log("🆔 Animal esperado:", animalId);
@@ -95,26 +100,32 @@ export default function MapScreen({
 
           // LOCALIZAÇÃO
           if (
-            data.tipo === "localizacao" ||
-            data.latitude
+            payload.tipo === "localizacao" ||
+            payload.latitude !== undefined
           ) {
             console.log("📍 Atualizando mapa realtime");
 
-            setLat(data.latitude);
-            setLng(data.longitude);
+            setLat(payload.latitude);
+            setLng(payload.longitude);
+
+            if (payload.isOutsideSafeZone !== undefined) {
+              setIsOutsideSafeZone(payload.isOutsideSafeZone);
+            } else if (payload.foraDaAreaSegura !== undefined) {
+              setIsOutsideSafeZone(payload.foraDaAreaSegura);
+            }
           }
 
           // BATIMENTO
           if (
-            data.tipo === "batimento" ||
-            data.frequenciaMedia
+            payload.tipo === "batimento" ||
+            payload.frequenciaMedia !== undefined
           ) {
             console.log(
               "❤️ BPM atualizado realtime:",
-              data.frequenciaMedia
+              payload.frequenciaMedia
             );
 
-            setLastBpm(data.frequenciaMedia);
+            setLastBpm(payload.frequenciaMedia);
           }
         });
 
@@ -128,6 +139,12 @@ export default function MapScreen({
     }
 
     init();
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, []);
 
   return (

@@ -6,13 +6,25 @@ import MapScreen from "@/components/screens/MapScreen/MapScreen";
 import BottomNavWithStatus from "@/components/ui/BottomNavWithStatus";
 
 import { getAnimalData } from "@/services/animalService";
+import { subscribeConnection } from "@/services/websocketService";
 
 export default function AppShell() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const [lastBpm, setLastBpm] = useState<number | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
 
   const animalId = "68194120636f719fcd5ee5fd";
+
+  useEffect(() => {
+    const unsubscribeConnection = subscribeConnection((status) => {
+      setIsConnected(status);
+    });
+
+    return () => {
+      unsubscribeConnection();
+    };
+  }, []);
 
   useEffect(() => {
     async function loadAnimal() {
@@ -52,6 +64,7 @@ export default function AppShell() {
         currentIndex={currentIndex}
         onChange={setCurrentIndex}
         lastBpm={lastBpm}
+        isConnected={isConnected}
       />
     </div>
   );

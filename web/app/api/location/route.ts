@@ -31,6 +31,7 @@ export async function GET(req: Request) {
       headers: {
         Authorization: authHeader,
       },
+      cache: "no-store",
     });
 
     if (!res.ok) {

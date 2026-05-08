@@ -8,8 +8,13 @@ let client: Client;
 type Callback = (data: any) => void;
 
 const listeners: Callback[] = [];
+const connectionListeners: ((isConnected: boolean) => void)[] = [];
 
-export function connectWebSocket() {
+function notifyConnection(status: boolean) {
+  connectionListeners.forEach((cb) => cb(status));
+}
+
+export function connectWebSocket(animalId: string) {
   if (client?.active) {
     console.log("🟡 WebSocket já conectado");
     return;
@@ -24,10 +29,11 @@ export function connectWebSocket() {
     reconnectDelay: 5000,
 
     onConnect: () => {
+      notifyConnection(true);
       console.log("🟢 STOMP conectado");
-      console.log("📡 Inscrito em /topic/petdex");
+      console.log(`📡 Inscrito em /topic/animal/${animalId}`);
 
-      client.subscribe("/topic/petdex", (message) => {
+      client.subscribe(`/topic/animal/${animalId}`, (message) => {
         try {
           const data = JSON.parse(message.body);
 
@@ -45,10 +51,12 @@ export function connectWebSocket() {
     },
 
     onDisconnect: () => {
+      notifyConnection(false);
       console.log("🔴 STOMP desconectado");
     },
 
     onWebSocketClose: () => {
+      notifyConnection(false);
       console.log("🔌 WebSocket fechado");
     },
 
@@ -64,4 +72,24 @@ export function subscribe(callback: Callback) {
   listeners.push(callback);
 
   console.log("👂 Novo listener registrado");
+
+  return () => {
+    const index = listeners.indexOf(callback);
+    if (index > -1) {
+      listeners.splice(index, 1);
+      console.log("🔇 Listener removido");
+    }
+  };
+}
+
+export function subscribeConnection(callback: (isConnected: boolean) => void) {
+  connectionListeners.push(callback);
+  callback(client?.active ?? false);
+
+  return () => {
+    const index = connectionListeners.indexOf(callback);
+    if (index > -1) {
+      connectionListeners.splice(index, 1);
+    }
+  };
 }
