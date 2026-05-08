@@ -23,37 +23,37 @@ public class TelemetrySubscriberAsync implements CommandLineRunner {
 
     public void run(String... args) throws Exception {
         String subscriptionId = "petdex-telemetry-sub";
-        //subscribeAsync(this.projectId, subscriptionId);
+        subscribeAsync(this.projectId, subscriptionId);
     }
 
-//    private void subscribeAsync(String projectId, String subscriptionId) {
-//        ProjectSubscriptionName subscriptionName = ProjectSubscriptionName.of(projectId, subscriptionId);
-//
-//        MessageReceiver receiver = (PubsubMessage message, AckReplyConsumer consumer) -> {
-//            String data = message.getData().toStringUtf8();
-//            System.out.println("ACK: " + data);
-//            if(!telemetrySubscriber.receiveMessage(data)) {
-//                consumer.ack();
-//            }
-//
-//            consumer.ack();
-//        };
-//
-//        Subscriber subscriber = null;
-//        try {
-//            subscriber = Subscriber.newBuilder(subscriptionName, receiver).build();
-//            subscriber.startAsync().awaitRunning();
-//            System.out.println("Escutando mensagem: " + subscriptionName);
-//            try {
-//                Thread.currentThread().join();
-//            } catch (InterruptedException e) {
-//                Thread.currentThread().interrupt();
-//                System.err.println("Thread interrompido: " + e.getMessage());
-//            }
-//        } catch (Exception exception) {
-//            if (subscriber != null) {
-//                subscriber.stopAsync();
-//            }
-//        }
-//    }
+    private void subscribeAsync(String projectId, String subscriptionId) {
+        ProjectSubscriptionName subscriptionName = ProjectSubscriptionName.of(projectId, subscriptionId);
+
+        MessageReceiver receiver = (PubsubMessage message, AckReplyConsumer consumer) -> {
+            String data = message.getData().toStringUtf8();
+            System.out.println("ACK: " + data);
+            if(!telemetrySubscriber.receiveMessage(data)) {
+                consumer.ack();
+            }
+
+            consumer.ack();
+        };
+
+        Subscriber subscriber = null;
+        try {
+            subscriber = Subscriber.newBuilder(subscriptionName, receiver).build();
+            subscriber.startAsync().awaitRunning();
+            System.out.println("Escutando mensagem: " + subscriptionName);
+            try {
+                Thread.currentThread().join();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                System.err.println("Thread interrompido: " + e.getMessage());
+            }
+        } catch (Exception exception) {
+            if (subscriber != null) {
+                subscriber.stopAsync();
+            }
+        }
+    }
 }

@@ -2,7 +2,7 @@ package com.petdex.api.infrastructure.messaging;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.petdex.api.application.services.mensageria.subscriber.SubscriberService; 
+import com.petdex.api.application.services.mensageria.subscriber.TelemetrySubscriberService;
 import com.petdex.api.domain.contracts.dto.batimento.BatimentoMensageriaReqDTO;
 import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoMensageriaReqDTO;
 import com.petdex.api.domain.contracts.dto.movimento.MovimentoMensageriaReqDTO;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class TelemetrySubscriber {
 
     private final ObjectMapper mapper;
-    private final SubscriberService subscriberService;
+    private final TelemetrySubscriberService telemetrySubscriberService;
 
 
     public Boolean receiveMessage(String message) {
@@ -35,18 +35,15 @@ public class TelemetrySubscriber {
             switch (type) {
                 case HEART_RATE:
                     BatimentoMensageriaReqDTO batimento = mapper.treeToValue(mensagemNode, BatimentoMensageriaReqDTO.class);
-                    subscriberService.processarBatimento(batimento);
-                    return true;
+                    return telemetrySubscriberService.processarBatimento(batimento);
 
                 case LOCATION:
                     LocalizacaoMensageriaReqDTO localizacao = mapper.treeToValue(mensagemNode, LocalizacaoMensageriaReqDTO.class);
-                    subscriberService.processarLocalizacao(localizacao);
-                    return true;
+                    return telemetrySubscriberService.processarLocalizacao(localizacao);
 
                 case MOVEMENT:
                     MovimentoMensageriaReqDTO movimento = mapper.treeToValue(mensagemNode, MovimentoMensageriaReqDTO.class);
-                    subscriberService.processarMovimento(movimento);
-                    return true;
+                    return telemetrySubscriberService.processarMovimento(movimento);
 
                 default:
                     throw new IllegalArgumentException("Tipo de mensagem desconhecido" + type);
