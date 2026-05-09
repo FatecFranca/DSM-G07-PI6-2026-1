@@ -13,7 +13,10 @@ import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoResDTO;
 import com.petdex.api.domain.contracts.dto.movimento.MovimentoMensageriaReqDTO;
 import com.petdex.api.domain.contracts.dto.movimento.MovimentoReqDTO;
 import com.petdex.api.domain.contracts.dto.movimento.MovimentoResDTO;
+import com.petdex.api.infrastructure.messaging.TelemetrySubscriber;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,17 +27,18 @@ public class ImplTelemetrySubscriberService implements TelemetrySubscriberServic
     private final BatimentoService batimentoService;
     private final LocalizacaoService localizacaoService;
     private final MovimentoService movimentoService;
+    private static final Logger logger = LoggerFactory.getLogger(ImplTelemetrySubscriberService.class);
 
     @Override
     public boolean processarBatimento(BatimentoMensageriaReqDTO batimentoDTO) {
-        System.out.println("[Telemetry Sub Service] Batimento recebido: " + batimentoDTO);
+        logger.info("[Telemetry Sub Service] Batimento recebido: {}", batimentoDTO);
         try {
             BatimentoResDTO batimentoSalvo = batimentoService.save(mapper.convertValue(batimentoDTO, BatimentoReqDTO.class));
             if (batimentoSalvo == null) {
-                System.out.println("[Telemetry Sub Service] ERRO: localizacao não foi cadastrado");
+                logger.error("[Telemetry Sub Service] ERRO: batimento não foi cadastrado");
                 return false;
             }
-            System.out.println("[Telemetry Sub Service] Sucesso: Batimento cadastrado!");
+            logger.info("[Telemetry Sub Service] Sucesso: Batimento cadastrado!");
             return true;
         } catch (Exception exception) {
             return false;
@@ -43,14 +47,14 @@ public class ImplTelemetrySubscriberService implements TelemetrySubscriberServic
 
     @Override
     public boolean processarLocalizacao(LocalizacaoMensageriaReqDTO localizacaoDTO) {
-        System.out.println("[Telemetry Sub Service] Localizacao recebida: " + localizacaoDTO);
+        logger.info("[Telemetry Sub Service] Localizacao recebida: {}", localizacaoDTO);
         try {
             LocalizacaoResDTO localizacaoSalva = localizacaoService.save(mapper.convertValue(localizacaoDTO, LocalizacaoReqDTO.class));
             if (localizacaoSalva == null) {
-                System.out.println("[Telemetry Sub Service] ERRO: localizacao não foi cadastrado");
+                logger.error("[Telemetry Sub Service] ERRO: localizacao não foi cadastrado");
                 return false;
             }
-            System.out.println("[Telemetry Sub Service] Sucesso: Localizacao cadastrada!");
+            logger.info("[Telemetry Sub Service] Sucesso: Localizacao cadastrada!");
             return true;
         } catch (Exception exception) {
             return false;
@@ -60,14 +64,14 @@ public class ImplTelemetrySubscriberService implements TelemetrySubscriberServic
     @Override
     public boolean processarMovimento(MovimentoMensageriaReqDTO movimentoDTO) {
 
-        System.out.println("[Telemetry Sub Service] Dados de movimento recebido: " + movimentoDTO);
+        logger.info("[Telemetry Sub Service] Dados de movimento recebido: {}", movimentoDTO);
         try {
             MovimentoResDTO movimentoSalvo = movimentoService.save(mapper.convertValue(movimentoDTO, MovimentoReqDTO.class));
             if (movimentoSalvo == null) {
-                System.out.println("[Telemetry Sub Service] ERRO: Dados de movimento não foram cadastrados");
+                logger.error("[Telemetry Sub Service] ERRO: Dados de movimento não foram cadastrados");
                 return false;
             }
-            System.out.println("[Telemetry Sub Service] Sucesso: Movimento cadastrado!");
+            logger.info("[Telemetry Sub Service] Sucesso: Movimento cadastrado!");
             return true;
         } catch (Exception exception) {
             return false;

@@ -8,7 +8,10 @@ import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoMensageriaReqD
 import com.petdex.api.domain.contracts.dto.movimento.MovimentoMensageriaReqDTO;
 import com.petdex.api.domain.contracts.enums.TelemetryTypeEnum;
 import lombok.AllArgsConstructor;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
+
 
 @AllArgsConstructor
 @Service
@@ -16,17 +19,18 @@ public class TelemetrySubscriber {
 
     private final ObjectMapper mapper;
     private final TelemetrySubscriberService telemetrySubscriberService;
-
+    private static final Logger logger = LoggerFactory.getLogger(TelemetrySubscriber.class);
 
     public Boolean receiveMessage(String message) {
         try {
 
-            System.out.println("[MensagemSerive] Menssagem recebida: " + message);
+            logger.info("[Telemetry Subcriber] Menssagem recebida: {}", message);
             JsonNode mensagemNode = mapper.readTree(message);
             JsonNode typeNode = mensagemNode.get("type");
 
             if (typeNode == null) {
-                throw new IllegalArgumentException("Campo ´type´ não informado");
+                logger.error("[Telemetry Subcriber] Campo type não informado na mensagem");
+                throw new IllegalArgumentException("[Telemetry Subcriber] Campo ´type´ não informado na mensagem");
             }
 
             String typeString = typeNode.asText();
@@ -46,10 +50,12 @@ public class TelemetrySubscriber {
                     return telemetrySubscriberService.processarMovimento(movimento);
 
                 default:
+                    logger.error("[Telemetry Subcriber] Tipo da mensagem desconhecido {}", type);
                     throw new IllegalArgumentException("Tipo de mensagem desconhecido" + type);
             }
 
         } catch (Exception e) {
+            logger.error("[Telemetry Subcriber] Erro ao processar mensagem {}", e.getMessage());
            throw new RuntimeException("Erro ao processar a mensagem: ", e);
         }
     }
