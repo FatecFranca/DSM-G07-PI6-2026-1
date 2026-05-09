@@ -20,7 +20,7 @@ import java.util.Optional;
 public class AreaSeguraServiceTest {
 
     @InjectMocks
-    private AreaSeguraService service;
+    private ImplAreaSeguraService service;
 
     @Mock
     private AreaSeguraRepository repository;

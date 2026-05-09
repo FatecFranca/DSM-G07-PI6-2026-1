@@ -1,6 +1,6 @@
 package com.petdex.api.view;
 
-import com.petdex.api.application.services.coleira.IColeiraService;
+import com.petdex.api.application.services.coleira.ColeiraService;
 import com.petdex.api.domain.contracts.dto.PageDTO;
 import com.petdex.api.domain.contracts.dto.coleira.ColeiraReqDTO;
 import com.petdex.api.domain.contracts.dto.coleira.ColeiraResDTO;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 public class ColeiraController {
 
     @Autowired
-    IColeiraService coleiraService;
+    private ColeiraService coleiraService;
 
     @Operation(
             summary = "Consultar coleira",

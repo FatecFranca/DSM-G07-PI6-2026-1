@@ -1,6 +1,6 @@
 package com.petdex.api.view;
 
-import com.petdex.api.application.services.usuario.IUsuarioService;
+import com.petdex.api.application.services.usuario.UsuarioService;
 import com.petdex.api.domain.contracts.dto.PageDTO;
 import com.petdex.api.domain.contracts.dto.usuario.UsuarioReqDTO;
 import com.petdex.api.domain.contracts.dto.usuario.UsuarioResDTO;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 public class UsuarioController {
 
     @Autowired
-    IUsuarioService usuarioService;
+    private UsuarioService usuarioService;
 
     @Operation(
             summary = "Consultar usuário",

@@ -1,6 +1,6 @@
 package com.petdex.api.view;
 
-import com.petdex.api.application.services.animal.IAnimalService;
+import com.petdex.api.application.services.animal.AnimalService;
 import com.petdex.api.domain.contracts.dto.PageDTO;
 import com.petdex.api.domain.contracts.dto.animal.AnimalReqDTO;
 import com.petdex.api.domain.contracts.dto.animal.AnimalResDTO;
@@ -33,7 +33,7 @@ import java.util.Optional;
 public class AnimalController {
 
     @Autowired
-    IAnimalService animalService;
+    AnimalService animalService;
 
     @Operation(
             summary = "Buscar animal por ID",

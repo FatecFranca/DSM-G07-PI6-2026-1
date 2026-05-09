@@ -24,7 +24,7 @@ import java.util.Optional;
 public class LocalizacaoServiceTest {
 
     @InjectMocks
-    private LocalizacaoService service;
+    private ImplLocalizacaoService service;
 
     @Mock
     private LocalizacaoRepository repository;

@@ -22,7 +22,7 @@ import java.util.Optional;
 public class BatimentoServiceTest {
 
     @InjectMocks
-    private BatimentoService service;
+    private ImplBatimentoService service;
 
     @Mock
     private BatimentoRepository repository;

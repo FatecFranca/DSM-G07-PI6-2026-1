@@ -27,7 +27,7 @@ import java.util.Optional;
 public class AnimalServiceTest {
 
     @InjectMocks
-    private AnimalService service;
+    private ImplAnimalService service;
 
     @Mock
     private AnimalRepository animalRepository;

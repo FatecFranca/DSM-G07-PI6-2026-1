@@ -1,6 +1,6 @@
 package com.petdex.api.view;
 
-import com.petdex.api.application.services.movimento.IMovimentoService;
+import com.petdex.api.application.services.movimento.MovimentoService;
 import com.petdex.api.domain.contracts.dto.movimento.MovimentoReqDTO;
 import com.petdex.api.domain.contracts.dto.movimento.MovimentoResDTO;
 import com.petdex.api.domain.contracts.dto.PageDTO;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/movimentos")
 public class MovimentoController {
     @Autowired
-    private IMovimentoService movimentoService;
+    private MovimentoService movimentoService;
 
     @Operation(
             summary = "Consultar movimento",

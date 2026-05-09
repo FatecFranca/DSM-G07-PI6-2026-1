@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 public class RacaController {
 
     @Autowired
-    RacaService racaService;
+    private RacaService racaService;
 
     @Operation(
             summary = "Consultar raça",

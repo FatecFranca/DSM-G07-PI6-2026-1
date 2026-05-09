@@ -1,6 +1,6 @@
 package com.petdex.api.view;
 
-import com.petdex.api.application.services.especie.IEspecieService;
+import com.petdex.api.application.services.especie.EspecieService;
 import com.petdex.api.domain.contracts.dto.PageDTO;
 import com.petdex.api.domain.contracts.dto.especie.EspecieReqDTO;
 import com.petdex.api.domain.contracts.dto.especie.EspecieResDTO;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 public class EspecieController {
 
     @Autowired
-    IEspecieService especieService;
+    private EspecieService especieService;
 
     @Operation(
             summary = "Consultar espécie",

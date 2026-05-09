@@ -1,6 +1,6 @@
 package com.petdex.api.view;
 
-import com.petdex.api.application.services.areasegura.IAreaSeguraService;
+import com.petdex.api.application.services.areasegura.AreaSeguraService;
 import com.petdex.api.domain.contracts.dto.areasegura.AreaSeguraReqDTO;
 import com.petdex.api.domain.contracts.dto.areasegura.AreaSeguraResDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,7 +27,7 @@ import java.util.Optional;
 public class AreaSeguraController {
 
     @Autowired
-    private IAreaSeguraService areaSeguraService;
+    private AreaSeguraService areaSeguraService;
 
     @Operation(
             summary = "Criar ou atualizar área segura de um animal",
