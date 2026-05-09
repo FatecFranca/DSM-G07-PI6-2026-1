@@ -162,3 +162,11 @@
     *** *(...);
 }
 
+# ============================================================================
+# Google Maps SDK - CRÍTICO PARA NÃO FICAR TELA BRANCA NO RELEASE
+# ============================================================================
+-keep class com.google.android.gms.maps.** { *; }
+-keep interface com.google.android.gms.maps.** { *; }
+-keep class com.google.maps.android.** { *; }
+-keep interface com.google.maps.android.** { *; }
+
