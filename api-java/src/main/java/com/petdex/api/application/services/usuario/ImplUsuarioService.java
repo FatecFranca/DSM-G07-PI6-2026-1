@@ -1,10 +1,10 @@
 package com.petdex.api.application.services.usuario;
 
-import com.petdex.api.application.services.security.PasswordService;
+import com.petdex.api.application.services.security.EncryptionService;
 import com.petdex.api.domain.collections.Usuario;
-import com.petdex.api.domain.contracts.dto.PageDTO;
-import com.petdex.api.domain.contracts.dto.usuario.UsuarioReqDTO;
-import com.petdex.api.domain.contracts.dto.usuario.UsuarioResDTO;
+import com.petdex.api.application.contracts.dto.PageDTO;
+import com.petdex.api.application.contracts.dto.usuario.UsuarioReqDTO;
+import com.petdex.api.application.contracts.dto.usuario.UsuarioResDTO;
 import com.petdex.api.infrastructure.exception.ConflictException;
 import com.petdex.api.infrastructure.mongodb.UsuarioRepository;
 import org.modelmapper.ModelMapper;
@@ -29,7 +29,7 @@ public class ImplUsuarioService implements UsuarioService {
     UsuarioRepository usuarioRepository;
 
     @Autowired
-    PasswordService passwordService;
+    EncryptionService encryptionService;
 
     @Override
     public UsuarioResDTO findById(String id) {
@@ -59,7 +59,7 @@ public class ImplUsuarioService implements UsuarioService {
 
         // Criptografa a senha antes de salvar
         Usuario usuario = mapper.map(usuarioReqDTO, Usuario.class);
-        usuario.setSenha(passwordService.hashPassword(usuarioReqDTO.getSenha()));
+        usuario.setSenha(encryptionService.hashPassword(usuarioReqDTO.getSenha()));
 
         return mapper.map(usuarioRepository.save(usuario), UsuarioResDTO.class);
     }
@@ -75,7 +75,7 @@ public class ImplUsuarioService implements UsuarioService {
         if (usuarioReqDTO.getCpf() != null) usuarioUpdate.setCpf(usuarioReqDTO.getCpf());
         if (usuarioReqDTO.getEmail() != null) usuarioUpdate.setEmail(usuarioReqDTO.getEmail());
         // Criptografa a senha antes de atualizar
-        if (usuarioReqDTO.getSenha() != null) usuarioUpdate.setSenha(passwordService.hashPassword(usuarioReqDTO.getSenha()));
+        if (usuarioReqDTO.getSenha() != null) usuarioUpdate.setSenha(encryptionService.hashPassword(usuarioReqDTO.getSenha()));
         if (usuarioReqDTO.getNome() != null) usuarioUpdate.setNome(usuarioReqDTO.getNome());
         if (usuarioReqDTO.getWhatsApp() != null) usuarioUpdate.setWhatsApp(usuarioReqDTO.getWhatsApp());
 

@@ -1,6 +1,6 @@
 package com.petdex.api.infrastructure.security;
 
-import com.petdex.api.application.services.security.JwtService;
+import com.petdex.api.application.services.security.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +24,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     @Autowired
-    private JwtService jwtService;
+    private TokenService tokenService;
 
 
     @Override
@@ -45,8 +45,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwt = authHeader.substring(7);
 
         try {
-            if (jwtService.validateToken(jwt)) {
-                userId = jwtService.extractUserId(jwt);
+            if (tokenService.validateToken(jwt)) {
+                userId = tokenService.extractUserId(jwt);
 
                 if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(

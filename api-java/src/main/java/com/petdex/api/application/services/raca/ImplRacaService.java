@@ -2,14 +2,13 @@ package com.petdex.api.application.services.raca;
 
 import com.petdex.api.domain.collections.Especie;
 import com.petdex.api.domain.collections.Raca;
-import com.petdex.api.domain.contracts.dto.PageDTO;
-import com.petdex.api.domain.contracts.dto.raca.RacaReqDTO;
-import com.petdex.api.domain.contracts.dto.raca.RacaResDTO;
+import com.petdex.api.application.contracts.dto.PageDTO;
+import com.petdex.api.application.contracts.dto.raca.RacaReqDTO;
+import com.petdex.api.application.contracts.dto.raca.RacaResDTO;
 import com.petdex.api.infrastructure.mongodb.EspecieRepository;
 import com.petdex.api.infrastructure.mongodb.RacaRepository;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
@@ -18,8 +17,6 @@ import java.util.List;
 
 @Service
 public class ImplRacaService implements RacaService {
-    
-    private static final Logger logger = LoggerFactory.getLogger(ImplRacaService.class);
 
     @Autowired
     ModelMapper mapper;
@@ -73,21 +70,30 @@ public class ImplRacaService implements RacaService {
     @Override
     public Page<RacaResDTO> findAllByEspecieId(String especieId, PageDTO pageDTO) {
 
+        // Buscar TODAS as raças do banco
         List<Raca> todasRacas = racaRepository.findAll();
 
-        logger.info("Filtrando raças para a espécie: {}. Total no banco: {}", especieId, todasRacas.size());
+        System.out.println("=== DEBUG FILTRO MANUAL POR ESPECIE ===");
+        System.out.println("ID da Espécie buscado: '" + especieId + "'");
+        System.out.println("Total de raças no banco: " + todasRacas.size());
 
+        // Filtrar manualmente as raças que pertencem à espécie
         List<Raca> racasFiltradas = todasRacas.stream()
                 .filter(raca -> {
                     boolean match = raca.getEspecie() != null && raca.getEspecie().equals(especieId);
+                    System.out.println("Raça: " + raca.getNome() + " | Especie: '" + raca.getEspecie() + "' | Match: " + match);
                     return match;
                 })
                 .toList();
 
+        System.out.println("Total de raças filtradas: " + racasFiltradas.size());
+
+        // Ordenar manualmente por nome
         List<Raca> racasOrdenadas = racasFiltradas.stream()
                 .sorted((r1, r2) -> r1.getNome().compareToIgnoreCase(r2.getNome()))
                 .toList();
 
+        // Aplicar paginação manual
         int page = pageDTO.getPage();
         int size = pageDTO.getSize();
         int start = page * size;
@@ -97,8 +103,9 @@ public class ImplRacaService implements RacaService {
                 ? racasOrdenadas.subList(start, end)
                 : List.of();
 
-        logger.info("Raças encontradas na página {}: {}", page, racasPaginadas.size());
+        System.out.println("Raças na página " + page + ": " + racasPaginadas.size());
 
+        // Converter para DTO
         List<RacaResDTO> dtoList = racasPaginadas.stream()
                 .map(r -> mapper.map(r, RacaResDTO.class))
                 .toList();
@@ -116,9 +123,14 @@ public class ImplRacaService implements RacaService {
     @Override
     public List<Raca> debugGetAllRacas() {
         List<Raca> todasRacas = racaRepository.findAll();
-        logger.info("Debugging all races. Total in database: {}", todasRacas.size());
+        System.out.println("=== DEBUG TODAS AS RACAS ===");
+        System.out.println("Total de raças no banco: " + todasRacas.size());
         todasRacas.forEach(r -> {
-            logger.info("Raça: {} | ID: {} | Especie: {}", r.getNome(), r.getId(), r.getEspecie());
+            System.out.println("Raça: " + r.getNome());
+            System.out.println("  ID: " + r.getId());
+            System.out.println("  Especie: '" + r.getEspecie() + "'");
+            System.out.println("  Especie length: " + (r.getEspecie() != null ? r.getEspecie().length() : "null"));
+            System.out.println("  Especie bytes: " + (r.getEspecie() != null ? java.util.Arrays.toString(r.getEspecie().getBytes()) : "null"));
         });
         return todasRacas;
     }

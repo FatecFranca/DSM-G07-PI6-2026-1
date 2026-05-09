@@ -2,8 +2,8 @@ package com.petdex.api.application.services.coleira;
 
 import com.petdex.api.domain.collections.Animal;
 import com.petdex.api.domain.collections.Coleira;
-import com.petdex.api.domain.contracts.dto.coleira.ColeiraReqDTO;
-import com.petdex.api.domain.contracts.dto.coleira.ColeiraResDTO;
+import com.petdex.api.application.contracts.dto.coleira.ColeiraReqDTO;
+import com.petdex.api.application.contracts.dto.coleira.ColeiraResDTO;
 import com.petdex.api.infrastructure.mongodb.AnimalRepository;
 import com.petdex.api.infrastructure.mongodb.ColeiraRepository;
 import org.assertj.core.api.Assertions;

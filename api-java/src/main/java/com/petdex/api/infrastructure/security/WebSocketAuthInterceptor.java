@@ -1,6 +1,6 @@
 package com.petdex.api.infrastructure.security;
 
-import com.petdex.api.application.services.security.JwtService;
+import com.petdex.api.application.services.security.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -23,7 +23,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
     private static final Logger logger = LoggerFactory.getLogger(WebSocketAuthInterceptor.class);
 
     @Autowired
-    private JwtService jwtService;
+    private TokenService tokenService;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -34,8 +34,8 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
 
             if (token != null) {
                 try {
-                    if (jwtService.validateToken(token)) {
-                        String userId = jwtService.extractUserId(token);
+                    if (tokenService.validateToken(token)) {
+                        String userId = tokenService.extractUserId(token);
 
                         if (userId != null) {
                             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(

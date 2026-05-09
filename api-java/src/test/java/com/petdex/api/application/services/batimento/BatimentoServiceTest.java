@@ -1,9 +1,9 @@
 package com.petdex.api.application.services.batimento;
 
-import com.petdex.api.application.services.websocket.interfaces.NotificationService;
+import com.petdex.api.application.contracts.websocket.NotificationService;
 import com.petdex.api.domain.collections.Batimento;
-import com.petdex.api.domain.contracts.dto.batimento.BatimentoReqDTO;
-import com.petdex.api.domain.contracts.dto.batimento.BatimentoResDTO;
+import com.petdex.api.application.contracts.dto.batimento.BatimentoReqDTO;
+import com.petdex.api.application.contracts.dto.batimento.BatimentoResDTO;
 import com.petdex.api.infrastructure.mongodb.BatimentoRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

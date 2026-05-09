@@ -1,9 +1,9 @@
 package com.petdex.api.application.services.usuario;
 
-import com.petdex.api.application.services.security.PasswordService;
+import com.petdex.api.infrastructure.security.PasswordService;
 import com.petdex.api.domain.collections.Usuario;
-import com.petdex.api.domain.contracts.dto.usuario.UsuarioReqDTO;
-import com.petdex.api.domain.contracts.dto.usuario.UsuarioResDTO;
+import com.petdex.api.application.contracts.dto.usuario.UsuarioReqDTO;
+import com.petdex.api.application.contracts.dto.usuario.UsuarioResDTO;
 import com.petdex.api.infrastructure.exception.ConflictException;
 import com.petdex.api.infrastructure.mongodb.UsuarioRepository;
 import org.assertj.core.api.Assertions;

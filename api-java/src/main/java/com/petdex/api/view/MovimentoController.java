@@ -1,16 +1,15 @@
 package com.petdex.api.view;
 
 import com.petdex.api.application.services.movimento.MovimentoService;
-import com.petdex.api.domain.contracts.dto.movimento.MovimentoReqDTO;
-import com.petdex.api.domain.contracts.dto.movimento.MovimentoResDTO;
-import com.petdex.api.domain.contracts.dto.PageDTO;
+import com.petdex.api.application.contracts.dto.movimento.MovimentoReqDTO;
+import com.petdex.api.application.contracts.dto.movimento.MovimentoResDTO;
+import com.petdex.api.application.contracts.dto.PageDTO;
 import com.petdex.api.swagger.respostas.ExemploRespostaPageMovimento;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;

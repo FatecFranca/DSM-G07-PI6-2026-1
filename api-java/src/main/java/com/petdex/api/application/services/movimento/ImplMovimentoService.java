@@ -2,10 +2,9 @@ package com.petdex.api.application.services.movimento;
 
 import com.petdex.api.application.services.ValidationService;
 import com.petdex.api.domain.collections.Movimento;
-import com.petdex.api.domain.contracts.dto.movimento.MovimentoReqDTO;
-import com.petdex.api.domain.contracts.dto.movimento.MovimentoResDTO;
-import com.petdex.api.domain.contracts.dto.PageDTO;
-import com.petdex.api.infrastructure.exception.ResourceNotFoundException;
+import com.petdex.api.application.contracts.dto.movimento.MovimentoReqDTO;
+import com.petdex.api.application.contracts.dto.movimento.MovimentoResDTO;
+import com.petdex.api.application.contracts.dto.PageDTO;
 import com.petdex.api.infrastructure.mongodb.MovimentoRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +18,8 @@ import java.util.List;
 
 @Service
 public class ImplMovimentoService implements MovimentoService {
-    
-    private static final Logger logger = LoggerFactory.getLogger(ImplMovimentoService.class);
 
+    private static final Logger logger = LoggerFactory.getLogger(ImplMovimentoService.class);
 
     @Autowired
     private MovimentoRepository movimentoRepository;
@@ -52,12 +50,8 @@ public class ImplMovimentoService implements MovimentoService {
 
     @Override
     public MovimentoResDTO fidById(String movimentoId) {
-        return movimentoRepository.findById(movimentoId)
-                .map(movimento -> mapper.map(movimento, MovimentoResDTO.class))
-                .orElseGet(() -> {
-                    logger.error("Movimento não encontrado com ID: {}", movimentoId);
-                    return null;
-                });
+
+        return mapper.map(movimentoRepository.findById(movimentoId), MovimentoResDTO.class);
     }
 
     @Override

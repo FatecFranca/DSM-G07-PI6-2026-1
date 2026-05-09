@@ -1,8 +1,8 @@
 package com.petdex.api.infrastructure.websocket;
 
-import com.petdex.api.application.services.websocket.interfaces.NotificationService;
-import com.petdex.api.domain.contracts.dto.websocket.BatimentoWebSocketDTO;
-import com.petdex.api.domain.contracts.dto.websocket.LocalizacaoWebSocketDTO;
+import com.petdex.api.application.contracts.websocket.NotificationService;
+import com.petdex.api.application.contracts.dto.websocket.BatimentoWebSocketDTO;
+import com.petdex.api.application.contracts.dto.websocket.LocalizacaoWebSocketDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

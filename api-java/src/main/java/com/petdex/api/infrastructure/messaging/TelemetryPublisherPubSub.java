@@ -4,10 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.spring.pubsub.core.PubSubTemplate;
 
-import com.petdex.api.domain.contracts.dto.batimento.BatimentoPublisherDTO;
-import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoPublisherDTO;
-import com.petdex.api.domain.contracts.dto.movimento.MovimentoPublisherDTO;
-import com.petdex.api.infrastructure.messaging.interfaces.TelemetryPublisher;
+import com.petdex.api.application.contracts.dto.batimento.BatimentoPublisherDTO;
+import com.petdex.api.application.contracts.dto.localizacao.LocalizacaoPublisherDTO;
+import com.petdex.api.application.contracts.dto.movimento.MovimentoPublisherDTO;
+import com.petdex.api.infrastructure.messaging.contracts.TelemetryPublisher;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

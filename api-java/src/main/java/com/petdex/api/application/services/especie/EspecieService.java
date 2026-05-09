@@ -1,8 +1,8 @@
 package com.petdex.api.application.services.especie;
 
-import com.petdex.api.domain.contracts.dto.PageDTO;
-import com.petdex.api.domain.contracts.dto.especie.EspecieReqDTO;
-import com.petdex.api.domain.contracts.dto.especie.EspecieResDTO;
+import com.petdex.api.application.contracts.dto.PageDTO;
+import com.petdex.api.application.contracts.dto.especie.EspecieReqDTO;
+import com.petdex.api.application.contracts.dto.especie.EspecieResDTO;
 import org.springframework.data.domain.Page;
 
 public interface EspecieService {

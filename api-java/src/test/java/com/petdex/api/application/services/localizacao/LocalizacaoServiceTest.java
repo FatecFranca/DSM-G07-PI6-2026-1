@@ -1,11 +1,11 @@
 package com.petdex.api.application.services.localizacao;
 
 import com.petdex.api.application.services.areasegura.IAreaSeguraService;
-import com.petdex.api.application.services.websocket.interfaces.NotificationService;
+import com.petdex.api.application.contracts.websocket.NotificationService;
 import com.petdex.api.domain.collections.Localizacao;
-import com.petdex.api.domain.contracts.dto.areasegura.AreaSeguraResDTO;
-import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoReqDTO;
-import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoResDTO;
+import com.petdex.api.application.contracts.dto.areasegura.AreaSeguraResDTO;
+import com.petdex.api.application.contracts.dto.localizacao.LocalizacaoReqDTO;
+import com.petdex.api.application.contracts.dto.localizacao.LocalizacaoResDTO;
 import com.petdex.api.infrastructure.mongodb.LocalizacaoRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

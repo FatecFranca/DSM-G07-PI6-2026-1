@@ -3,9 +3,9 @@ package com.petdex.api.application.services.animal;
 import com.petdex.api.domain.collections.Animal;
 import com.petdex.api.domain.collections.Especie;
 import com.petdex.api.domain.collections.Raca;
-import com.petdex.api.domain.contracts.dto.PageDTO;
-import com.petdex.api.domain.contracts.dto.animal.AnimalReqDTO;
-import com.petdex.api.domain.contracts.dto.animal.AnimalResDTO;
+import com.petdex.api.application.contracts.dto.PageDTO;
+import com.petdex.api.application.contracts.dto.animal.AnimalReqDTO;
+import com.petdex.api.application.contracts.dto.animal.AnimalResDTO;
 import com.petdex.api.infrastructure.exception.ResourceNotFoundException;
 import com.petdex.api.infrastructure.mongodb.AnimalRepository;
 import com.petdex.api.infrastructure.mongodb.EspecieRepository;
@@ -32,7 +32,6 @@ import java.util.UUID;
 
 @Service
 public class ImplAnimalService implements AnimalService {
-
     private static final Logger logger = LoggerFactory.getLogger(ImplAnimalService.class);
 
     @Autowired
@@ -160,6 +159,7 @@ public class ImplAnimalService implements AnimalService {
 
     @Override
     public Optional<AnimalResDTO> findByUsuarioId(String usuarioId) {
+        // Busca o animal pelo ID do usuário
         Optional<Animal> animalOpt = animalRepository.findByUsuario(usuarioId);
 
         return animalOpt.map(animal -> {
@@ -186,11 +186,14 @@ public class ImplAnimalService implements AnimalService {
         });
 
         try {
+            // Verifica se existe uma imagem antiga e a exclui
             String oldImageUrl = animal.getUrlImagem();
             if (oldImageUrl != null && !oldImageUrl.isEmpty()) {
+                // Extrai o nome do arquivo da URL antiga
                 String oldFileName = oldImageUrl.substring(oldImageUrl.lastIndexOf("/") + 1);
                 Path oldFilePath = Paths.get("/uploads/animais/").resolve(oldFileName);
 
+                // Exclui o arquivo antigo se ele existir
                 if (Files.exists(oldFilePath)) {
                     Files.delete(oldFilePath);
                     logger.info("Imagem antiga removida: {}", oldFileName);

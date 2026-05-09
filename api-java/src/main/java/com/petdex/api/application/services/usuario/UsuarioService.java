@@ -1,8 +1,8 @@
 package com.petdex.api.application.services.usuario;
 
-import com.petdex.api.domain.contracts.dto.PageDTO;
-import com.petdex.api.domain.contracts.dto.usuario.UsuarioReqDTO;
-import com.petdex.api.domain.contracts.dto.usuario.UsuarioResDTO;
+import com.petdex.api.application.contracts.dto.PageDTO;
+import com.petdex.api.application.contracts.dto.usuario.UsuarioReqDTO;
+import com.petdex.api.application.contracts.dto.usuario.UsuarioResDTO;
 import org.springframework.data.domain.Page;
 
 public interface UsuarioService {

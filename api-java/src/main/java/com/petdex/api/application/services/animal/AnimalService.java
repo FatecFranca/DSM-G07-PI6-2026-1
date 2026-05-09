@@ -1,8 +1,8 @@
 package com.petdex.api.application.services.animal;
 
-import com.petdex.api.domain.contracts.dto.PageDTO;
-import com.petdex.api.domain.contracts.dto.animal.AnimalReqDTO;
-import com.petdex.api.domain.contracts.dto.animal.AnimalResDTO;
+import com.petdex.api.application.contracts.dto.PageDTO;
+import com.petdex.api.application.contracts.dto.animal.AnimalReqDTO;
+import com.petdex.api.application.contracts.dto.animal.AnimalResDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 

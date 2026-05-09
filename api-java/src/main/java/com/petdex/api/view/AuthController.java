@@ -1,8 +1,8 @@
 package com.petdex.api.view;
 
 import com.petdex.api.application.services.auth.AuthService;
-import com.petdex.api.domain.contracts.dto.auth.LoginReqDTO;
-import com.petdex.api.domain.contracts.dto.auth.LoginResDTO;
+import com.petdex.api.application.contracts.dto.auth.LoginReqDTO;
+import com.petdex.api.application.contracts.dto.auth.LoginResDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -1,9 +1,9 @@
 package com.petdex.api.view;
 
 import com.petdex.api.application.services.animal.AnimalService;
-import com.petdex.api.domain.contracts.dto.PageDTO;
-import com.petdex.api.domain.contracts.dto.animal.AnimalReqDTO;
-import com.petdex.api.domain.contracts.dto.animal.AnimalResDTO;
+import com.petdex.api.application.contracts.dto.PageDTO;
+import com.petdex.api.application.contracts.dto.animal.AnimalReqDTO;
+import com.petdex.api.application.contracts.dto.animal.AnimalResDTO;
 import com.petdex.api.swagger.respostas.ExemploRespostaDeletarAnimal;
 import com.petdex.api.swagger.respostas.ExemploRespostaPageAnimal;
 import com.petdex.api.swagger.respostas.ExemploRespostaSalvarImagemAnimal;
@@ -17,14 +17,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Optional;
 
 @RestController

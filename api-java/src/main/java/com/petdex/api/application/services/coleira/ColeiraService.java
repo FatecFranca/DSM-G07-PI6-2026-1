@@ -1,8 +1,8 @@
 package com.petdex.api.application.services.coleira;
 
-import com.petdex.api.domain.contracts.dto.PageDTO;
-import com.petdex.api.domain.contracts.dto.coleira.ColeiraReqDTO;
-import com.petdex.api.domain.contracts.dto.coleira.ColeiraResDTO;
+import com.petdex.api.application.contracts.dto.PageDTO;
+import com.petdex.api.application.contracts.dto.coleira.ColeiraReqDTO;
+import com.petdex.api.application.contracts.dto.coleira.ColeiraResDTO;
 import org.springframework.data.domain.Page;
 
 public interface ColeiraService {

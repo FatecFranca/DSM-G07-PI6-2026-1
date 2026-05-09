@@ -1,8 +1,8 @@
 package com.petdex.api.application.services.batimento;
 
-import com.petdex.api.domain.contracts.dto.batimento.BatimentoReqDTO;
-import com.petdex.api.domain.contracts.dto.batimento.BatimentoResDTO;
-import com.petdex.api.domain.contracts.dto.PageDTO;
+import com.petdex.api.application.contracts.dto.batimento.BatimentoReqDTO;
+import com.petdex.api.application.contracts.dto.batimento.BatimentoResDTO;
+import com.petdex.api.application.contracts.dto.PageDTO;
 import org.springframework.data.domain.Page;
 
 import java.util.Optional;

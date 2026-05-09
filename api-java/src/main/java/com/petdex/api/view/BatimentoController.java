@@ -1,16 +1,15 @@
 package com.petdex.api.view;
 
 import com.petdex.api.application.services.batimento.BatimentoService;
-import com.petdex.api.domain.contracts.dto.batimento.BatimentoReqDTO;
-import com.petdex.api.domain.contracts.dto.batimento.BatimentoResDTO;
-import com.petdex.api.domain.contracts.dto.PageDTO;
+import com.petdex.api.application.contracts.dto.batimento.BatimentoReqDTO;
+import com.petdex.api.application.contracts.dto.batimento.BatimentoResDTO;
+import com.petdex.api.application.contracts.dto.PageDTO;
 import com.petdex.api.swagger.respostas.ExemploRespostaPageBatimento;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;

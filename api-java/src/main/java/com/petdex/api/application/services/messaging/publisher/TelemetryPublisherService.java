@@ -1,8 +1,8 @@
 package com.petdex.api.application.services.messaging.publisher;
 
-import com.petdex.api.domain.contracts.dto.batimento.BatimentoPublisherDTO;
-import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoPublisherDTO;
-import com.petdex.api.domain.contracts.dto.movimento.MovimentoPublisherDTO;
+import com.petdex.api.application.contracts.dto.batimento.BatimentoPublisherDTO;
+import com.petdex.api.application.contracts.dto.localizacao.LocalizacaoPublisherDTO;
+import com.petdex.api.application.contracts.dto.movimento.MovimentoPublisherDTO;
 
 public interface TelemetryPublisherService {
 

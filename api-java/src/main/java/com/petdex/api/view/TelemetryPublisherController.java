@@ -1,9 +1,9 @@
 package com.petdex.api.view;
 
 import com.petdex.api.application.services.messaging.publisher.TelemetryPublisherService;
-import com.petdex.api.domain.contracts.dto.batimento.BatimentoPublisherDTO;
-import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoPublisherDTO;
-import com.petdex.api.domain.contracts.dto.movimento.MovimentoPublisherDTO;
+import com.petdex.api.application.contracts.dto.batimento.BatimentoPublisherDTO;
+import com.petdex.api.application.contracts.dto.localizacao.LocalizacaoPublisherDTO;
+import com.petdex.api.application.contracts.dto.movimento.MovimentoPublisherDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

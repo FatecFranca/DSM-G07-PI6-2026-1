@@ -1,8 +1,8 @@
 package com.petdex.api.application.services.localizacao;
 
-import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoReqDTO;
-import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoResDTO;
-import com.petdex.api.domain.contracts.dto.PageDTO;
+import com.petdex.api.application.contracts.dto.localizacao.LocalizacaoReqDTO;
+import com.petdex.api.application.contracts.dto.localizacao.LocalizacaoResDTO;
+import com.petdex.api.application.contracts.dto.PageDTO;
 import org.springframework.data.domain.Page;
 
 import java.util.Optional;

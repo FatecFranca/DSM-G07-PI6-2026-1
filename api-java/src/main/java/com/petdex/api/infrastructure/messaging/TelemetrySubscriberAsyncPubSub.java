@@ -6,7 +6,7 @@ import com.google.cloud.pubsub.v1.Subscriber;
 import com.google.pubsub.v1.ProjectSubscriptionName;
 import com.google.pubsub.v1.PubsubMessage;
 import com.petdex.api.application.services.messaging.subscriber.TelemetrySubscriberService;
-import com.petdex.api.infrastructure.messaging.interfaces.TelemetrySubscriberAsync;
+import com.petdex.api.infrastructure.messaging.contracts.TelemetrySubscriberAsync;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
