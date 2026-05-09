@@ -15,10 +15,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Handler para erros de autenticação (401 Unauthorized)
- * Retorna uma mensagem JSON personalizada quando o usuário não está autenticado
- */
+
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     
