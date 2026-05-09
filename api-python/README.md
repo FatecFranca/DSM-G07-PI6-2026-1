@@ -19,7 +19,7 @@ Bem-vindo à API de Análise de Dados da PetDex! Desenvolvida com **Python** e *
 * **PyPMML** (Carregamento e execução de modelos PMML)
 * **httpx** (Cliente HTTP assíncrono para comunicação com a API Java)
 * **Uvicorn** (Servidor ASGI)
-* **Azure** (Plataforma de hospedagem da API)
+* **Google Cloud** (Plataforma de hospedagem da API)
 
 ---
 
@@ -153,7 +153,7 @@ Ao identificar um batimento com baixa probabilidade de ocorrência, o tutor é a
 
 ## 📡 Endpoints da API
 
-A API está hospedada em um servidor **Azure** (Ubuntu, Standard B1ms) e pode ser acessada através do link:
+A API está hospedada em um servidor **Google Cloud** e pode ser acessada através do link:
 
 🔗 **API Base:** [http://34.24.9.134:8083](http://34.24.9.134:8083)
 
@@ -281,7 +281,7 @@ Adicione a variável `API_URL` no arquivo `.env` com o endpoint da API Java:
 # Para desenvolvimento local
 API_URL=http://localhost:8080
 
-# Para produção (servidor Azure)
+# Para produção (servidor Google Cloud)
 API_URL=http://34.24.9.134:8080
 ```
 
@@ -430,7 +430,7 @@ docker run -p 8000:8000 --env-file .env petdex-api-python
 
 ## 🚀 Infraestrutura de Hospedagem
 
-A API está hospedada em um servidor **Microsoft Azure** com as seguintes especificações:
+A API está hospedada em um servidor **Google Cloud** com as seguintes especificações:
 
 - **Sistema Operacional:** Ubuntu
 - **Tipo de Máquina:** Standard B1ms

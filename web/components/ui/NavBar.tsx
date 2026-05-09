@@ -16,38 +16,38 @@ export default function NavBar({ currentIndex, onChange }: NavBarProps) {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 w-full bg-[var(--background)] h-[85px] px-2 pt-1 pb-3 flex justify-between px-80">
-      {items.map((item, index) => {
-        const isSelected = currentIndex === index;
+    <div className="w-full bg-[var(--color-sand-900)]">
+      
+      <div className="flex justify-around items-center h-[70px] sm:h-[85px] px-2 sm:max-w-3xl sm:mx-auto">
+        
+        {items.map((item, index) => {
+          const isSelected = currentIndex === index;
 
-        return (
-          <div
-            key={index}
-            onClick={() => onChange(index)}
-            className="flex flex-col items-center justify-center flex-1 cursor-pointer"
-          >
+          return (
             <div
-              className={`text-[30px] ${
-                isSelected
-                  ? "text-[var(--color-primary-active)]"
-                  : "text-orange-300"
-              }`}
+              key={index}
+              onClick={() => onChange(index)}
+              className="flex flex-col items-center justify-center flex-1 cursor-pointer"
             >
-              {item.icon}
-            </div>
+              <div
+                className={`text-[28px] ${
+                  isSelected ? "text-[#BF4904]" : "text-[#D89042]"
+                }`}
+              >
+                {item.icon}
+              </div>
 
-            <span
-              className={`text-xs mt-1 ${
-                isSelected
-                  ? "text-[var(--color-primary-active)] font-bold"
-                  : "text-orange-300"
-              }`}
-            >
-              {item.label}
-            </span>
-          </div>
-        );
-      })}
+              <span
+                className={`text-xs ${
+                  isSelected ? "text-[#BF4904] font-bold" : "text-[#D89042]"
+                }`}
+              >
+                {item.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

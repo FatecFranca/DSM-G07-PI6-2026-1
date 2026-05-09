@@ -167,9 +167,9 @@ A PetDex foi desenvolvida com uma **arquitetura modular e distribuída**, dividi
   - Modelo de classificação **CART (Árvore de Decisão)** em formato PMML
   - Execução assíncrona com **Uvicorn**
 
-* **Hospedagem:** Servidor Azure
+* **Hospedagem:** Servidor Google Cloud
   - Sistema Operacional: **Ubuntu**
-  - Tipo de Máquina: **Standard B1ms**
+  - Tipo de Máquina: **e2-medium (2 vCPUs, 4 GB de memória)**
   - APIs acessíveis via IP público
 
 * **Containerização e Orquestração:**
@@ -182,12 +182,12 @@ A PetDex foi desenvolvida com uma **arquitetura modular e distribuída**, dividi
 
 ## 🚀 Infraestrutura e Deploy
 
-### **☁️ Hospedagem na Microsoft Azure**
+### **☁️ Hospedagem na Google Cloud**
 
-O projeto PetDex está hospedado na **Microsoft Azure**, utilizando uma máquina virtual com as seguintes especificações:
+O projeto PetDex está hospedado na **Google Cloud**, utilizando uma máquina virtual com as seguintes especificações:
 
 - **Sistema Operacional:** Ubuntu Server
-- **Tipo de Máquina:** Standard B1ms
+- **Tipo de Máquina:** e2-medium (2 vCPUs, 4 GB de memória)
 - **IP Público:** 34.24.9.134
 - **Região:** East US
 
@@ -254,7 +254,7 @@ O projeto implementa um pipeline de **CI/CD (Continuous Integration/Continuous D
 2. **Build Automático:** GitHub Actions detecta mudanças e inicia o build
 3. **Criação de Imagens Docker:** Novas imagens são construídas automaticamente
 4. **Push para Registry:** Imagens são enviadas para o Docker Hub/Registry
-5. **Deploy no Servidor:** Servidor Azure puxa as novas imagens e reinicia os containers
+5. **Deploy no Servidor:** Servidor GCP puxa as novas imagens e reinicia os containers
 6. **Verificação:** Health checks garantem que os serviços estão funcionando
 
 **Benefícios:**
@@ -266,7 +266,7 @@ O projeto implementa um pipeline de **CI/CD (Continuous Integration/Continuous D
 
 ### **📡 Informações do Servidor**
 
-**IP do Servidor Azure:** `34.24.9.134`
+**IP do Servidor Google Cloud:** `34.24.9.134`
 
 **Endpoints das APIs:**
 
@@ -366,7 +366,7 @@ O arquivo `modelo_CART.pmml` foi escolhido como o **"cérebro" oficial da PetDex
 | **Hardware (IoT)** | ESP32 S3 Zero, GY-MAX30102, MPU6050, NEO-6M, Impressão 3D (PLA) |
 | **Backend** | Java + Spring Boot, MongoDB, Swagger, JWT, FastAPI (Python), Scikit-learn, PMML |
 | **Frontend** | Flutter, API Google Maps |
-| **Infraestrutura** | Azure (Ubuntu, Standard B1ms), arquitetura de microsserviços |
+| **Infraestrutura** | GCP (Ubuntu, Standard B1ms), arquitetura de microsserviços |
 
 ---
 
