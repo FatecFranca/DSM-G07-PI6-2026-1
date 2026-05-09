@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import MapScreen from "@/components/screens/MapScreen/MapScreen";
+import LocationScreen from "@/components/screens/LocationScreen/LocationScreen";
 import BottomNavWithStatus from "@/components/ui/BottomNavWithStatus";
 
 import { getAnimalData } from "@/services/animalService";
@@ -53,7 +54,11 @@ export default function AppShell() {
     />,
     <div key="health">Health</div>,
     <div key="checkup">Checkup</div>,
-    <div key="location">Location</div>,
+    <LocationScreen
+      key="location"
+      animalId={animalId}
+      animalName="Uno"
+    />,
   ];
 
   return (

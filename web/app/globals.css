@@ -13,6 +13,16 @@
   --color-sand-900: #F0D37B;
   --color-orange-900: #BF4904;
   --color-brown: #754819;
+  --color-blue: #1976D2;
+
+  /* Status Colors */
+  --color-green-50: #E8F5E9;
+  --color-green-200: #A5D6A7;
+  --color-green-700: #388E3C;
+
+  --color-red-50: #FFEBEE;
+  --color-red-200: #EF9A9A;
+  --color-red-700: #D32F2F;
 }
 
 @theme inline {
