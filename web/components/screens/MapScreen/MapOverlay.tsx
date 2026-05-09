@@ -29,12 +29,6 @@ export default function MapOverlay({
         </div>
       )}
 
-      {/* ALERTA */}
-      {isOutsideSafeZone && (
-        <div className="absolute top-16 left-4 right-4 bg-red-100 p-3 rounded-xl text-center z-50">
-          Pet fora da área segura
-        </div>
-      )}
     </>
   );
 }

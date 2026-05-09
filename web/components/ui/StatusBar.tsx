@@ -23,10 +23,10 @@ export default function StatusBar({
   isConnected,
   animalName = "Pet",
   sex = "M",
-  lastBpm = 0,
+  lastBpm,
   battery = 96,
 }: StatusBarProps) {
-  console.log("BPM recebido:", lastBpm);
+
   const [isExpanded, setIsExpanded] = useState(false);
 
   function toggle() {
@@ -101,7 +101,7 @@ export default function StatusBar({
         <div className="flex flex-col items-end justify-center">
           <div className="flex items-center gap-2">
             <span className="text-3xl font-bold text-[var(--color-brown)]">
-              {lastBpm || "--"}
+              {lastBpm ?? "--"}
             </span>
 
             <FaHeartbeat className="text-[var(--color-orange-400)] text-lg" />

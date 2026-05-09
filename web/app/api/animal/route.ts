@@ -21,11 +21,13 @@ export async function GET(req: NextRequest) {
         headers: {
           Authorization: token || "",
         },
+        cache: "no-store",
       }),
       fetch(`${JAVA_API}/batimentos/animal/${animalId}/ultimo`, {
         headers: {
           Authorization: token || "",
         },
+        cache: "no-store",
       }),
     ]);
 

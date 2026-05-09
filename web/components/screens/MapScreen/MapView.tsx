@@ -70,6 +70,9 @@ export default function MapView({
     if (markerRef.current) {
       markerRef.current.position = { lat, lng };
     }
+    if (mapRef.current) {
+      mapRef.current.panTo({ lat, lng });
+    }
   }, [lat, lng]);
 
   if (!isLoaded) return null;
