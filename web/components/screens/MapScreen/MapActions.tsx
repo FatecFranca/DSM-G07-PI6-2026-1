@@ -9,7 +9,7 @@ export default function MapActions({ onRefresh }: MapActionsProps) {
     <div className="flex flex-col gap-2">
       <button
         onClick={onRefresh}
-        className="bg-[var(--color-orange-400)] text-white p-3 rounded-xl shadow flex items-center justify-center"
+        className="bg-[var(--color-primary)] text-white p-3 rounded-xl shadow flex items-center justify-center"
       >
         {/* Ícone location-crosshairs */}
         <svg

@@ -1,6 +1,6 @@
 export async function getEnderecoAtualDoAnimal(lat: number, lng: number) {
   try {
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY?.trim();
 
     if (!apiKey) return null;
 
@@ -9,6 +9,7 @@ export async function getEnderecoAtualDoAnimal(lat: number, lng: number) {
     );
 
     const data = await res.json();
+    console.log("📍 API Geocoding:", data);
 
     if (data.status === "OK" && data.results.length > 0) {
       return data.results[0].formatted_address;
