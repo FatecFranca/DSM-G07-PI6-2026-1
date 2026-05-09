@@ -11,7 +11,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class LocalizacaoMensageriaReqDTO {
+public class LocalizacaoPublisherDTO {
 
     @Schema(description = "Tipo do dado que vai ser inserido no pub/sub. Não é alterável.", example = "location")
     private TelemetryTypeEnum type = TelemetryTypeEnum.LOCATION;

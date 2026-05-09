@@ -1,17 +1,17 @@
-package com.petdex.api.application.services.mensageria.subscriber;
+package com.petdex.api.application.services.messaging.subscriber;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petdex.api.application.services.batimento.BatimentoService;
 import com.petdex.api.application.services.localizacao.LocalizacaoService;
 import com.petdex.api.application.services.movimento.MovimentoService;
-import com.petdex.api.domain.contracts.dto.batimento.BatimentoMensageriaReqDTO;
+import com.petdex.api.domain.contracts.dto.batimento.BatimentoPublisherDTO;
 import com.petdex.api.domain.contracts.dto.batimento.BatimentoReqDTO;
 import com.petdex.api.domain.contracts.dto.batimento.BatimentoResDTO;
-import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoMensageriaReqDTO;
+import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoPublisherDTO;
 import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoReqDTO;
 import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoResDTO;
-import com.petdex.api.domain.contracts.dto.movimento.MovimentoMensageriaReqDTO;
+import com.petdex.api.domain.contracts.dto.movimento.MovimentoPublisherDTO;
 import com.petdex.api.domain.contracts.dto.movimento.MovimentoReqDTO;
 import com.petdex.api.domain.contracts.dto.movimento.MovimentoResDTO;
 import com.petdex.api.domain.contracts.enums.TelemetryTypeEnum;
@@ -34,7 +34,6 @@ public class ImplTelemetrySubscriberService implements TelemetrySubscriberServic
     public boolean processarMensagem(String message) {
         try {
 
-            logger.info("[Telemetry Sub Service] Menssagem recebida: {}", message);
             JsonNode mensagemNode = mapper.readTree(message);
             JsonNode typeNode = mensagemNode.get("type");
 
@@ -48,15 +47,15 @@ public class ImplTelemetrySubscriberService implements TelemetrySubscriberServic
 
             switch (type) {
                 case HEART_RATE:
-                    BatimentoMensageriaReqDTO batimento = mapper.treeToValue(mensagemNode, BatimentoMensageriaReqDTO.class);
+                    BatimentoPublisherDTO batimento = mapper.treeToValue(mensagemNode, BatimentoPublisherDTO.class);
                     return this.processarBatimento(batimento);
 
                 case LOCATION:
-                    LocalizacaoMensageriaReqDTO localizacao = mapper.treeToValue(mensagemNode, LocalizacaoMensageriaReqDTO.class);
+                    LocalizacaoPublisherDTO localizacao = mapper.treeToValue(mensagemNode, LocalizacaoPublisherDTO.class);
                     return this.processarLocalizacao(localizacao);
 
                 case MOVEMENT:
-                    MovimentoMensageriaReqDTO movimento = mapper.treeToValue(mensagemNode, MovimentoMensageriaReqDTO.class);
+                    MovimentoPublisherDTO movimento = mapper.treeToValue(mensagemNode, MovimentoPublisherDTO.class);
                     return this.processarMovimento(movimento);
 
                 default:
@@ -71,7 +70,7 @@ public class ImplTelemetrySubscriberService implements TelemetrySubscriberServic
     }
 
 
-    private boolean processarBatimento(BatimentoMensageriaReqDTO batimentoDTO) {
+    private boolean processarBatimento(BatimentoPublisherDTO batimentoDTO) {
         logger.info("[Telemetry Sub Service] Batimento recebido: {}", batimentoDTO);
         try {
             BatimentoResDTO batimentoSalvo = batimentoService.save(mapper.convertValue(batimentoDTO, BatimentoReqDTO.class));
@@ -86,7 +85,7 @@ public class ImplTelemetrySubscriberService implements TelemetrySubscriberServic
         }
     }
 
-    private boolean processarLocalizacao(LocalizacaoMensageriaReqDTO localizacaoDTO) {
+    private boolean processarLocalizacao(LocalizacaoPublisherDTO localizacaoDTO) {
         logger.info("[Telemetry Sub Service] Localizacao recebida: {}", localizacaoDTO);
         try {
             LocalizacaoResDTO localizacaoSalva = localizacaoService.save(mapper.convertValue(localizacaoDTO, LocalizacaoReqDTO.class));
@@ -101,7 +100,7 @@ public class ImplTelemetrySubscriberService implements TelemetrySubscriberServic
         }
     }
 
-    private boolean processarMovimento(MovimentoMensageriaReqDTO movimentoDTO) {
+    private boolean processarMovimento(MovimentoPublisherDTO movimentoDTO) {
 
         logger.info("[Telemetry Sub Service] Dados de movimento recebido: {}", movimentoDTO);
         try {

@@ -11,7 +11,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class BatimentoMensageriaReqDTO {
+public class BatimentoPublisherDTO {
 
     @Schema(description = "Tipo do dado que vai ser inserido no pub/sub", example = "heart_rate")
     private TelemetryTypeEnum type = TelemetryTypeEnum.HEART_RATE;

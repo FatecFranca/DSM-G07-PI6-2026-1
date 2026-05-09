@@ -1,9 +1,9 @@
 package com.petdex.api.view;
 
-import com.petdex.api.application.services.mensageria.publisher.TelemetryPublisherService;
-import com.petdex.api.domain.contracts.dto.batimento.BatimentoMensageriaReqDTO;
-import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoMensageriaReqDTO;
-import com.petdex.api.domain.contracts.dto.movimento.MovimentoMensageriaReqDTO;
+import com.petdex.api.application.services.messaging.publisher.TelemetryPublisherService;
+import com.petdex.api.domain.contracts.dto.batimento.BatimentoPublisherDTO;
+import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoPublisherDTO;
+import com.petdex.api.domain.contracts.dto.movimento.MovimentoPublisherDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,20 +20,20 @@ public class TelemetryPublisherController {
     private final TelemetryPublisherService telemetryPublisherService;
 
     @PostMapping("/batimento")
-    public ResponseEntity<HttpStatus> publicarBatimento(@RequestBody BatimentoMensageriaReqDTO batimento) {
-        telemetryPublisherService.publicarBatimento(batimento);
+    public ResponseEntity<HttpStatus> publicarBatimento(@RequestBody BatimentoPublisherDTO batimento) {
+        telemetryPublisherService.processarBatimento(batimento);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/localizacao")
-    public ResponseEntity<HttpStatus> publicarLocalizacao (@RequestBody LocalizacaoMensageriaReqDTO localizacao) {
-        telemetryPublisherService.publicarLocalizacao(localizacao);
+    public ResponseEntity<HttpStatus> publicarLocalizacao (@RequestBody LocalizacaoPublisherDTO localizacao) {
+        telemetryPublisherService.processarLocalizacao(localizacao);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
    @PostMapping("/movimento")
-    public ResponseEntity<HttpStatus> publicarMovimento(@RequestBody MovimentoMensageriaReqDTO movimento) {
-        telemetryPublisherService.publicarMovimento(movimento);
+    public ResponseEntity<HttpStatus> publicarMovimento(@RequestBody MovimentoPublisherDTO movimento) {
+        telemetryPublisherService.processarMovimento(movimento);
         return new ResponseEntity<>(HttpStatus.OK);
    }
 }
