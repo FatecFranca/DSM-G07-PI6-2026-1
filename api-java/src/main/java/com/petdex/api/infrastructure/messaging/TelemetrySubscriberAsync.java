@@ -1,11 +1,11 @@
-package com.petdex.api.config;
+package com.petdex.api.infrastructure.messaging;
 
 import com.google.cloud.pubsub.v1.AckReplyConsumer;
 import com.google.cloud.pubsub.v1.MessageReceiver;
 import com.google.cloud.pubsub.v1.Subscriber;
 import com.google.pubsub.v1.ProjectSubscriptionName;
 import com.google.pubsub.v1.PubsubMessage;
-import com.petdex.api.infrastructure.messaging.TelemetrySubscriber;
+import com.petdex.api.application.services.mensageria.subscriber.TelemetrySubscriberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -19,7 +19,7 @@ public class TelemetrySubscriberAsync implements CommandLineRunner {
     String projectId;
 
     @Autowired
-    private TelemetrySubscriber telemetrySubscriber;
+    private TelemetrySubscriberService telemetrySubscriberService;
 
     public void run(String... args) throws Exception {
         String subscriptionId = "petdex-telemetry-sub";
@@ -32,18 +32,18 @@ public class TelemetrySubscriberAsync implements CommandLineRunner {
         MessageReceiver receiver = (PubsubMessage message, AckReplyConsumer consumer) -> {
             String data = message.getData().toStringUtf8();
             System.out.println("ACK: " + data);
-            if(!telemetrySubscriber.receiveMessage(data)) {
+            if(!telemetrySubscriberService.processarMensagem(data)) {
                 consumer.ack();
             }
 
-            consumer.ack();
+            consumer.nack();
         };
 
         Subscriber subscriber = null;
         try {
             subscriber = Subscriber.newBuilder(subscriptionName, receiver).build();
             subscriber.startAsync().awaitRunning();
-            System.out.println("Escutando mensagem: " + subscriptionName);
+            System.out.println("Recebendo mensagens: " + subscriptionName);
             try {
                 Thread.currentThread().join();
             } catch (InterruptedException e) {

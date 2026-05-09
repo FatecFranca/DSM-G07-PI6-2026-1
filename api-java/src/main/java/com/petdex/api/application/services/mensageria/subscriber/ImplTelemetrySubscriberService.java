@@ -1,5 +1,6 @@
 package com.petdex.api.application.services.mensageria.subscriber;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petdex.api.application.services.batimento.BatimentoService;
 import com.petdex.api.application.services.localizacao.LocalizacaoService;
@@ -13,7 +14,7 @@ import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoResDTO;
 import com.petdex.api.domain.contracts.dto.movimento.MovimentoMensageriaReqDTO;
 import com.petdex.api.domain.contracts.dto.movimento.MovimentoReqDTO;
 import com.petdex.api.domain.contracts.dto.movimento.MovimentoResDTO;
-import com.petdex.api.infrastructure.messaging.TelemetrySubscriber;
+import com.petdex.api.domain.contracts.enums.TelemetryTypeEnum;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,47 @@ public class ImplTelemetrySubscriberService implements TelemetrySubscriberServic
     private static final Logger logger = LoggerFactory.getLogger(ImplTelemetrySubscriberService.class);
 
     @Override
-    public boolean processarBatimento(BatimentoMensageriaReqDTO batimentoDTO) {
+    public boolean processarMensagem(String message) {
+        try {
+
+            logger.info("[Telemetry Subcriber] Menssagem recebida: {}", message);
+            JsonNode mensagemNode = mapper.readTree(message);
+            JsonNode typeNode = mensagemNode.get("type");
+
+            if (typeNode == null) {
+                logger.error("[Telemetry Subcriber] Campo type não informado na mensagem");
+                throw new IllegalArgumentException("[Telemetry Subcriber] Campo ´type´ não informado na mensagem");
+            }
+
+            String typeString = typeNode.asText();
+            TelemetryTypeEnum type = TelemetryTypeEnum.fromString(typeString);
+
+            switch (type) {
+                case HEART_RATE:
+                    BatimentoMensageriaReqDTO batimento = mapper.treeToValue(mensagemNode, BatimentoMensageriaReqDTO.class);
+                    return this.processarBatimento(batimento);
+
+                case LOCATION:
+                    LocalizacaoMensageriaReqDTO localizacao = mapper.treeToValue(mensagemNode, LocalizacaoMensageriaReqDTO.class);
+                    return this.processarLocalizacao(localizacao);
+
+                case MOVEMENT:
+                    MovimentoMensageriaReqDTO movimento = mapper.treeToValue(mensagemNode, MovimentoMensageriaReqDTO.class);
+                    return this.processarMovimento(movimento);
+
+                default:
+                    logger.error("[Telemetry Subscriber Service] Tipo da mensagem desconhecido {}", type);
+                    throw new IllegalArgumentException("Tipo de mensagem desconhecido" + type);
+            }
+
+        } catch (Exception e) {
+            logger.error("[Telemetry Subcriber Service] Erro ao processar mensagem {}", e.getMessage());
+            throw new RuntimeException("Erro ao processar a mensagem: ", e);
+        }
+    }
+
+
+    private boolean processarBatimento(BatimentoMensageriaReqDTO batimentoDTO) {
         logger.info("[Telemetry Sub Service] Batimento recebido: {}", batimentoDTO);
         try {
             BatimentoResDTO batimentoSalvo = batimentoService.save(mapper.convertValue(batimentoDTO, BatimentoReqDTO.class));
@@ -45,8 +86,7 @@ public class ImplTelemetrySubscriberService implements TelemetrySubscriberServic
         }
     }
 
-    @Override
-    public boolean processarLocalizacao(LocalizacaoMensageriaReqDTO localizacaoDTO) {
+    private boolean processarLocalizacao(LocalizacaoMensageriaReqDTO localizacaoDTO) {
         logger.info("[Telemetry Sub Service] Localizacao recebida: {}", localizacaoDTO);
         try {
             LocalizacaoResDTO localizacaoSalva = localizacaoService.save(mapper.convertValue(localizacaoDTO, LocalizacaoReqDTO.class));
@@ -61,8 +101,7 @@ public class ImplTelemetrySubscriberService implements TelemetrySubscriberServic
         }
     }
 
-    @Override
-    public boolean processarMovimento(MovimentoMensageriaReqDTO movimentoDTO) {
+    private boolean processarMovimento(MovimentoMensageriaReqDTO movimentoDTO) {
 
         logger.info("[Telemetry Sub Service] Dados de movimento recebido: {}", movimentoDTO);
         try {

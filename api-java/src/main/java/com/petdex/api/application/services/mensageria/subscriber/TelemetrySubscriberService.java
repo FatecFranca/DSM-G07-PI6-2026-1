@@ -6,8 +6,5 @@ import com.petdex.api.domain.contracts.dto.movimento.MovimentoMensageriaReqDTO;
 
 
 public interface TelemetrySubscriberService {
-
-    boolean processarBatimento(BatimentoMensageriaReqDTO batimento);
-    boolean processarLocalizacao(LocalizacaoMensageriaReqDTO localizacao);
-    boolean processarMovimento(MovimentoMensageriaReqDTO movimento);
+    boolean processarMensagem(String message);
 }
