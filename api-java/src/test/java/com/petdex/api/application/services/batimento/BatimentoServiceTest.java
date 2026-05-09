@@ -1,6 +1,6 @@
 package com.petdex.api.application.services.batimento;
 
-import com.petdex.api.application.services.websocket.WebSocketNotificationService;
+import com.petdex.api.application.services.websocket.interfaces.NotificationService;
 import com.petdex.api.domain.collections.Batimento;
 import com.petdex.api.domain.contracts.dto.batimento.BatimentoReqDTO;
 import com.petdex.api.domain.contracts.dto.batimento.BatimentoResDTO;
@@ -28,7 +28,7 @@ public class BatimentoServiceTest {
     private BatimentoRepository repository;
 
     @Mock
-    private WebSocketNotificationService webSocketNotificationService;
+    private NotificationService notificationService;
 
     @Spy
     private ModelMapper mapper = new ModelMapper();
@@ -53,7 +53,7 @@ public class BatimentoServiceTest {
         // verificação
         Assertions.assertThat(result).isNotNull();
         Mockito.verify(repository, Mockito.times(1)).save(Mockito.any());
-        Mockito.verify(webSocketNotificationService, Mockito.times(1)).enviarNotificacaoBatimento(Mockito.anyString(), Mockito.any());
+        Mockito.verify(notificationService, Mockito.times(1)).enviarNotificacaoBatimento(Mockito.anyString(), Mockito.any());
     }
 
     @Test

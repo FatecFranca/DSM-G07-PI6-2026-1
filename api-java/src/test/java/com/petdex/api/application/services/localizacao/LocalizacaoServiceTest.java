@@ -1,7 +1,7 @@
 package com.petdex.api.application.services.localizacao;
 
 import com.petdex.api.application.services.areasegura.IAreaSeguraService;
-import com.petdex.api.application.services.websocket.WebSocketNotificationService;
+import com.petdex.api.application.services.websocket.interfaces.NotificationService;
 import com.petdex.api.domain.collections.Localizacao;
 import com.petdex.api.domain.contracts.dto.areasegura.AreaSeguraResDTO;
 import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoReqDTO;
@@ -33,7 +33,7 @@ public class LocalizacaoServiceTest {
     private IAreaSeguraService areaSeguraService;
 
     @Mock
-    private WebSocketNotificationService webSocketNotificationService;
+    private NotificationService notificationService;
 
     @Spy
     private ModelMapper mapper = new ModelMapper();
@@ -68,6 +68,6 @@ public class LocalizacaoServiceTest {
         Assertions.assertThat(result).isNotNull();
         Assertions.assertThat(result.getIsOutsideSafeZone()).isFalse();
         Mockito.verify(repository, Mockito.times(1)).save(Mockito.any());
-        Mockito.verify(webSocketNotificationService, Mockito.times(1)).enviarNotificacaoLocalizacao(Mockito.anyString(), Mockito.any());
+        Mockito.verify(notificationService, Mockito.times(1)).enviarNotificacaoLocalizacao(Mockito.anyString(), Mockito.any());
     }
 }

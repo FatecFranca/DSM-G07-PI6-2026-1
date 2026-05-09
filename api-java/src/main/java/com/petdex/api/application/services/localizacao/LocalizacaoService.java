@@ -2,7 +2,7 @@ package com.petdex.api.application.services.localizacao;
 
 import com.petdex.api.application.services.ValidationService;
 import com.petdex.api.application.services.areasegura.IAreaSeguraService;
-import com.petdex.api.application.services.websocket.WebSocketNotificationService;
+import com.petdex.api.application.services.websocket.interfaces.NotificationService;
 import com.petdex.api.domain.collections.AreaSegura;
 import com.petdex.api.domain.collections.Localizacao;
 import com.petdex.api.domain.contracts.dto.areasegura.AreaSeguraResDTO;
@@ -36,7 +36,7 @@ public class LocalizacaoService implements ILocalizacaoService {
     private IAreaSeguraService areaSeguraService;
 
     @Autowired
-    private WebSocketNotificationService webSocketNotificationService;
+    private NotificationService notificationService;
 
     public LocalizacaoResDTO save(LocalizacaoReqDTO localizacaoReq) {
         System.out.println("╔════════════════════════════════════════════════════════════════╗");
@@ -93,7 +93,7 @@ public class LocalizacaoService implements ILocalizacaoService {
         );
 
         // Envia notificação via WebSocket
-        webSocketNotificationService.enviarNotificacaoLocalizacao(
+        notificationService.enviarNotificacaoLocalizacao(
                 localizacaoReq.getAnimal(),
                 webSocketDTO
         );

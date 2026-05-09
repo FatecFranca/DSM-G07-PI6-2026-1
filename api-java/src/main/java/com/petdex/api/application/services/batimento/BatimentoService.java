@@ -1,7 +1,7 @@
 package com.petdex.api.application.services.batimento;
 
 import com.petdex.api.application.services.ValidationService;
-import com.petdex.api.application.services.websocket.WebSocketNotificationService;
+import com.petdex.api.application.services.websocket.interfaces.NotificationService;
 import com.petdex.api.domain.collections.Batimento;
 import com.petdex.api.domain.contracts.dto.batimento.BatimentoReqDTO;
 import com.petdex.api.domain.contracts.dto.batimento.BatimentoResDTO;
@@ -30,7 +30,7 @@ public class BatimentoService implements IBatimentoService {
     private ModelMapper mapper;
 
     @Autowired
-    private WebSocketNotificationService webSocketNotificationService;
+    private NotificationService notificationService;
 
     public BatimentoResDTO save(BatimentoReqDTO batimentoReq) {
 //
@@ -51,7 +51,7 @@ public class BatimentoService implements IBatimentoService {
         );
 
         // Envia notificação via WebSocket
-        webSocketNotificationService.enviarNotificacaoBatimento(
+        notificationService.enviarNotificacaoBatimento(
                 batimentoReq.getAnimal(),
                 webSocketDTO
         );
