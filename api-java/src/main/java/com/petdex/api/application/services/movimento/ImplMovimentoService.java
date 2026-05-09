@@ -5,9 +5,12 @@ import com.petdex.api.domain.collections.Movimento;
 import com.petdex.api.domain.contracts.dto.movimento.MovimentoReqDTO;
 import com.petdex.api.domain.contracts.dto.movimento.MovimentoResDTO;
 import com.petdex.api.domain.contracts.dto.PageDTO;
+import com.petdex.api.infrastructure.exception.ResourceNotFoundException;
 import com.petdex.api.infrastructure.mongodb.MovimentoRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
@@ -16,6 +19,8 @@ import java.util.List;
 
 @Service
 public class ImplMovimentoService implements MovimentoService {
+    
+    private static final Logger logger = LoggerFactory.getLogger(ImplMovimentoService.class);
 
 
     @Autowired
@@ -30,17 +35,29 @@ public class ImplMovimentoService implements MovimentoService {
     @Override
     public MovimentoResDTO save(MovimentoReqDTO movimentoReq) {
 
-//        if (!validation.existAnimal(movimentoReq.getAnimalId()) || !validation.existColeira(movimentoReq.getColeiraId())) {
-//            return null; // Lançar excessão 404
-//        }
+        if (!validation.existAnimal(movimentoReq.getAnimal())) {
+            logger.error("Falha ao salvar movimento: Animal ID {} não encontrado", movimentoReq.getAnimal());
+            throw new ResourceNotFoundException("Animal", "ID", movimentoReq.getAnimal());
+        }
 
-        return mapper.map(movimentoRepository.save(mapper.map(movimentoReq, Movimento.class)), MovimentoResDTO.class);
+        if (!validation.existColeira(movimentoReq.getColeira())) {
+            logger.error("Falha ao salvar movimento: Coleira ID {} não encontrada", movimentoReq.getColeira());
+            throw new ResourceNotFoundException("Coleira", "ID", movimentoReq.getColeira());
+        }
+
+        MovimentoResDTO res = mapper.map(movimentoRepository.save(mapper.map(movimentoReq, Movimento.class)), MovimentoResDTO.class);
+        logger.info("Movimento cadastrado com sucesso para o animal: {}", movimentoReq.getAnimal());
+        return res;
     }
 
     @Override
     public MovimentoResDTO fidById(String movimentoId) {
-
-        return mapper.map(movimentoRepository.findById(movimentoId), MovimentoResDTO.class);
+        return movimentoRepository.findById(movimentoId)
+                .map(movimento -> mapper.map(movimento, MovimentoResDTO.class))
+                .orElseGet(() -> {
+                    logger.error("Movimento não encontrado com ID: {}", movimentoId);
+                    return null;
+                });
     }
 
     @Override

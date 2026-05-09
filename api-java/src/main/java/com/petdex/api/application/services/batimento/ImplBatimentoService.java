@@ -7,9 +7,12 @@ import com.petdex.api.domain.contracts.dto.batimento.BatimentoReqDTO;
 import com.petdex.api.domain.contracts.dto.batimento.BatimentoResDTO;
 import com.petdex.api.domain.contracts.dto.PageDTO;
 import com.petdex.api.domain.contracts.dto.websocket.BatimentoWebSocketDTO;
+import com.petdex.api.infrastructure.exception.ResourceNotFoundException;
 import com.petdex.api.infrastructure.mongodb.BatimentoRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,8 @@ import java.util.Optional;
 
 @Service
 public class ImplBatimentoService implements BatimentoService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ImplBatimentoService.class);
 
     @Autowired
     private BatimentoRepository batimentoRepository;
@@ -33,16 +38,20 @@ public class ImplBatimentoService implements BatimentoService {
     private NotificationService notificationService;
 
     public BatimentoResDTO save(BatimentoReqDTO batimentoReq) {
-//
-//        if (!validation.existAnimal(batimentoReq.getAnimalId()) || !validation.existColeira(batimentoReq.getColeiraId())) {
-//            return null; // Lançar excessão 404
-//        }
 
-        // Salva o batimento no banco de dados
+        if (!validation.existAnimal(batimentoReq.getAnimal())) {
+            logger.error("Falha ao salvar batimento: Animal ID {} não encontrado", batimentoReq.getAnimal());
+            throw new ResourceNotFoundException("Animal", "ID", batimentoReq.getAnimal());
+        }
+        
+        if (!validation.existColeira(batimentoReq.getColeira())) {
+            logger.error("Falha ao salvar batimento: Coleira ID {} não encontrada", batimentoReq.getColeira());
+            throw new ResourceNotFoundException("Coleira", "ID", batimentoReq.getColeira());
+        }
+
         Batimento batimentoSalvo = batimentoRepository.save(mapper.map(batimentoReq, Batimento.class));
         BatimentoResDTO batimentoResDTO = mapper.map(batimentoSalvo, BatimentoResDTO.class);
 
-        // Cria o DTO para envio via WebSocket
         BatimentoWebSocketDTO webSocketDTO = new BatimentoWebSocketDTO(
                 batimentoReq.getAnimal(),
                 batimentoReq.getColeira(),
@@ -50,7 +59,6 @@ public class ImplBatimentoService implements BatimentoService {
                 batimentoReq.getData()
         );
 
-        // Envia notificação via WebSocket
         notificationService.enviarNotificacaoBatimento(
                 batimentoReq.getAnimal(),
                 webSocketDTO
@@ -60,7 +68,12 @@ public class ImplBatimentoService implements BatimentoService {
     }
 
     public BatimentoResDTO fidById(String batimentoId) {
-        return mapper.map(batimentoRepository.findById(batimentoId), BatimentoResDTO.class);
+        return batimentoRepository.findById(batimentoId)
+                .map(batimento -> mapper.map(batimento, BatimentoResDTO.class))
+                .orElseGet(() -> {
+                    logger.error("Batimento não encontrado com ID: {}", batimentoId);
+                    return null;
+                });
     }
 
     public Page<BatimentoResDTO> findAllByAnimalId(String animalId, PageDTO pageDTO) {

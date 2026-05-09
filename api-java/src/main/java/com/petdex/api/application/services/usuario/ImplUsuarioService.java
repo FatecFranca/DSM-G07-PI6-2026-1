@@ -8,6 +8,8 @@ import com.petdex.api.domain.contracts.dto.usuario.UsuarioResDTO;
 import com.petdex.api.infrastructure.exception.ConflictException;
 import com.petdex.api.infrastructure.mongodb.UsuarioRepository;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -18,6 +20,8 @@ import java.util.Optional;
 
 @Service
 public class ImplUsuarioService implements UsuarioService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ImplUsuarioService.class);
     @Autowired
     ModelMapper mapper;
 
@@ -49,6 +53,7 @@ public class ImplUsuarioService implements UsuarioService {
         // Verifica se o email já está cadastrado
         Optional<Usuario> usuarioExistente = usuarioRepository.findByEmail(usuarioReqDTO.getEmail());
         if (usuarioExistente.isPresent()) {
+            logger.error("Falha ao criar usuário: O e-mail {} já está cadastrado", usuarioReqDTO.getEmail());
             throw new ConflictException("Usuário", "email", usuarioReqDTO.getEmail());
         }
 
@@ -62,7 +67,10 @@ public class ImplUsuarioService implements UsuarioService {
     @Override
     public UsuarioResDTO update(String id, UsuarioReqDTO usuarioReqDTO) {
 
-        Usuario usuarioUpdate = usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Não foi possível contrar um usuário com este ID: " + id));
+        Usuario usuarioUpdate = usuarioRepository.findById(id).orElseThrow(() -> {
+            logger.error("Falha ao atualizar: Usuário não encontrado com ID: {}", id);
+            return new RuntimeException("Não foi possível contrar um usuário com este ID: " + id);
+        });
 
         if (usuarioReqDTO.getCpf() != null) usuarioUpdate.setCpf(usuarioReqDTO.getCpf());
         if (usuarioReqDTO.getEmail() != null) usuarioUpdate.setEmail(usuarioReqDTO.getEmail());

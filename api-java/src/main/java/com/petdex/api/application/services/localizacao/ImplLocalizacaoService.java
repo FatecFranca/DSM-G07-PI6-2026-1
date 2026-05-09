@@ -9,6 +9,7 @@ import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoReqDTO;
 import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoResDTO;
 import com.petdex.api.domain.contracts.dto.PageDTO;
 import com.petdex.api.domain.contracts.dto.websocket.LocalizacaoWebSocketDTO;
+import com.petdex.api.infrastructure.exception.ResourceNotFoundException;
 import com.petdex.api.infrastructure.mongodb.LocalizacaoRepository;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -42,6 +43,16 @@ public class ImplLocalizacaoService implements LocalizacaoService {
 
     @Override
     public LocalizacaoResDTO save(LocalizacaoReqDTO localizacaoReq) {
+        if (!validation.existAnimal(localizacaoReq.getAnimal())) {
+            logger.error("Falha ao salvar localização: Animal ID {} não encontrado", localizacaoReq.getAnimal());
+            throw new ResourceNotFoundException("Animal", "ID", localizacaoReq.getAnimal());
+        }
+
+        if (!validation.existColeira(localizacaoReq.getColeira())) {
+            logger.error("Falha ao salvar localização: Coleira ID {} não encontrada", localizacaoReq.getColeira());
+            throw new ResourceNotFoundException("Coleira", "ID", localizacaoReq.getColeira());
+        }
+
         logger.info("Salvando localização para o animal: {} (Lat: {}, Lng: {})", 
                 localizacaoReq.getAnimal(), localizacaoReq.getLatitude(), localizacaoReq.getLongitude());
 

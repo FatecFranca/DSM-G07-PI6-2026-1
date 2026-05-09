@@ -7,6 +7,8 @@ import com.petdex.api.domain.contracts.dto.especie.EspecieResDTO;
 import com.petdex.api.infrastructure.mongodb.EspecieRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,8 @@ import java.util.List;
 @Service
 public class ImplEspecieService implements EspecieService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ImplEspecieService.class);
+
     @Autowired
     ModelMapper mapper;
 
@@ -24,7 +28,12 @@ public class ImplEspecieService implements EspecieService {
 
     @Override
     public EspecieResDTO findById(String id) {
-        return mapper.map(especieRepository.findById(id), EspecieResDTO.class);
+        return especieRepository.findById(id)
+                .map(especie -> mapper.map(especie, EspecieResDTO.class))
+                .orElseGet(() -> {
+                    logger.error("Espécie não encontrada com ID: {}", id);
+                    return null;
+                });
     }
 
     @Override
@@ -49,7 +58,10 @@ public class ImplEspecieService implements EspecieService {
     @Override
     public EspecieResDTO update(String id, EspecieReqDTO especieReqDTO) {
 
-        Especie especieUptade = especieRepository.findById(id).orElseThrow(() -> new RuntimeException("Não existe especie com esse ID: " + id));
+        Especie especieUptade = especieRepository.findById(id).orElseThrow(() -> {
+            logger.error("Falha ao atualizar espécie: ID {} não encontrado", id);
+            return new RuntimeException("Não existe especie com esse ID: " + id);
+        });
         if(especieReqDTO.getNome() != null) especieUptade.setNome(especieReqDTO.getNome());
 
         return mapper.map(especieRepository.save(especieUptade), EspecieResDTO.class);

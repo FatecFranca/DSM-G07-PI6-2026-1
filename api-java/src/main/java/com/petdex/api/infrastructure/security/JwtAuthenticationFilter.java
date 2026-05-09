@@ -9,80 +9,71 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-/**
- * Filtro de autenticação JWT que intercepta todas as requisições
- * Valida o token JWT presente no header Authorization
- */
+
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     @Autowired
     private JwtService jwtService;
 
-    /**
-     * Intercepta cada requisição HTTP e valida o token JWT
-     * @param request Requisição HTTP
-     * @param response Resposta HTTP
-     * @param filterChain Cadeia de filtros
-     */
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
 
-        // Extrai o header Authorization
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String userId;
 
-        // Log do header Authorization
-        // Se não houver header ou não começar com "Bearer ", continua sem autenticação
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            logger.info("Requisição sem token JWT: {}", request.getRequestURI());
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Extrai o token (remove "Bearer " do início)
         jwt = authHeader.substring(7);
 
         try {
-            // Valida o token e extrai o userId
             if (jwtService.validateToken(jwt)) {
                 userId = jwtService.extractUserId(jwt);
 
-                // Se o token é válido e não há autenticação no contexto
                 if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    // Cria um objeto de autenticação
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userId,
                             null,
-                            new ArrayList<>() // Sem roles/authorities por enquanto
+                            new ArrayList<>()
                     );
 
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                    // Define a autenticação no contexto de segurança
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            logger.error("Token JWT expirado: {}", e.getMessage());
             request.setAttribute("jwt_error", "Token JWT expirado");
         } catch (io.jsonwebtoken.MalformedJwtException e) {
+            logger.error("Token JWT malformado: {}", e.getMessage());
             request.setAttribute("jwt_error", "Token JWT malformado ou inválido");
         } catch (io.jsonwebtoken.security.SignatureException e) {
+            logger.error("Assinatura do token JWT inválida: {}", e.getMessage());
             request.setAttribute("jwt_error", "Assinatura do token JWT inválida");
         } catch (Exception e) {
-            // Token inválido - continua sem autenticação
+            logger.error("Erro ao validar token JWT: {}", e.getMessage());
             request.setAttribute("jwt_error", "Erro ao validar token JWT: " + e.getMessage());
         }
 
-        // Continua a cadeia de filtro
         filterChain.doFilter(request, response);
     }
 }

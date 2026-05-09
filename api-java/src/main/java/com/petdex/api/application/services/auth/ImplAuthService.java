@@ -8,6 +8,8 @@ import com.petdex.api.domain.contracts.dto.auth.LoginReqDTO;
 import com.petdex.api.domain.contracts.dto.auth.LoginResDTO;
 import com.petdex.api.infrastructure.mongodb.AnimalRepository;
 import com.petdex.api.infrastructure.mongodb.UsuarioRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,8 @@ import java.util.Optional;
 
 @Service
 public class ImplAuthService implements AuthService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ImplAuthService.class);
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -31,10 +35,14 @@ public class ImplAuthService implements AuthService {
     @Override
     public LoginResDTO login(LoginReqDTO loginReqDTO) {
         Usuario usuario = usuarioRepository.findByEmail(loginReqDTO.getEmail())
-                .orElseThrow(() -> new RuntimeException("Credenciais inválidas"));
+                .orElseThrow(() -> {
+                    logger.error("Falha no login: Usuário não encontrado com e-mail {}", loginReqDTO.getEmail());
+                    return new RuntimeException("Credenciais inválidas");
+                });
 
 
         if (!passwordService.validatePassword(loginReqDTO.getSenha(), usuario.getSenha())) {
+            logger.error("Falha no login: Senha incorreta para o usuário {}", loginReqDTO.getEmail());
             throw new RuntimeException("Credenciais inválidas");
         }
 

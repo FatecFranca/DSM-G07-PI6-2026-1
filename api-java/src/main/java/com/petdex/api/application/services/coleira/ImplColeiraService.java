@@ -13,12 +13,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.client.HttpServerErrorException;
 
 import java.util.List;
 
 @Service
 public class ImplColeiraService implements ColeiraService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ImplColeiraService.class);
 
     @Autowired
     ColeiraRepository coleiraRepository;
@@ -32,7 +36,10 @@ public class ImplColeiraService implements ColeiraService {
     @Override
     public ColeiraResDTO findById(String id) {
         return mapper.map(coleiraRepository.findById(id)
-                        .orElseThrow(() -> new HttpServerErrorException(HttpStatus.NOT_FOUND, "Não existe coleira com o ID: " + id)),
+                        .orElseThrow(() -> {
+                            logger.error("Coleira não encontrada com ID: {}", id);
+                            return new HttpServerErrorException(HttpStatus.NOT_FOUND, "Não existe coleira com o ID: " + id);
+                        }),
                 ColeiraResDTO.class);
     }
 
@@ -58,9 +65,14 @@ public class ImplColeiraService implements ColeiraService {
     public ColeiraResDTO create(ColeiraReqDTO coleiraReqDTO) {
 
         Animal animal = animalRepository.findById(coleiraReqDTO.getAnimal())
-                .orElseThrow(() -> new HttpServerErrorException(HttpStatus.NOT_FOUND, "Não existe animal com o ID: " + coleiraReqDTO.getAnimal()));
+                .orElseThrow(() -> {
+                    logger.error("Falha ao criar coleira: Animal ID {} não encontrado", coleiraReqDTO.getAnimal());
+                    return new HttpServerErrorException(HttpStatus.NOT_FOUND, "Não existe animal com o ID: " + coleiraReqDTO.getAnimal());
+                });
 
-        return mapper.map(coleiraRepository.save(mapper.map(coleiraReqDTO, Coleira.class)), ColeiraResDTO.class);
+        ColeiraResDTO res = mapper.map(coleiraRepository.save(mapper.map(coleiraReqDTO, Coleira.class)), ColeiraResDTO.class);
+        logger.info("Coleira cadastrada com sucesso: ID {}", res.getId());
+        return res;
     }
 
     @Override
