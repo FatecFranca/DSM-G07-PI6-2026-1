@@ -34,13 +34,13 @@ public class ImplTelemetrySubscriberService implements TelemetrySubscriberServic
     public boolean processarMensagem(String message) {
         try {
 
-            logger.info("[Telemetry Subcriber] Menssagem recebida: {}", message);
+            logger.info("[Telemetry Sub Service] Menssagem recebida: {}", message);
             JsonNode mensagemNode = mapper.readTree(message);
             JsonNode typeNode = mensagemNode.get("type");
 
             if (typeNode == null) {
-                logger.error("[Telemetry Subcriber] Campo type não informado na mensagem");
-                throw new IllegalArgumentException("[Telemetry Subcriber] Campo ´type´ não informado na mensagem");
+                logger.error("[Telemetry Sub Service] Campo type não informado na mensagem");
+                throw new IllegalArgumentException("[Telemetry Sub Service] Campo ´type´ não informado na mensagem");
             }
 
             String typeString = typeNode.asText();
@@ -65,7 +65,7 @@ public class ImplTelemetrySubscriberService implements TelemetrySubscriberServic
             }
 
         } catch (Exception e) {
-            logger.error("[Telemetry Subcriber Service] Erro ao processar mensagem {}", e.getMessage());
+            logger.error("[Telemetry Sub Service] Erro ao processar mensagem {}", e.getMessage());
             throw new RuntimeException("Erro ao processar a mensagem: ", e);
         }
     }
