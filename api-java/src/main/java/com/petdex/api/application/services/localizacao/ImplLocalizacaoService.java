@@ -11,7 +11,8 @@ import com.petdex.api.domain.contracts.dto.PageDTO;
 import com.petdex.api.domain.contracts.dto.websocket.LocalizacaoWebSocketDTO;
 import com.petdex.api.infrastructure.mongodb.LocalizacaoRepository;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,8 @@ import java.util.Optional;
 
 @Service
 public class ImplLocalizacaoService implements LocalizacaoService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ImplLocalizacaoService.class);
 
     @Autowired
     private LocalizacaoRepository localizacaoRepository;
@@ -39,26 +42,18 @@ public class ImplLocalizacaoService implements LocalizacaoService {
 
     @Override
     public LocalizacaoResDTO save(LocalizacaoReqDTO localizacaoReq) {
-        System.out.println("╔════════════════════════════════════════════════════════════════╗");
-        System.out.println("║ 🔵 LocalizacaoService.save() CHAMADO                          ║");
-        System.out.println("╠════════════════════════════════════════════════════════════════╣");
-        System.out.println("   Animal: " + localizacaoReq.getAnimal());
-        System.out.println("   Lat/Lng: " + localizacaoReq.getLatitude() + ", " + localizacaoReq.getLongitude());
-        System.out.println("   Thread: " + Thread.currentThread().getName());
-        System.out.println("╚════════════════════════════════════════════════════════════════╝");
+        logger.info("Salvando localização para o animal: {} (Lat: {}, Lng: {})", 
+                localizacaoReq.getAnimal(), localizacaoReq.getLatitude(), localizacaoReq.getLongitude());
 
-        // Salva a localização no banco de dados
         Localizacao localizacaoSalva = localizacaoRepository.save(mapper.map(localizacaoReq, Localizacao.class));
         LocalizacaoResDTO localizacaoResDTO = mapper.map(localizacaoSalva, LocalizacaoResDTO.class);
 
-        // Verifica se o animal está fora da área segura
         boolean isForaDaAreaSegura = areaSeguraService.isForaDaAreaSegura(
                 localizacaoReq.getAnimal(),
                 localizacaoReq.getLatitude(),
                 localizacaoReq.getLongitude()
         );
 
-        // Calcula a distância do perímetro (se houver área segura configurada)
         Double distanciaDoPerimetro = null;
         Optional<AreaSeguraResDTO> areaSeguraOpt = areaSeguraService.findByAnimalId(localizacaoReq.getAnimal());
         if (areaSeguraOpt.isPresent()) {
@@ -69,15 +64,12 @@ public class ImplLocalizacaoService implements LocalizacaoService {
                     localizacaoReq.getLatitude(),
                     localizacaoReq.getLongitude()
             );
-            // Distância do perímetro = distância total - raio (positivo se fora, negativo se dentro)
             distanciaDoPerimetro = distanciaTotal - areaSegura.getRaio();
         }
 
-        // Define os dados de área segura na resposta
         localizacaoResDTO.setIsOutsideSafeZone(isForaDaAreaSegura);
         localizacaoResDTO.setDistanciaDoPerimetro(distanciaDoPerimetro);
 
-        // Cria o DTO para envio via WebSocket
         LocalizacaoWebSocketDTO webSocketDTO = new LocalizacaoWebSocketDTO(
                 localizacaoReq.getAnimal(),
                 localizacaoReq.getColeira(),
@@ -88,7 +80,6 @@ public class ImplLocalizacaoService implements LocalizacaoService {
                 distanciaDoPerimetro
         );
 
-        // Envia notificação via WebSocket
         notificationService.enviarNotificacaoLocalizacao(
                 localizacaoReq.getAnimal(),
                 webSocketDTO
@@ -104,7 +95,6 @@ public class ImplLocalizacaoService implements LocalizacaoService {
         return localizacaoOpt.map(localizacao -> {
             LocalizacaoResDTO localizacaoResDTO = mapper.map(localizacao, LocalizacaoResDTO.class);
 
-            // Verifica se o animal está fora da área segura
             boolean isForaDaAreaSegura = areaSeguraService.isForaDaAreaSegura(
                     localizacao.getAnimal(),
                     localizacao.getLatitude(),
@@ -112,7 +102,6 @@ public class ImplLocalizacaoService implements LocalizacaoService {
             );
             localizacaoResDTO.setIsOutsideSafeZone(isForaDaAreaSegura);
 
-            // Calcula a distância do perímetro (se houver área segura configurada)
             Double distanciaDoPerimetro = null;
             Optional<AreaSeguraResDTO> areaSeguraOpt = areaSeguraService.findByAnimalId(localizacao.getAnimal());
             if (areaSeguraOpt.isPresent()) {
@@ -123,7 +112,6 @@ public class ImplLocalizacaoService implements LocalizacaoService {
                         localizacao.getLatitude(),
                         localizacao.getLongitude()
                 );
-                // Distância do perímetro = distância total - raio (positivo se fora, negativo se dentro)
                 distanciaDoPerimetro = distanciaTotal - areaSegura.getRaio();
             }
             localizacaoResDTO.setDistanciaDoPerimetro(distanciaDoPerimetro);
@@ -141,7 +129,6 @@ public class ImplLocalizacaoService implements LocalizacaoService {
                 .map(localizacao -> {
                     LocalizacaoResDTO localizacaoResDTO = mapper.map(localizacao, LocalizacaoResDTO.class);
 
-                    // Verifica se o animal está fora da área segura
                     boolean isForaDaAreaSegura = areaSeguraService.isForaDaAreaSegura(
                             animalId,
                             localizacao.getLatitude(),
@@ -149,7 +136,6 @@ public class ImplLocalizacaoService implements LocalizacaoService {
                     );
                     localizacaoResDTO.setIsOutsideSafeZone(isForaDaAreaSegura);
 
-                    // Calcula a distância do perímetro (se houver área segura configurada)
                     Double distanciaDoPerimetro = null;
                     Optional<AreaSeguraResDTO> areaSeguraOpt = areaSeguraService.findByAnimalId(animalId);
                     if (areaSeguraOpt.isPresent()) {
@@ -160,7 +146,6 @@ public class ImplLocalizacaoService implements LocalizacaoService {
                                 localizacao.getLatitude(),
                                 localizacao.getLongitude()
                         );
-                        // Distância do perímetro = distância total - raio (positivo se fora, negativo se dentro)
                         distanciaDoPerimetro = distanciaTotal - areaSegura.getRaio();
                     }
                     localizacaoResDTO.setDistanciaDoPerimetro(distanciaDoPerimetro);
@@ -181,7 +166,6 @@ public class ImplLocalizacaoService implements LocalizacaoService {
                 .map(localizacao -> {
                     LocalizacaoResDTO localizacaoResDTO = mapper.map(localizacao, LocalizacaoResDTO.class);
 
-                    // Verifica se o animal está fora da área segura
                     boolean isForaDaAreaSegura = areaSeguraService.isForaDaAreaSegura(
                             localizacao.getAnimal(),
                             localizacao.getLatitude(),
@@ -189,7 +173,6 @@ public class ImplLocalizacaoService implements LocalizacaoService {
                     );
                     localizacaoResDTO.setIsOutsideSafeZone(isForaDaAreaSegura);
 
-                    // Calcula a distância do perímetro (se houver área segura configurada)
                     Double distanciaDoPerimetro = null;
                     Optional<AreaSeguraResDTO> areaSeguraOpt = areaSeguraService.findByAnimalId(localizacao.getAnimal());
                     if (areaSeguraOpt.isPresent()) {
@@ -200,7 +183,6 @@ public class ImplLocalizacaoService implements LocalizacaoService {
                                 localizacao.getLatitude(),
                                 localizacao.getLongitude()
                         );
-                        // Distância do perímetro = distância total - raio (positivo se fora, negativo se dentro)
                         distanciaDoPerimetro = distanciaTotal - areaSegura.getRaio();
                     }
                     localizacaoResDTO.setDistanciaDoPerimetro(distanciaDoPerimetro);
@@ -219,7 +201,6 @@ public class ImplLocalizacaoService implements LocalizacaoService {
         return ultimaLocalizacao.map(localizacao -> {
             LocalizacaoResDTO localizacaoResDTO = mapper.map(localizacao, LocalizacaoResDTO.class);
 
-            // Verifica se o animal está fora da área segura
             boolean isForaDaAreaSegura = areaSeguraService.isForaDaAreaSegura(
                     animalId,
                     localizacao.getLatitude(),
@@ -227,7 +208,6 @@ public class ImplLocalizacaoService implements LocalizacaoService {
             );
             localizacaoResDTO.setIsOutsideSafeZone(isForaDaAreaSegura);
 
-            // Calcula a distância do perímetro (se houver área segura configurada)
             Double distanciaDoPerimetro = null;
             Optional<AreaSeguraResDTO> areaSeguraOpt = areaSeguraService.findByAnimalId(animalId);
             if (areaSeguraOpt.isPresent()) {
@@ -238,7 +218,6 @@ public class ImplLocalizacaoService implements LocalizacaoService {
                         localizacao.getLatitude(),
                         localizacao.getLongitude()
                 );
-                // Distância do perímetro = distância total - raio (positivo se fora, negativo se dentro)
                 distanciaDoPerimetro = distanciaTotal - areaSegura.getRaio();
             }
             localizacaoResDTO.setDistanciaDoPerimetro(distanciaDoPerimetro);

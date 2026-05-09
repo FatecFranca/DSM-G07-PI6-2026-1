@@ -25,15 +25,15 @@ public class TelemetryPublisherPubSub implements TelemetryPublisher {
     @Override
     public void publicarBatimento(BatimentoPublisherDTO batimento) {
         try {
-            logger.info("[Telemetry Publisher] Publicando batimento: {}", batimento);
+            logger.info("Publicando batimento: {}", batimento);
             String batimentoJson = objectMapper.writeValueAsString(batimento);
             pubSubTemplate.publish(TOPIC, batimentoJson);
-            logger.info("[Telemetry Publisher] Batimento publicado com sucesso!");
+            logger.info("Batimento publicado com sucesso!");
         } catch (JsonProcessingException e) {
-            logger.error("[Telemetry Publisher] Erro ao converter batimento para JSON: {}", e.getMessage());
+            logger.error("Erro ao converter batimento para JSON: {}", e.getMessage());
             throw new RuntimeException("Erro ao converter batimento para JSON", e);
         } catch (Exception e) {
-            logger.error("[Telemetry Publisher] Erro publicar batimento: {}", e.getMessage());
+            logger.error("Erro publicar batimento: {}", e.getMessage());
             throw new RuntimeException("Erro ao publicar batimento", e);
         }
     }
@@ -41,15 +41,15 @@ public class TelemetryPublisherPubSub implements TelemetryPublisher {
     @Override
     public void publicarLocalizacao(LocalizacaoPublisherDTO localizacao) {
         try {
-            logger.info("[Telemetry Publisher] Publicando localizacao: {}", localizacao);
+            logger.info("Publicando localizacao: {}", localizacao);
             String localizacaoJson = objectMapper.writeValueAsString(localizacao);
             pubSubTemplate.publish(TOPIC, localizacaoJson);
-            logger.info("[Telemetry Publisher] Localizacao publicada com sucesso!");
+            logger.info("Localizacao publicada com sucesso!");
         } catch (JsonProcessingException e) {
-            logger.error("[Telemetry Publisher] Erro ao converter localizacao para JSON: {}", e.getMessage());
+            logger.error("Erro ao converter localizacao para JSON: {}", e.getMessage());
             throw new RuntimeException("Erro ao converter localizacao para JSON", e);
         }  catch (Exception e) {
-            logger.error("[Telemetry Publisher] Erro publicar localizacao: {}", e.getMessage());
+            logger.error("Erro publicar localizacao: {}", e.getMessage());
             throw new RuntimeException("Erro ao publicar localizacao", e);
         }
     }
@@ -57,15 +57,15 @@ public class TelemetryPublisherPubSub implements TelemetryPublisher {
     @Override
     public void publicarMovimento(MovimentoPublisherDTO movimento) {
         try {
-            logger.info("[Telemetry Publisher] Publicando movimento: {}", movimento);
+            logger.info("Publicando movimento: {}", movimento);
             String localizacaoJson = objectMapper.writeValueAsString(movimento);
             pubSubTemplate.publish(TOPIC, localizacaoJson);
-            logger.info("[Telemetry Publisher] Movimento publicado com sucesso!");
+            logger.info("Movimento publicado com sucesso!");
         } catch (JsonProcessingException e) {
-            logger.error("[Telemetry Publisher] Erro ao converter movimento para JSON: {}", e.getMessage());
+            logger.error("Erro ao converter movimento para JSON: {}", e.getMessage());
             throw new RuntimeException("Erro ao converter movimento para JSON", e);
         } catch (Exception e) {
-            logger.error("[Telemetry Publisher] Erro publicar movimento: {}", e.getMessage());
+            logger.error("Erro publicar movimento: {}", e.getMessage());
             throw new RuntimeException("Erro ao publicar movimento", e);
         }
     }

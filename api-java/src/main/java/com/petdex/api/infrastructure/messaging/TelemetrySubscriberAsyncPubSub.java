@@ -38,17 +38,17 @@ public class TelemetrySubscriberAsyncPubSub implements CommandLineRunner, Teleme
 
         MessageReceiver receiver = (PubsubMessage message, AckReplyConsumer consumer) -> {
             try {
-                logger.info("[Telemetry Sub Async] Mensagem recebida. ID: {}", message.getMessageId());
+                logger.info("Mensagem recebida. ID: {}", message.getMessageId());
                 String data = message.getData().toStringUtf8();
                 if(!telemetrySubscriberService.processarMensagem(data)) {
-                    logger.error("[Telemetry Sub Async] Erro ao processar a mensagem. ID: {}", message.getMessageId());
+                    logger.error("Erro ao processar a mensagem. ID: {}", message.getMessageId());
                     consumer.nack();
                 } else {
-                    logger.info("[Telemetry Sub Async] Mensagem processada com sucesso. ID: {}", message.getMessageId());
+                    logger.info("Mensagem processada com sucesso. ID: {}", message.getMessageId());
                     consumer.ack();
                 }
             } catch (Exception e) {
-                logger.error("[Telemetry Sub Async] Exceção ao processar mensagem ID: {}. Erro: {}", message.getMessageId(), e.getMessage());
+                logger.error("Exceção ao processar mensagem ID: {}. Erro: {}", message.getMessageId(), e.getMessage());
                 consumer.nack();
             }
         };
@@ -57,15 +57,15 @@ public class TelemetrySubscriberAsyncPubSub implements CommandLineRunner, Teleme
         try {
             subscriber = Subscriber.newBuilder(subscriptionName, receiver).build();
             subscriber.startAsync().awaitRunning();
-            logger.info("[Telemetry Sub Async] Subscription iniciada: {}", subscriptionName);
+            logger.info("Subscription iniciada: {}", subscriptionName);
             try {
                 Thread.currentThread().join();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                logger.error("[Telemetry Sub Async] Thread interrompido: {}", e.getMessage());
+                logger.error("Thread interrompido: {}", e.getMessage());
             }
         } catch (Exception exception) {
-            logger.error("[Telemetry Sub Async] Erro: {}", exception.getMessage());
+            logger.error("Erro: {}", exception.getMessage());
             if (subscriber != null) {
                 subscriber.stopAsync();
             }

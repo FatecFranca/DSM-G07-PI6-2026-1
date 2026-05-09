@@ -38,8 +38,8 @@ public class ImplTelemetrySubscriberService implements TelemetrySubscriberServic
             JsonNode typeNode = mensagemNode.get("type");
 
             if (typeNode == null) {
-                logger.error("[Telemetry Sub Service] Campo type não informado na mensagem");
-                throw new IllegalArgumentException("[Telemetry Sub Service] Campo ´type´ não informado na mensagem");
+                logger.error("Campo 'type' não informado na mensagem");
+                throw new IllegalArgumentException("Campo 'type' não informado na mensagem");
             }
 
             String typeString = typeNode.asText();
@@ -59,26 +59,26 @@ public class ImplTelemetrySubscriberService implements TelemetrySubscriberServic
                     return this.processarMovimento(movimento);
 
                 default:
-                    logger.error("[Telemetry Subscriber Service] Tipo da mensagem desconhecido {}", type);
-                    throw new IllegalArgumentException("Tipo de mensagem desconhecido" + type);
+                    logger.error("Tipo de mensagem desconhecido: {}", type);
+                    throw new IllegalArgumentException("Tipo de mensagem desconhecido: " + type);
             }
 
         } catch (Exception e) {
-            logger.error("[Telemetry Sub Service] Erro ao processar mensagem {}", e.getMessage());
-            throw new RuntimeException("Erro ao processar a mensagem: ", e);
+            logger.error("Erro ao processar mensagem: {}", e.getMessage());
+            throw new RuntimeException("Erro ao processar a mensagem", e);
         }
     }
 
 
     private boolean processarBatimento(BatimentoPublisherDTO batimentoDTO) {
-        logger.info("[Telemetry Sub Service] Batimento recebido: {}", batimentoDTO);
+        logger.info("Batimento recebido: {}", batimentoDTO);
         try {
             BatimentoResDTO batimentoSalvo = batimentoService.save(mapper.convertValue(batimentoDTO, BatimentoReqDTO.class));
             if (batimentoSalvo == null) {
-                logger.error("[Telemetry Sub Service] ERRO: batimento não foi cadastrado");
+                logger.error("Erro: batimento não foi cadastrado");
                 return false;
             }
-            logger.info("[Telemetry Sub Service] Sucesso: Batimento cadastrado!");
+            logger.info("Batimento cadastrado com sucesso");
             return true;
         } catch (Exception exception) {
             return false;
@@ -86,14 +86,14 @@ public class ImplTelemetrySubscriberService implements TelemetrySubscriberServic
     }
 
     private boolean processarLocalizacao(LocalizacaoPublisherDTO localizacaoDTO) {
-        logger.info("[Telemetry Sub Service] Localizacao recebida: {}", localizacaoDTO);
+        logger.info("Localizacao recebida: {}", localizacaoDTO);
         try {
             LocalizacaoResDTO localizacaoSalva = localizacaoService.save(mapper.convertValue(localizacaoDTO, LocalizacaoReqDTO.class));
             if (localizacaoSalva == null) {
-                logger.error("[Telemetry Sub Service] ERRO: localizacao não foi cadastrado");
+                logger.error("Erro: localizacao não foi cadastrada");
                 return false;
             }
-            logger.info("[Telemetry Sub Service] Sucesso: Localizacao cadastrada!");
+            logger.info("Localizacao cadastrada com sucesso");
             return true;
         } catch (Exception exception) {
             return false;
@@ -102,14 +102,14 @@ public class ImplTelemetrySubscriberService implements TelemetrySubscriberServic
 
     private boolean processarMovimento(MovimentoPublisherDTO movimentoDTO) {
 
-        logger.info("[Telemetry Sub Service] Dados de movimento recebido: {}", movimentoDTO);
+        logger.info("Dados de movimento recebido: {}", movimentoDTO);
         try {
             MovimentoResDTO movimentoSalvo = movimentoService.save(mapper.convertValue(movimentoDTO, MovimentoReqDTO.class));
             if (movimentoSalvo == null) {
-                logger.error("[Telemetry Sub Service] ERRO: Dados de movimento não foram cadastrados");
+                logger.error("Erro: Dados de movimento não foram cadastrados");
                 return false;
             }
-            logger.info("[Telemetry Sub Service] Sucesso: Movimento cadastrado!");
+            logger.info("Movimento cadastrado com sucesso");
             return true;
         } catch (Exception exception) {
             return false;
