@@ -1,10 +1,12 @@
 "use client";
 
+import { FaCheckCircle, FaExclamationTriangle } from "react-icons/fa";
+
 interface Props {
   isLoaded: boolean;
   isLoadingLocation: boolean;
   error: string | null;
-  isOutsideSafeZone: boolean;
+  isOutsideSafeZone: boolean | null;
 }
 
 export default function MapOverlay({
@@ -29,6 +31,21 @@ export default function MapOverlay({
         </div>
       )}
 
+      {/* SAFE ZONE NOTIFICATION */}
+      {isOutsideSafeZone === true && (
+        <div className="absolute top-4 right-4 z-50">
+          <div
+            className="py-2 px-3 rounded-xl border-[1.5px] flex items-center gap-2 shadow-md bg-[var(--color-red-50)] border-[var(--color-red-200)]"
+          >
+            <FaExclamationTriangle className="text-[var(--color-red-700)] text-[18px]" />
+            <span
+              className="font-semibold text-[13px] text-[var(--color-red-700)]"
+            >
+              Pet fora da área segura
+            </span>
+          </div>
+        </div>
+      )}
     </>
   );
 }
