@@ -54,7 +54,6 @@ bool lendo = false;
 
 #define GPS_BAUD 9600
 TinyGPSPlus gps;
-// Create an instance of the HardwareSerial class for Serial 2
 HardwareSerial gpsSerial(2);
 
 // -------------- // --------------
@@ -357,9 +356,10 @@ void enviarBatimento(int media, String timestamp) {
   digitalWrite(GREEN_PIN, HIGH);
   digitalWrite(RED_PIN, LOW);
   digitalWrite(BLUE_PIN, LOW);
-  String endpoint = String(serverName) + "/batimentos";
+  String endpoint = String(serverName) + "/telemetria/batimento";
   HTTPClient http;
   String jsonData = "{";
+  jsondata += "\"type\": \"heart_rate\", ";
   jsonData += "\"frequenciaMedia\": \"" + String(media) + "\", ";
   jsonData += "\"coleira\": \"" + coleiraId + "\", ";
   jsonData += "\"animal\": \"" + animalId + "\", ";
@@ -374,12 +374,11 @@ void enviarBatimento(int media, String timestamp) {
   int httpResponseCode = http.POST(jsonData);
   Serial.print("POST status: ");
   Serial.println(httpResponseCode);
-  if (httpResponseCode > 0) {
-    String response = http.getString();
-    Serial.println("Resposta: " + response);
+  if (httpResponseCode == 201 || httpResponseCode == 200) {
+    Serial.println("Dados enviados para cadastro com sucesso!");
   } else {
-    digitalWrite(RED_PIN, HIGH);
     Serial.println("Erro ao enviar dados.");
+    digitalWrite(RED_PIN, HIGH);
     delay(500);
   }
 
@@ -390,9 +389,10 @@ void enviarLocalizacao(double latitude, double longitude, String timestamp) {
   digitalWrite(GREEN_PIN, HIGH);
   digitalWrite(RED_PIN, LOW);
   digitalWrite(BLUE_PIN, LOW);
-  String endpoint = String(serverName) + "/localizacoes";
+  String endpoint = String(serverName) + "/telemetria/localizacao";
   HTTPClient http;
   String jsonData = "{";
+  jsondata += "\"type\": \"location\", ";
   jsonData += "\"latitude\": \"" + String(latitude, 6) + "\", ";
   jsonData += "\"longitude\": \"" + String(longitude, 6) + "\", ";
   jsonData += "\"coleira\": \"" + coleiraId + "\", ";
@@ -408,13 +408,11 @@ void enviarLocalizacao(double latitude, double longitude, String timestamp) {
   int httpResponseCode = http.POST(jsonData);
   Serial.print("POST status: ");
   Serial.println(httpResponseCode);
-  if (httpResponseCode > 0) {
-    String response = http.getString();
-    Serial.println("Resposta: " + response);
+  if (httpResponseCode == 201 || httpResponseCode == 200) {
+    Serial.println("Dados enviados para cadastro com sucesso!");
   } else {
     Serial.println("Erro ao enviar dados.");
     digitalWrite(RED_PIN, HIGH);
-    Serial.println("Erro ao enviar dados.");
     delay(500);
   }
 
@@ -425,9 +423,10 @@ void enviarMovimento(double accX, double accY, double accZ, double angleX, doubl
   digitalWrite(GREEN_PIN, HIGH);
   digitalWrite(RED_PIN, LOW);
   digitalWrite(BLUE_PIN, LOW);
-  String endpoint = String(serverName) + "/movimentos";
+  String endpoint = String(serverName) + "/telemetria/movimento";
   HTTPClient http;
   String jsonData = "{";
+  jsondata += "\"type\": \"movement\", ";
   jsonData += "\"acelerometroX\": \"" + String(accX) + "\", ";
   jsonData += "\"acelerometroY\": \"" + String(accY) + "\", ";
   jsonData += "\"acelerometroZ\": \"" + String(accZ) + "\", ";
@@ -447,13 +446,11 @@ void enviarMovimento(double accX, double accY, double accZ, double angleX, doubl
   int httpResponseCode = http.POST(jsonData);
   Serial.print("POST status: ");
   Serial.println(httpResponseCode);
-  if (httpResponseCode > 0) {
-    String response = http.getString();
-    Serial.println("Resposta: " + response);
+  if (httpResponseCode == 201 || httpResponseCode == 200) {
+    Serial.println("Dados enviados para cadastro com sucesso!");
   } else {
     Serial.println("Erro ao enviar dados.");
     digitalWrite(RED_PIN, HIGH);
-    Serial.println("Erro ao enviar dados.");
     delay(500);
   }
 
