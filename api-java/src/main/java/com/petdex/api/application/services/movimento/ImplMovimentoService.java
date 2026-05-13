@@ -5,6 +5,7 @@ import com.petdex.api.domain.collections.Movimento;
 import com.petdex.api.application.contracts.dto.movimento.MovimentoReqDTO;
 import com.petdex.api.application.contracts.dto.movimento.MovimentoResDTO;
 import com.petdex.api.application.contracts.dto.PageDTO;
+import com.petdex.api.infrastructure.exception.ResourceNotFoundException;
 import com.petdex.api.infrastructure.mongodb.MovimentoRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
