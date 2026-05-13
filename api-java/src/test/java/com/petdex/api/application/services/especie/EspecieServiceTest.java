@@ -20,7 +20,7 @@ import java.util.Optional;
 public class EspecieServiceTest {
 
     @InjectMocks
-    private EspecieService service;
+    private ImplEspecieService service;
 
     @Mock
     private EspecieRepository repository;

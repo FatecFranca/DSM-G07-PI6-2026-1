@@ -9,6 +9,7 @@ import com.petdex.api.infrastructure.exception.ResourceNotFoundException;
 import com.petdex.api.infrastructure.mongodb.AnimalRepository;
 import com.petdex.api.infrastructure.mongodb.EspecieRepository;
 import com.petdex.api.infrastructure.mongodb.RacaRepository;
+import com.petdex.api.infrastructure.mongodb.UsuarioRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +37,9 @@ public class AnimalServiceTest {
 
     @Mock
     private RacaRepository racaRepository;
+
+    @Mock
+    private UsuarioRepository usuarioRepository;
 
     @Spy
     private ModelMapper mapper = new ModelMapper();
@@ -86,12 +90,16 @@ public class AnimalServiceTest {
         // cenário
         AnimalReqDTO req = new AnimalReqDTO();
         req.setNome("Rex");
+        req.setUsuario("usuario123");
+        req.setRaca("raca123");
         
         Animal animalSalvo = new Animal();
         animalSalvo.setId("123");
         animalSalvo.setNome("Rex");
 
         Mockito.when(animalRepository.save(Mockito.any(Animal.class))).thenReturn(animalSalvo);
+        Mockito.when(usuarioRepository.existsById(Mockito.anyString())).thenReturn(true);
+        Mockito.when(racaRepository.existsById(Mockito.anyString())).thenReturn(true);
 
         // ação
         AnimalResDTO result = service.create(req);

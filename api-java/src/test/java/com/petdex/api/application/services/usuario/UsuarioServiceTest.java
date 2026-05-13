@@ -1,6 +1,6 @@
 package com.petdex.api.application.services.usuario;
 
-import com.petdex.api.infrastructure.security.PasswordService;
+import com.petdex.api.application.services.security.EncryptionService;
 import com.petdex.api.domain.collections.Usuario;
 import com.petdex.api.application.contracts.dto.usuario.UsuarioReqDTO;
 import com.petdex.api.application.contracts.dto.usuario.UsuarioResDTO;
@@ -22,13 +22,13 @@ import java.util.Optional;
 public class UsuarioServiceTest {
 
     @InjectMocks
-    private UsuarioService service;
+    private ImplUsuarioService service;
 
     @Mock
     private UsuarioRepository repository;
 
     @Mock
-    private PasswordService passwordService;
+    private EncryptionService encryptionService;
 
     @Spy
     private ModelMapper mapper = new ModelMapper();
@@ -56,7 +56,7 @@ public class UsuarioServiceTest {
         Usuario usuarioSalvo = new Usuario("1L", "John", "123.456.789-00", "(11) 99999-9999", "novo@email.com", "hash123");
 
         Mockito.when(repository.findByEmail("novo@email.com")).thenReturn(Optional.empty());
-        Mockito.when(passwordService.hashPassword("senha123")).thenReturn("hash123");
+        Mockito.when(encryptionService.hashPassword("senha123")).thenReturn("hash123");
         Mockito.when(repository.save(Mockito.any(Usuario.class))).thenReturn(usuarioSalvo);
 
         // ação

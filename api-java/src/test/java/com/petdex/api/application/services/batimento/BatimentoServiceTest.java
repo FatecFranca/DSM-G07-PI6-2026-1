@@ -5,6 +5,7 @@ import com.petdex.api.domain.collections.Batimento;
 import com.petdex.api.application.contracts.dto.batimento.BatimentoReqDTO;
 import com.petdex.api.application.contracts.dto.batimento.BatimentoResDTO;
 import com.petdex.api.infrastructure.mongodb.BatimentoRepository;
+import com.petdex.api.application.services.ValidationService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +31,9 @@ public class BatimentoServiceTest {
     @Mock
     private NotificationService notificationService;
 
+    @Mock
+    private ValidationService validation;
+
     @Spy
     private ModelMapper mapper = new ModelMapper();
 
@@ -38,6 +42,7 @@ public class BatimentoServiceTest {
         // cenário
         BatimentoReqDTO req = new BatimentoReqDTO();
         req.setAnimal("animal123");
+        req.setColeira("coleira123");
         req.setFrequenciaMedia(80);
         req.setData(new Date());
 
@@ -46,6 +51,8 @@ public class BatimentoServiceTest {
         batimentoSalvo.setAnimal("animal123");
 
         Mockito.when(repository.save(Mockito.any(Batimento.class))).thenReturn(batimentoSalvo);
+        Mockito.when(validation.existAnimal(Mockito.anyString())).thenReturn(true);
+        Mockito.when(validation.existColeira(Mockito.anyString())).thenReturn(true);
 
         // ação
         BatimentoResDTO result = service.save(req);

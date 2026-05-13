@@ -23,7 +23,7 @@ import java.util.Optional;
 public class ColeiraServiceTest {
 
     @InjectMocks
-    private ColeiraService service;
+    private ImplColeiraService service;
 
     @Mock
     private ColeiraRepository repository;

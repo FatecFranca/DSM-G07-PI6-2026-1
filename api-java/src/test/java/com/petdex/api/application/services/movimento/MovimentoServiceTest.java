@@ -4,6 +4,7 @@ import com.petdex.api.domain.collections.Movimento;
 import com.petdex.api.application.contracts.dto.movimento.MovimentoReqDTO;
 import com.petdex.api.application.contracts.dto.movimento.MovimentoResDTO;
 import com.petdex.api.infrastructure.mongodb.MovimentoRepository;
+import com.petdex.api.application.services.ValidationService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,10 +21,13 @@ import java.util.Optional;
 public class MovimentoServiceTest {
 
     @InjectMocks
-    private MovimentoService service;
+    private ImplMovimentoService service;
 
     @Mock
     private MovimentoRepository repository;
+
+    @Mock
+    private ValidationService validation;
 
     @Spy
     private ModelMapper mapper = new ModelMapper();
@@ -33,11 +37,14 @@ public class MovimentoServiceTest {
         // cenário
         MovimentoReqDTO req = new MovimentoReqDTO();
         req.setAnimal("animal123");
+        req.setColeira("coleira123");
 
         Movimento movimentoSalvo = new Movimento();
         movimentoSalvo.setId("123");
 
         Mockito.when(repository.save(Mockito.any(Movimento.class))).thenReturn(movimentoSalvo);
+        Mockito.when(validation.existAnimal(Mockito.anyString())).thenReturn(true);
+        Mockito.when(validation.existColeira(Mockito.anyString())).thenReturn(true);
 
         // ação
         MovimentoResDTO result = service.save(req);

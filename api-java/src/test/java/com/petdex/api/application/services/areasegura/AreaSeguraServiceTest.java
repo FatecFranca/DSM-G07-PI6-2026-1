@@ -4,6 +4,7 @@ import com.petdex.api.domain.collections.AreaSegura;
 import com.petdex.api.application.contracts.dto.areasegura.AreaSeguraReqDTO;
 import com.petdex.api.application.contracts.dto.areasegura.AreaSeguraResDTO;
 import com.petdex.api.infrastructure.mongodb.AreaSeguraRepository;
+import com.petdex.api.application.services.ValidationService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,6 +26,9 @@ public class AreaSeguraServiceTest {
     @Mock
     private AreaSeguraRepository repository;
 
+    @Mock
+    private ValidationService validation;
+
     @Spy
     private ModelMapper mapper = new ModelMapper();
 
@@ -33,6 +37,7 @@ public class AreaSeguraServiceTest {
         // cenário
         AreaSeguraReqDTO req = new AreaSeguraReqDTO("animal123", -23.55, -46.63, 500.0);
         Mockito.when(repository.findByAnimal("animal123")).thenReturn(Optional.empty());
+        Mockito.when(validation.existAnimal(Mockito.anyString())).thenReturn(true);
         Mockito.when(repository.save(Mockito.any(AreaSegura.class))).thenAnswer(i -> i.getArguments()[0]);
 
         // ação

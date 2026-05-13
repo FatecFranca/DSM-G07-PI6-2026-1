@@ -22,7 +22,7 @@ import java.util.Optional;
 public class RacaServiceTest {
 
     @InjectMocks
-    private RacaService service;
+    private ImplRacaService service;
 
     @Mock
     private RacaRepository racaRepository;

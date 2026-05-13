@@ -21,16 +21,24 @@ jobs:
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
       - name: 🏗️ Build e Push da API Java
-        run: |
-          cd api-java
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/api-java:${{ env.BRANCH_NAME }} .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/api-java:${{ env.BRANCH_NAME }}
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 2
+          command: |
+            cd api-java
+            docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/api-java:${{ env.BRANCH_NAME }} .
+            docker push ${{ secrets.DOCKERHUB_USERNAME }}/api-java:${{ env.BRANCH_NAME }}
 
       - name: 🐍 Build e Push da API Python
-        run: |
-          cd api-python
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/api-python:${BRANCH_NAME} .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/api-python:${BRANCH_NAME}
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 2
+          command: |
+            cd api-python
+            docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/api-python:${BRANCH_NAME} .
+            docker push ${{ secrets.DOCKERHUB_USERNAME }}/api-python:${BRANCH_NAME}
 
   deploy:
     runs-on: ubuntu-latest
