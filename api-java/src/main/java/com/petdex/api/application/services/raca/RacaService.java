@@ -17,5 +17,4 @@ public interface RacaService {
     RacaResDTO update (String id, RacaReqDTO racaReqDTO);
     void delete (String id);
 
-    List<Raca> debugGetAllRacas();
 }

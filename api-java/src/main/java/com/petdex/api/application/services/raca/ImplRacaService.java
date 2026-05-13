@@ -73,20 +73,12 @@ public class ImplRacaService implements RacaService {
         // Buscar TODAS as raças do banco
         List<Raca> todasRacas = racaRepository.findAll();
 
-        System.out.println("=== DEBUG FILTRO MANUAL POR ESPECIE ===");
-        System.out.println("ID da Espécie buscado: '" + especieId + "'");
-        System.out.println("Total de raças no banco: " + todasRacas.size());
-
         // Filtrar manualmente as raças que pertencem à espécie
         List<Raca> racasFiltradas = todasRacas.stream()
                 .filter(raca -> {
-                    boolean match = raca.getEspecie() != null && raca.getEspecie().equals(especieId);
-                    System.out.println("Raça: " + raca.getNome() + " | Especie: '" + raca.getEspecie() + "' | Match: " + match);
-                    return match;
+                    return raca.getEspecie() != null && raca.getEspecie().equals(especieId);
                 })
                 .toList();
-
-        System.out.println("Total de raças filtradas: " + racasFiltradas.size());
 
         // Ordenar manualmente por nome
         List<Raca> racasOrdenadas = racasFiltradas.stream()
@@ -103,8 +95,6 @@ public class ImplRacaService implements RacaService {
                 ? racasOrdenadas.subList(start, end)
                 : List.of();
 
-        System.out.println("Raças na página " + page + ": " + racasPaginadas.size());
-
         // Converter para DTO
         List<RacaResDTO> dtoList = racasPaginadas.stream()
                 .map(r -> mapper.map(r, RacaResDTO.class))
@@ -118,20 +108,5 @@ public class ImplRacaService implements RacaService {
        Raca racaDelete =  racaRepository.findById(id)
                .orElseThrow(() -> new RuntimeException("Não foi possível encontrar uma raça com o ID: " + id));
        racaRepository.delete(racaDelete);
-    }
-
-    @Override
-    public List<Raca> debugGetAllRacas() {
-        List<Raca> todasRacas = racaRepository.findAll();
-        System.out.println("=== DEBUG TODAS AS RACAS ===");
-        System.out.println("Total de raças no banco: " + todasRacas.size());
-        todasRacas.forEach(r -> {
-            System.out.println("Raça: " + r.getNome());
-            System.out.println("  ID: " + r.getId());
-            System.out.println("  Especie: '" + r.getEspecie() + "'");
-            System.out.println("  Especie length: " + (r.getEspecie() != null ? r.getEspecie().length() : "null"));
-            System.out.println("  Especie bytes: " + (r.getEspecie() != null ? java.util.Arrays.toString(r.getEspecie().getBytes()) : "null"));
-        });
-        return todasRacas;
     }
 }

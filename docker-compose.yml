@@ -5,7 +5,7 @@ networks:
 
 services:
   api-java:
-    image: petdex/api-java:main
+    image: ${DOCKERHUB_USERNAME}/api-java:${TAG}
 
     networks:
       - petdex-network
@@ -22,7 +22,7 @@ services:
     restart: always
 
   api-python:
-    image: petdex/api-python:main
+    image: ${DOCKERHUB_USERNAME}/api-python:${TAG}
     networks:
       - petdex-network
     ports:
