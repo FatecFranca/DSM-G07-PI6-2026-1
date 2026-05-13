@@ -1,9 +1,9 @@
 package com.petdex.api.application.services.batimento;
 
-import com.petdex.api.application.services.websocket.WebSocketNotificationService;
+import com.petdex.api.application.contracts.websocket.NotificationService;
 import com.petdex.api.domain.collections.Batimento;
-import com.petdex.api.domain.contracts.dto.batimento.BatimentoReqDTO;
-import com.petdex.api.domain.contracts.dto.batimento.BatimentoResDTO;
+import com.petdex.api.application.contracts.dto.batimento.BatimentoReqDTO;
+import com.petdex.api.application.contracts.dto.batimento.BatimentoResDTO;
 import com.petdex.api.infrastructure.mongodb.BatimentoRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -22,13 +22,13 @@ import java.util.Optional;
 public class BatimentoServiceTest {
 
     @InjectMocks
-    private BatimentoService service;
+    private ImplBatimentoService service;
 
     @Mock
     private BatimentoRepository repository;
 
     @Mock
-    private WebSocketNotificationService webSocketNotificationService;
+    private NotificationService notificationService;
 
     @Spy
     private ModelMapper mapper = new ModelMapper();
@@ -53,7 +53,7 @@ public class BatimentoServiceTest {
         // verificação
         Assertions.assertThat(result).isNotNull();
         Mockito.verify(repository, Mockito.times(1)).save(Mockito.any());
-        Mockito.verify(webSocketNotificationService, Mockito.times(1)).enviarNotificacaoBatimento(Mockito.anyString(), Mockito.any());
+        Mockito.verify(notificationService, Mockito.times(1)).enviarNotificacaoBatimento(Mockito.anyString(), Mockito.any());
     }
 
     @Test

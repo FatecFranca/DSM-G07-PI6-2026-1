@@ -1,9 +1,9 @@
 package com.petdex.api.view;
 
-import com.petdex.api.application.services.coleira.IColeiraService;
-import com.petdex.api.domain.contracts.dto.PageDTO;
-import com.petdex.api.domain.contracts.dto.coleira.ColeiraReqDTO;
-import com.petdex.api.domain.contracts.dto.coleira.ColeiraResDTO;
+import com.petdex.api.application.services.coleira.ColeiraService;
+import com.petdex.api.application.contracts.dto.PageDTO;
+import com.petdex.api.application.contracts.dto.coleira.ColeiraReqDTO;
+import com.petdex.api.application.contracts.dto.coleira.ColeiraResDTO;
 import com.petdex.api.swagger.respostas.ExemploRespostaDeletarColeira;
 import com.petdex.api.swagger.respostas.ExemploRespostaPageColeira;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 public class ColeiraController {
 
     @Autowired
-    IColeiraService coleiraService;
+    private ColeiraService coleiraService;
 
     @Operation(
             summary = "Consultar coleira",

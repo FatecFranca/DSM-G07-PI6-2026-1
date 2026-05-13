@@ -1,6 +1,6 @@
 package com.petdex.api.infrastructure.security;
 
-import com.petdex.api.application.services.security.JwtService;
+import com.petdex.api.application.services.security.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -10,25 +10,21 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Interceptor para autenticação JWT em conexões WebSocket
- * Valida o token JWT presente no header ou query parameter da conexão STOMP
- */
 @Component
 public class WebSocketAuthInterceptor implements ChannelInterceptor {
+    
+    private static final Logger logger = LoggerFactory.getLogger(WebSocketAuthInterceptor.class);
 
     @Autowired
-    private JwtService jwtService;
+    private TokenService tokenService;
 
-    /**
-     * Intercepta mensagens antes de serem enviadas ao canal
-     * Valida o token JWT na conexão CONNECT
-     */
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
@@ -38,8 +34,8 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
 
             if (token != null) {
                 try {
-                    if (jwtService.validateToken(token)) {
-                        String userId = jwtService.extractUserId(token);
+                    if (tokenService.validateToken(token)) {
+                        String userId = tokenService.extractUserId(token);
 
                         if (userId != null) {
                             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
@@ -53,7 +49,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                         }
                     }
                 } catch (Exception e) {
-                    System.err.println("Erro ao validar token JWT no WebSocket: " + e.getMessage());
+                    logger.error("Erro ao validar token JWT no WebSocket: {}", e.getMessage());
                 }
             }
         }
@@ -61,13 +57,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
         return message;
     }
 
-    /**
-     * Extrai o token JWT do header Authorization ou do query parameter
-     * @param accessor Accessor do header STOMP
-     * @return Token JWT ou null se não encontrado
-     */
     private String extractToken(StompHeaderAccessor accessor) {
-        // Tenta extrair do header Authorization
         List<String> authHeaders = accessor.getNativeHeader("Authorization");
         if (authHeaders != null && !authHeaders.isEmpty()) {
             String authHeader = authHeaders.get(0);
@@ -75,8 +65,6 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                 return authHeader.substring(7);
             }
         }
-
-        // Tenta extrair do query parameter 'token'
         List<String> tokenParams = accessor.getNativeHeader("token");
         if (tokenParams != null && !tokenParams.isEmpty()) {
             return tokenParams.get(0);

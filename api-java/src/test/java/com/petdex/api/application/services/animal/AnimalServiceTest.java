@@ -3,8 +3,8 @@ package com.petdex.api.application.services.animal;
 import com.petdex.api.domain.collections.Animal;
 import com.petdex.api.domain.collections.Especie;
 import com.petdex.api.domain.collections.Raca;
-import com.petdex.api.domain.contracts.dto.animal.AnimalReqDTO;
-import com.petdex.api.domain.contracts.dto.animal.AnimalResDTO;
+import com.petdex.api.application.contracts.dto.animal.AnimalReqDTO;
+import com.petdex.api.application.contracts.dto.animal.AnimalResDTO;
 import com.petdex.api.infrastructure.exception.ResourceNotFoundException;
 import com.petdex.api.infrastructure.mongodb.AnimalRepository;
 import com.petdex.api.infrastructure.mongodb.EspecieRepository;
@@ -20,14 +20,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
 public class AnimalServiceTest {
 
     @InjectMocks
-    private AnimalService service;
+    private ImplAnimalService service;
 
     @Mock
     private AnimalRepository animalRepository;

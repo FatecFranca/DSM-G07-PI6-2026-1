@@ -1,16 +1,15 @@
 package com.petdex.api.view;
 
-import com.petdex.api.application.services.localizacao.ILocalizacaoService;
-import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoReqDTO;
-import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoResDTO;
-import com.petdex.api.domain.contracts.dto.PageDTO;
+import com.petdex.api.application.services.localizacao.LocalizacaoService;
+import com.petdex.api.application.contracts.dto.localizacao.LocalizacaoReqDTO;
+import com.petdex.api.application.contracts.dto.localizacao.LocalizacaoResDTO;
+import com.petdex.api.application.contracts.dto.PageDTO;
 import com.petdex.api.swagger.respostas.ExemploRespostaPageLocalizacao;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class LocalizacaoController {
 
     @Autowired
-    private ILocalizacaoService localizacaoService;
+    private LocalizacaoService localizacaoService;
 
     @Operation(
             summary = "Consultar localização",

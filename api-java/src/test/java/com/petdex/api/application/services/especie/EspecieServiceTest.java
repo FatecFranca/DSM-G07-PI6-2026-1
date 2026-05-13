@@ -1,8 +1,8 @@
 package com.petdex.api.application.services.especie;
 
 import com.petdex.api.domain.collections.Especie;
-import com.petdex.api.domain.contracts.dto.especie.EspecieReqDTO;
-import com.petdex.api.domain.contracts.dto.especie.EspecieResDTO;
+import com.petdex.api.application.contracts.dto.especie.EspecieReqDTO;
+import com.petdex.api.application.contracts.dto.especie.EspecieResDTO;
 import com.petdex.api.infrastructure.mongodb.EspecieRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

@@ -1,6 +1,6 @@
 package com.petdex.api.swagger.respostas;
 
-import com.petdex.api.domain.contracts.dto.usuario.UsuarioResDTO;
+import com.petdex.api.application.contracts.dto.usuario.UsuarioResDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;

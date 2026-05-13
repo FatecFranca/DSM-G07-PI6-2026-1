@@ -1,8 +1,8 @@
 package com.petdex.api.application.services.areasegura;
 
 import com.petdex.api.domain.collections.AreaSegura;
-import com.petdex.api.domain.contracts.dto.areasegura.AreaSeguraReqDTO;
-import com.petdex.api.domain.contracts.dto.areasegura.AreaSeguraResDTO;
+import com.petdex.api.application.contracts.dto.areasegura.AreaSeguraReqDTO;
+import com.petdex.api.application.contracts.dto.areasegura.AreaSeguraResDTO;
 import com.petdex.api.infrastructure.mongodb.AreaSeguraRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ import java.util.Optional;
 public class AreaSeguraServiceTest {
 
     @InjectMocks
-    private AreaSeguraService service;
+    private ImplAreaSeguraService service;
 
     @Mock
     private AreaSeguraRepository repository;

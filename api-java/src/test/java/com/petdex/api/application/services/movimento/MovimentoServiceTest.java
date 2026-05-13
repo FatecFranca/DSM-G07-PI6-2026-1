@@ -1,8 +1,8 @@
 package com.petdex.api.application.services.movimento;
 
 import com.petdex.api.domain.collections.Movimento;
-import com.petdex.api.domain.contracts.dto.movimento.MovimentoReqDTO;
-import com.petdex.api.domain.contracts.dto.movimento.MovimentoResDTO;
+import com.petdex.api.application.contracts.dto.movimento.MovimentoReqDTO;
+import com.petdex.api.application.contracts.dto.movimento.MovimentoResDTO;
 import com.petdex.api.infrastructure.mongodb.MovimentoRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

@@ -1,11 +1,11 @@
 package com.petdex.api.application.services.localizacao;
 
 import com.petdex.api.application.services.areasegura.IAreaSeguraService;
-import com.petdex.api.application.services.websocket.WebSocketNotificationService;
+import com.petdex.api.application.contracts.websocket.NotificationService;
 import com.petdex.api.domain.collections.Localizacao;
-import com.petdex.api.domain.contracts.dto.areasegura.AreaSeguraResDTO;
-import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoReqDTO;
-import com.petdex.api.domain.contracts.dto.localizacao.LocalizacaoResDTO;
+import com.petdex.api.application.contracts.dto.areasegura.AreaSeguraResDTO;
+import com.petdex.api.application.contracts.dto.localizacao.LocalizacaoReqDTO;
+import com.petdex.api.application.contracts.dto.localizacao.LocalizacaoResDTO;
 import com.petdex.api.infrastructure.mongodb.LocalizacaoRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ import java.util.Optional;
 public class LocalizacaoServiceTest {
 
     @InjectMocks
-    private LocalizacaoService service;
+    private ImplLocalizacaoService service;
 
     @Mock
     private LocalizacaoRepository repository;
@@ -33,7 +33,7 @@ public class LocalizacaoServiceTest {
     private IAreaSeguraService areaSeguraService;
 
     @Mock
-    private WebSocketNotificationService webSocketNotificationService;
+    private NotificationService notificationService;
 
     @Spy
     private ModelMapper mapper = new ModelMapper();
@@ -68,6 +68,6 @@ public class LocalizacaoServiceTest {
         Assertions.assertThat(result).isNotNull();
         Assertions.assertThat(result.getIsOutsideSafeZone()).isFalse();
         Mockito.verify(repository, Mockito.times(1)).save(Mockito.any());
-        Mockito.verify(webSocketNotificationService, Mockito.times(1)).enviarNotificacaoLocalizacao(Mockito.anyString(), Mockito.any());
+        Mockito.verify(notificationService, Mockito.times(1)).enviarNotificacaoLocalizacao(Mockito.anyString(), Mockito.any());
     }
 }

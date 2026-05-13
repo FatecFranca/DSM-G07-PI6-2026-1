@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
@@ -13,12 +15,11 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Handler para erros de acesso negado (403 Forbidden)
- * Retorna uma mensagem JSON personalizada quando o usuário não tem permissão para acessar o recurso
- */
+
 @Component
 public class JwtAccessDeniedHandler implements AccessDeniedHandler {
+    
+    private static final Logger logger = LoggerFactory.getLogger(JwtAccessDeniedHandler.class);
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response,
@@ -26,6 +27,8 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
         
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+
+        logger.error("Acesso negado ao recurso: {} - O usuário não tem as permissões necessárias.", request.getRequestURI());
 
         Map<String, Object> errorDetails = new HashMap<>();
         errorDetails.put("timestamp", LocalDateTime.now().toString());

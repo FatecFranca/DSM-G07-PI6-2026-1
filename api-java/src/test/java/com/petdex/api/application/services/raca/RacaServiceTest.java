@@ -2,8 +2,8 @@ package com.petdex.api.application.services.raca;
 
 import com.petdex.api.domain.collections.Especie;
 import com.petdex.api.domain.collections.Raca;
-import com.petdex.api.domain.contracts.dto.raca.RacaReqDTO;
-import com.petdex.api.domain.contracts.dto.raca.RacaResDTO;
+import com.petdex.api.application.contracts.dto.raca.RacaReqDTO;
+import com.petdex.api.application.contracts.dto.raca.RacaResDTO;
 import com.petdex.api.infrastructure.mongodb.EspecieRepository;
 import com.petdex.api.infrastructure.mongodb.RacaRepository;
 import org.assertj.core.api.Assertions;
