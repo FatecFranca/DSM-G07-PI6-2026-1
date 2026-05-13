@@ -15,8 +15,10 @@ services:
       - DATABASE_URI=${DATABASE_URI}
       - JWT_SECRET=${JWT_SECRET}
       - BCRYPT_SALT=${BCRYPT_SALT}
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/google-cloud-key.json
     volumes:
       - ./uploads:/uploads 
+      - ./app/google-cloud-key.json:/app/google-cloud-key.json
     restart: always
 
   api-python:
