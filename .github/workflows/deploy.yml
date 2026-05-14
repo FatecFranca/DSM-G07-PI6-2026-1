@@ -48,6 +48,14 @@ jobs:
       - name: 🧩 Checkout do repositório
         uses: actions/checkout@v4
 
+      - name: 📁 Criar diretório de destino na VM
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: mkdir -p /home/${{ secrets.VM_USER }}/petdex
+
       - name: 📦 Copiar docker-compose.yml para a VM
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -73,7 +81,6 @@ jobs:
           script: |
             echo "🚀 Atualizando APIs da PetDex na VM..."
 
-            mkdir -p /home/${{ secrets.VM_USER }}/petdex
             cd /home/${{ secrets.VM_USER }}/petdex
 
             docker compose pull
