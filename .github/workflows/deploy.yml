@@ -55,6 +55,10 @@ jobs:
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
           script: |
+            echo "--- Usuário da Pipeline ---"
+            whoami
+            echo "--- Diretório Home ---"
+            echo $HOME
             mkdir -p ~/petdex
             echo "--- Espaço em Disco ---"
             df -h /
