@@ -41,6 +41,7 @@ export default function StatusBar({
         rounded-t-[30px]
         p-4
         flex flex-col
+        shadow-[0_-5px_10px_rgba(0,0,0,0.08)]
         transition-all duration-300
         ${isExpanded ? "h-[220px]" : "h-[110px]"}
       `}

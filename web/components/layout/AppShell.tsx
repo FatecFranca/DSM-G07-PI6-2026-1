@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import MapScreen from "@/components/screens/MapScreen/MapScreen";
 import LocationScreen from "@/components/screens/LocationScreen/LocationScreen";
+import HealthScreen from "@/components/screens/HealthScreen/HealthScreen";
 import BottomNavWithStatus from "@/components/ui/BottomNavWithStatus";
 
 import { getAnimalData } from "@/services/animalService";
@@ -52,7 +53,11 @@ export default function AppShell() {
       key="map"
       setLastBpm={setLastBpm}
     />,
-    <div key="health">Health</div>,
+    <HealthScreen 
+      key="health" 
+      animalId={animalId} 
+      animalName="Uno" 
+    />,
     <div key="checkup">Checkup</div>,
     <LocationScreen
       key="location"
