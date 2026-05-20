@@ -31,45 +31,46 @@ export class AnimalStatsService {
   async getMediaUltimos5Dias(animalId: string): Promise<HeartbeatData[]> {
     try {
       const res = await fetch(
-        `${PYTHON_API}/batimentos/animal/${animalId}/media-ultimos-5-dias`,
+        `/api/batimentos-history?animalId=${animalId}`,
         { headers: this.getHeaders() }
       );
       if (!res.ok) throw new Error("Falha ao buscar médias dos últimos 5 dias");
       
-      const data = await res.json();
-      // O formato retornado pela API deve ser um dicionário { "YYYY-MM-DD": media } ou uma lista
-      // Vamos tentar adaptar. Se for um dicionário de datas:
-      if (typeof data === "object" && !Array.isArray(data)) {
-        return Object.entries(data).map(([date, bpm]) => {
-          // Format date from YYYY-MM-DD to DD/MM
-          const [, month, day] = date.split("-");
-          return {
-            data: `${day}/${month}`,
-            bpm: Math.round(Number(bpm)),
-          };
-        }).reverse(); // Ensure chronological order if necessary, but usually API handles it.
-      }
-      
-      // Se for uma lista
-      if (Array.isArray(data)) {
-         return data.map((item: any) => {
-           const dateStr = item.data || item.date;
-           let formattedDate = dateStr;
-           if (dateStr && typeof dateStr === "string" && dateStr.includes("-")) {
-             const baseDate = dateStr.split("T")[0].split(" ")[0]; // "2025-10-17"
-             const parts = baseDate.split("-");
-             if (parts.length >= 3) {
-               formattedDate = `${parts[2]}/${parts[1]}`;
-             }
-           }
-           return {
-             data: formattedDate,
-             bpm: Math.round(item.media || item.bpm || item.valor),
-           };
-         });
-      }
+      const pageData = await res.json();
+      const content = pageData.content || [];
 
-      return [];
+      // Filtra registros com data futura (limite: final do dia 2026-05-20)
+      const maxDate = new Date("2026-05-20T23:59:59-03:00").getTime();
+      const validRecords = content.filter((item: any) => {
+        if (!item.data) return false;
+        const itemTime = new Date(item.data).getTime();
+        return !isNaN(itemTime) && itemTime <= maxDate;
+      });
+
+      // Agrupa os registros por dia (YYYY-MM-DD)
+      const groupedByDay: { [dateStr: string]: { sum: number; count: number } } = {};
+      validRecords.forEach((item: any) => {
+        const dateStr = item.data.split("T")[0]; // YYYY-MM-DD
+        if (!groupedByDay[dateStr]) {
+          groupedByDay[dateStr] = { sum: 0, count: 0 };
+        }
+        groupedByDay[dateStr].sum += item.frequenciaMedia || 0;
+        groupedByDay[dateStr].count += 1;
+      });
+
+      // Calcula as médias, ordena cronologicamente e pega os últimos 5 dias
+      const days = Object.entries(groupedByDay)
+        .map(([dateStr, stats]) => {
+          const [, month, day] = dateStr.split("-");
+          return {
+            dateStr,
+            data: `${day}/${month}`,
+            bpm: Math.round(stats.sum / stats.count),
+          };
+        })
+        .sort((a, b) => a.dateStr.localeCompare(b.dateStr));
+
+      return days.slice(-5);
     } catch (e) {
       console.error("[AnimalStatsService] getMediaUltimos5Dias", e);
       return [];
@@ -124,34 +125,51 @@ export class AnimalStatsService {
   async getMediaUltimas5HorasRegistradas(animalId: string): Promise<HeartbeatData[]> {
     try {
       const res = await fetch(
-        `${PYTHON_API}/batimentos/animal/${animalId}/media-ultimas-5-horas-registradas`,
+        `/api/batimentos-history?animalId=${animalId}`,
         { headers: this.getHeaders() }
       );
       if (!res.ok) throw new Error("Falha ao buscar médias das últimas 5 horas");
       
-      const data = await res.json();
-      
-      // Se for um dicionário de timestamps: { "2025-10-17 20:00:00-03:00": bpm }
-      if (typeof data === "object" && !Array.isArray(data)) {
-        return Object.entries(data).map(([date, bpm]) => {
-          return {
-            data: date, // Keep original timestamp so the chart can format it
-            bpm: Math.round(Number(bpm)),
-          };
-        }).reverse();
-      }
-      
-      // Se for uma lista de objetos
-      if (Array.isArray(data)) {
-         return data.map((item: any) => {
-           return {
-             data: item.data || item.date || item.timestamp || "",
-             bpm: Math.round(item.media || item.bpm || item.valor || item.frequenciaMedia || 0),
-           };
-         });
-      }
+      const pageData = await res.json();
+      const content = pageData.content || [];
 
-      return [];
+      // Filtra registros com data futura (limite: final do dia 2026-05-20)
+      const maxDate = new Date("2026-05-20T23:59:59-03:00").getTime();
+      const validRecords = content.filter((item: any) => {
+        if (!item.data) return false;
+        const itemTime = new Date(item.data).getTime();
+        return !isNaN(itemTime) && itemTime <= maxDate;
+      });
+
+      // Agrupa por hora (YYYY-MM-DDTHH:00:00)
+      const groupedByHour: { [hourStr: string]: { sum: number; count: number } } = {};
+      validRecords.forEach((item: any) => {
+        const d = new Date(item.data);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
+        const hour = String(d.getHours()).padStart(2, "0");
+        
+        const hourStr = `${year}-${month}-${day}T${hour}:00:00`;
+        if (!groupedByHour[hourStr]) {
+          groupedByHour[hourStr] = { sum: 0, count: 0 };
+        }
+        groupedByHour[hourStr].sum += item.frequenciaMedia || 0;
+        groupedByHour[hourStr].count += 1;
+      });
+
+      // Calcula as médias, ordena cronologicamente e pega as últimas 5 horas
+      const hours = Object.entries(groupedByHour)
+        .map(([hourStr, stats]) => {
+          return {
+            hourStr,
+            data: hourStr,
+            bpm: Math.round(stats.sum / stats.count),
+          };
+        })
+        .sort((a, b) => a.hourStr.localeCompare(b.hourStr));
+
+      return hours.slice(-5);
     } catch (e) {
       console.error("[AnimalStatsService] getMediaUltimas5HorasRegistradas", e);
       return [];

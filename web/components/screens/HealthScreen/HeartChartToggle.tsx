@@ -61,7 +61,7 @@ const CustomTooltip = ({ active, payload }: any) => {
 
 
 export default function HeartChartToggle({ horasData, diasData }: Props) {
-  const [activeTab, setActiveTab] = useState<"horas" | "dias">("horas");
+  const [activeTab, setActiveTab] = useState<"horas" | "dias">("dias");
 
   // Se não houver nenhum dado, exibe fallback amigável
   if (horasData.length === 0 && diasData.length === 0) {
@@ -74,8 +74,8 @@ export default function HeartChartToggle({ horasData, diasData }: Props) {
     );
   }
 
-  // Se o usuário selecionou horas mas não tem dados, muda pro que tiver
-  const currentTab = activeTab === "horas" && horasData.length === 0 ? "dias" : activeTab;
+  // Se o usuário selecionou dias mas não tem dados, muda pro que tiver
+  const currentTab = activeTab === "dias" && diasData.length === 0 ? "horas" : activeTab;
 
   // Cálculo dinâmico dos limites de Y para o gráfico de linha (horas)
   let minY = 0;
@@ -124,18 +124,6 @@ export default function HeartChartToggle({ horasData, diasData }: Props) {
 
         {/* Pill Selector com micro-animação */}
         <div className="flex bg-[rgba(117,72,25,0.08)] p-0.5 rounded-full border border-[rgba(117,72,25,0.1)] shrink-0">
-          {horasData.length > 0 && (
-            <button
-              onClick={() => setActiveTab("horas")}
-              className={`px-3 py-1 text-[11px] font-bold rounded-full cursor-pointer transition-all duration-300 ${
-                currentTab === "horas"
-                  ? "bg-[var(--color-orange-900)] text-white shadow-sm"
-                  : "text-[var(--color-brown)] hover:opacity-80"
-              }`}
-            >
-              Horas
-            </button>
-          )}
           {diasData.length > 0 && (
             <button
               onClick={() => setActiveTab("dias")}
@@ -146,6 +134,18 @@ export default function HeartChartToggle({ horasData, diasData }: Props) {
               }`}
             >
               Dias
+            </button>
+          )}
+          {horasData.length > 0 && (
+            <button
+              onClick={() => setActiveTab("horas")}
+              className={`px-3 py-1 text-[11px] font-bold rounded-full cursor-pointer transition-all duration-300 ${
+                currentTab === "horas"
+                  ? "bg-[var(--color-orange-900)] text-white shadow-sm"
+                  : "text-[var(--color-brown)] hover:opacity-80"
+              }`}
+            >
+              Horas
             </button>
           )}
         </div>

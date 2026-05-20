@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { animalStatsService, AnaliseBatimento } from "@/services/animalStatsService";
+import { getAnimalData } from "@/services/animalService";
 import { subscribe } from "@/services/websocketService";
 
 interface Props {
@@ -17,8 +18,20 @@ export default function HealthStatsCard({ animalId }: Props) {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await animalStatsService.getAnaliseUltimoBatimento(animalId);
-      setAnalise(data);
+      const [data, animalData] = await Promise.all([
+        animalStatsService.getAnaliseUltimoBatimento(animalId),
+        getAnimalData(animalId),
+      ]);
+
+      if (data) {
+        const bpmValue = animalData?.bpm ?? data.batimentoAnalisado;
+        setAnalise({
+          ...data,
+          batimentoAnalisado: bpmValue,
+        });
+      } else {
+        setAnalise(null);
+      }
     } catch (err) {
       setError("Não foi possível carregar a análise no momento.");
     } finally {
@@ -65,7 +78,7 @@ export default function HealthStatsCard({ animalId }: Props) {
           <p className="font-bold text-[16px] text-[var(--color-brown)] text-center mb-4">
             {analise.titulo}
           </p>
-          
+
           <p className="text-[14px] text-[var(--color-brown)] text-center leading-relaxed mb-5">
             {analise.interpretacao}
           </p>

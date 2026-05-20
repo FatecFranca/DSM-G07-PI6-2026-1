@@ -15,12 +15,16 @@ interface Props {
   title: string;
   data: HeartbeatData[];
   backgroundColor?: string;
+  chartHeight?: number;
+  compact?: boolean;
 }
 
 export default function HeartLineChart({
   title,
   data,
   backgroundColor = "var(--color-sand-900)",
+  chartHeight = 220,
+  compact = false,
 }: Props) {
   if (data.length === 0) {
     return (
@@ -67,13 +71,17 @@ export default function HeartLineChart({
   return (
     <div
       style={{ backgroundColor }}
-      className="w-full rounded-[24px] p-6 shadow-md flex flex-col items-center"
+      className={`w-full rounded-[24px] shadow-md flex flex-col items-center ${
+        compact ? "p-3 pb-4" : "p-6"
+      }`}
     >
-      <h3 className="text-[var(--color-orange-900)] font-bold text-[14px] text-center mb-6">
+      <h3 className={`text-[var(--color-orange-900)] font-bold text-[14px] text-center ${
+        compact ? "mb-2" : "mb-6"
+      }`}>
         {title}
       </h3>
 
-      <div className="w-full h-[220px]">
+      <div className="w-full" style={{ height: chartHeight }}>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={data}

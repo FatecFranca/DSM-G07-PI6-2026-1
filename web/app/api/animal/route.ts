@@ -23,12 +23,15 @@ export async function GET(req: NextRequest) {
         },
         cache: "no-store",
       }),
-      fetch(`${JAVA_API}/batimentos/animal/${animalId}/ultimo`, {
-        headers: {
-          Authorization: token || "",
-        },
-        cache: "no-store",
-      }),
+      fetch(
+        `${JAVA_API}/batimentos/animal/${animalId}?size=1&sortBy=id&direction=desc`,
+        {
+          headers: {
+            Authorization: token || "",
+          },
+          cache: "no-store",
+        }
+      ),
     ]);
 
     if (!animalRes.ok || !heartbeatRes.ok) {
@@ -39,7 +42,8 @@ export async function GET(req: NextRequest) {
     }
 
     const animal = await animalRes.json();
-    const heartbeat = await heartbeatRes.json();
+    const heartbeatPage = await heartbeatRes.json();
+    const heartbeat = heartbeatPage.content?.[0] || null;
 
     return NextResponse.json({
       nome: animal.nome,
