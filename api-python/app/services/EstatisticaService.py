@@ -12,10 +12,8 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 from scipy.stats import pearsonr
 from sklearn.preprocessing import StandardScaler
-from datetime import timedelta
 from app.infraestructure.clients.java_api_client import JavaAPIClient
 import logging
-
 
 logger = logging.getLogger("EstatisticaService")
 
@@ -23,9 +21,9 @@ class EstatisticaService:
     def __init__(self):
         self.java_api_client = JavaAPIClient()
 
-    def _get_animal_todos_batimentos(self, animal_id: str, token: str, max_pages: int = 3)-> list[dict]:
+    def _get_animal_todos_batimentos(self, animal_id: str, token: str, max_pages: int = 3) -> list[dict]:
         batimentos = []
-        page= 0
+        page = 0
         size = 100
 
         if not max_pages:
@@ -36,7 +34,7 @@ class EstatisticaService:
             status_code, response = self.java_api_client.get_animal_batimentos(animal_id, token, page, size)
 
             if status_code != 200:
-                logger.error(f"API retornou {status_code}. Response: {response.text[:300]}")
+                logger.error(f"API retornou {status_code}. Response: {response.text[:300] if hasattr(response, 'text') else str(response)[:300]}")
                 return []
 
             if not response:
@@ -47,7 +45,7 @@ class EstatisticaService:
             batimentos.extend(response.get("content", []))
             
             if total_pages > 1:
-                for page in range (1, total_pages):
+                for page in range(1, total_pages):
                     status_code, response = self.java_api_client.get_animal_batimentos(animal_id, token, page, size)
                     if response:
                         batimentos.extend(response.get("content", []))
@@ -58,7 +56,7 @@ class EstatisticaService:
 
         return batimentos
 
-    def _get_animal_movimentos_todos(self, animal_id: str, token: str, max_pages: int = 3)-> list[dict]:
+    def _get_animal_movimentos_todos(self, animal_id: str, token: str, max_pages: int = 3) -> list[dict]:
         movimentos = []
         page = 0
         size = 100
@@ -71,7 +69,7 @@ class EstatisticaService:
             status_code, response = self.java_api_client.get_animal_movimentos(animal_id, token, page, size)
 
             if status_code != 200:
-                logger.error(f"API retornou {status_code}. Response: {response.text[:300]}")
+                logger.error(f"API retornou {status_code}. Response: {response.text[:300] if hasattr(response, 'text') else str(response)[:300]}")
                 return []
 
             if not response:
@@ -82,7 +80,7 @@ class EstatisticaService:
             movimentos.extend(response.get("content", []))
 
             if total_pages > 1:
-                for page in range (1, total_pages):
+                for page in range(1, total_pages):
                     status_code, response = self.java_api_client.get_animal_movimentos(animal_id, token, page, size)
                     if response:
                         movimentos.extend(response.get("content", []))
@@ -93,20 +91,45 @@ class EstatisticaService:
 
         return movimentos
 
+    # ---------------------------------------------------------
+    # Métodos Puros (Cálculos de Negócio)
+    # ---------------------------------------------------------
 
+    def calcular_estatisticas(self, dados: List[dict]) -> dict:
+        if not dados:
+            return {
+                "media": None,
+                "mediana": None,
+                "moda": None,
+                "desvio_padrao": None,
+                "assimetria": None,
+                "curtose": None
+            }
+        df = pd.DataFrame(dados)
+        if df.empty or "frequenciaMedia" not in df.columns:
+            return {
+                "media": None,
+                "mediana": None,
+                "moda": None,
+                "desvio_padrao": None,
+                "assimetria": None,
+                "curtose": None
+            }
 
-    def batimentos_calcular_estatisticas(self, animal_id: str, token: str) -> dict:
-
-        batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
-   
-        if not batimentos:
-            return {"error": True, "mensagem": "Nenhum batimento disponível."}
-
-        df = pd.DataFrame(batimentos)
         df["frequenciaMedia"] = pd.to_numeric(df["frequenciaMedia"], errors="coerce")
         valores = df["frequenciaMedia"].dropna()
         valores = valores[(valores >= 30) & (valores <= 200)]
         print(f"Total bruto: {len(df)} | Após filtro de faixa: {len(valores)}")
+
+        if valores.empty:
+            return {
+                "media": None,
+                "mediana": None,
+                "moda": None,
+                "desvio_padrao": None,
+                "assimetria": None,
+                "curtose": None
+            }
 
         media = valores.mean()
         desvio = valores.std()
@@ -130,19 +153,16 @@ class EstatisticaService:
             "media": float(valores.mean()),
             "mediana": float(valores.median()),
             "moda": float(valores.mode().iloc[0]) if not valores.mode().empty else None,
-            "desvio_padrao": float(valores.std()),
-            "assimetria": float(skew(valores, bias=False)),
-            "curtose": float(kurtosis(valores, bias=False))
+            "desvio_padrao": float(valores.std()) if not pd.isna(valores.std()) else 0.0,
+            "assimetria": float(skew(valores, bias=False)) if len(valores) > 2 else 0.0,
+            "curtose": float(kurtosis(valores, bias=False)) if len(valores) > 3 else 0.0
         }
 
-    def media_batimentos_por_intervalo(self, animal_id: str, token: str, inicio: date, fim: date) -> Dict:
+    def media_por_intervalo(self, dados: List[dict], inicio: date, fim: date) -> Dict:
+        if not dados:
+            return {"media": None, "mensagem": "Nenhum dado disponível."}
 
-        batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
-
-        if not batimentos:
-            return {"error": True, "media": None, "mensagem": "Nenhum dado disponível."}
-
-        df = pd.DataFrame(batimentos)
+        df = pd.DataFrame(dados)
 
         if 'data' not in df.columns or 'frequenciaMedia' not in df.columns:
             return {"media": None, "mensagem": "Colunas esperadas não encontradas."}
@@ -160,8 +180,7 @@ class EstatisticaService:
         media = int(round(float(df_filtrado['frequenciaMedia'].mean())))
         return {"media": media}
 
-
-    def calcular_probabilidade(self, valor: int, valores_batimentos: list) ->dict :
+    def calcular_probabilidade(self, valor: int, valores_batimentos: list) -> dict:
         valores_validos = [v for v in valores_batimentos if isinstance(v, (int, float)) and 20 <= v <= 200]
 
         if not valores_validos:
@@ -181,7 +200,10 @@ class EstatisticaService:
                 "avaliacao": "O valor informado está fora da faixa fisiológica plausível para cães e gatos (20 a 200 BPM)."
             }
 
-        z = abs((valor - media) / desvio)
+        # Evita divisão por zero se desvio for nulo
+        desvio_calculo = desvio if desvio > 0 else 1.0
+
+        z = abs((valor - media) / desvio_calculo)
         prob = (1 - norm.cdf(z)) * 2 * 100
 
         if z < 1:
@@ -203,7 +225,7 @@ class EstatisticaService:
             titulo = "Batimento incomum ❗"
             interpretacao = (
                 f"O valor de {valor} BPM é estatisticamente incomum com base nos últimos dias. "
-                f"A chance de isso ocorrer naturalmente é de apenas {round(prob, 2)}%. Isso pode indicar agitação, estresse, exaustão ou até uma condição fisiológica crítica, como frequência cardíaca muito alta ou muito baixa. Observe o comportamento do seu pet e, se os sinais persistirem, tente acalmá-lo e procure um veterinário o quanto antes."
+                f"A chance de isso ocorrer naturalmente é de apenas {round(prob, 2)}%. Isso pode indicar agitação, estresse, exaustão ou até uma condition fisiológica crítica, como frequência cardíaca muito alta ou muito baixa. Observe o comportamento do seu pet e, se os sinais persistirem, tente acalmá-lo e procure um veterinário o quanto antes."
             )
         else:
             classificacao = "Raro ou fora do padrão"
@@ -223,55 +245,78 @@ class EstatisticaService:
             "interpretacao": interpretacao,
             "avaliacao": interpretacao
         }
-    
-    def probabilidade_batimento(self, animal_id: str, token: str, valor: int) -> dict:
-        try:
-            batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
-            
-            if not batimentos:
-                return {"error": True, "media": None, "mensagem": "Nenhum dado disponível."}
 
-            valores_batimentos = [batimento["frequenciaMedia"] for batimento in batimentos if isinstance(batimento.get("frequenciaMedia"), (int, float))]
-            if not valores_batimentos:
-                return {"error": True, "mensagem": "Nenhum dado de batimentos disponível."}
+    def calcular_probabilidade_ultimo_batimento(self, valor: int, valores_batimentos: list) -> dict:
+        valores_validos = [v for v in valores_batimentos if isinstance(v, (int, float)) and 20 <= v <= 200]
 
-            return self.calcular_probabilidade(valor=valor, valores_batimentos=valores_batimentos)
-        except Exception as e:
-            logger.exception("Erro ao calcular probalidade do batimento")
-            return {"error": True, "mensagem": "Erro ao calcular probablidade do batimento"}
+        if not valores_validos:
+            return {
+                "erro": "Não há dados suficientes dentro da faixa fisiológica (20 a 200 BPM) para análise."
+            }
 
-    def probabilidade_ultimo_batimento(self, animal_id: str, token: str) -> dict:
-        try:
-            status_code, response = self.java_api_client.get_animal_ultimo_batimento(animal_id, token)
+        media = np.mean(valores_validos)
+        desvio = np.std(valores_validos)
 
-            if status_code != 200:
-                return {"error": True, "mensagem": f"Erro {status_code} na APIao buscar último batimento do animal"}
+        if valor < 20 or valor > 250:
+            return {
+                "valor_informado": valor,
+                "media_registrada": int(round(media)),
+                "desvio_padrao": int(round(desvio)),
+                "titulo": "Último batimento fora da faixa ❌",
+                "batimento_analisado": f"{valor} BPM",
+                "interpretacao": "O último batimento coletado está fora da faixa fisiológica plausível para cães e gatos (20 a 200 BPM). Provavelmente ocorreu um erro com a coleira durante a coleta."
+            }
 
-            if not response:
-                return {"error": True, "mensagem": f"API retornou conteúdo vazio na resposta"}
+        # Evita divisão por zero se desvio for nulo
+        desvio_calculo = desvio if desvio > 0 else 1.0
 
-            valor_ultimo_batimento = response.get("frequenciaMedia", 0)  
+        z = abs((valor - media) / desvio_calculo)
+        prob = (1 - norm.cdf(z)) * 2 * 100
 
-            batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
-            if not batimentos:
-                return {"error": True, "media": "Nenhum dado disponível."}
+        if z < 1:
+            classificacao = "Dentro do esperado"
+            titulo = "Batimento esperado ✅"
+            interpretacao = (
+                f"O valor do último batimento coletado está dentro do comportamento normal observado nos últimos dias. "
+            )
+        elif z < 2:
+            classificacao = "Ligeiramente incomum"
+            titulo = "Batimento um pouco fora do comum ⚠️"
+            interpretacao = (
+                f"O valor do último batimento coletado é um pouco diferente da média recente. "
+                f"Não é necessário se preocupar, mas observe o comportamento do seu pet."
+            )
+        elif z < 3:
+            classificacao = "Incomum"
+            titulo = "Batimento incomum ❗"
+            interpretacao = (
+                f"O valor do último batimento coletado é estatisticamente incomum com base nos últimos dias."
+                f"Isso pode indicar agitação, estresse, exaustão ou até uma condição fisiológica crítica. Observe o comportamento do seu pet e, se os sinais persistirem, tente acalmá-lo, observe o comportamneto dele e as próximas análises, se persistir procure um veterinário"
+            )
+        else:
+            classificacao = "Raro ou fora do padrão"
+            titulo = "Batimento raro ou atípico 🚨"
+            interpretacao = (
+                f"O valor do último batimento coletado é muito raro com base nos dados recentes. "
+                f"Isso pode indicar uma situação atípica, erro na medição ou necessidade de atenção veterinária se persistir."
+            )
 
-            valores_batimentos = [batimento["frequenciaMedia"] for batimento in batimentos if isinstance(batimento.get("frequenciaMedia"), (int, float))]
-            if not valores_batimentos:
-                return {"error": True, "mensagem": "Nenhum dado de batimentos disponível."}
-            return self.calcular_probabilidade(valor=valor_ultimo_batimento, valores_batimentos=valores_batimentos)
-        except Exception as e:
-            logger.exception("Erro ao calcular probalidade do último batimento")
-            return {"error": True, "mensagem": "Erro ao calcular probablidade do último batimento"}
+        return {
+            "valor_informado": valor,
+            "media_registrada": int(round(media)),
+            "desvio_padrao": int(round(desvio)),
+            "probabilidade_percentual": round(prob, 2),
+            "classificacao": classificacao,
+            "titulo": titulo,
+            "interpretacao": interpretacao,
+            "batimento_analisado": f"{valor} BPM",
+            "avaliacao": interpretacao
+        }
 
-
-    def media_ultimos_5_dias_validos(self, animal_id: str, token: str) -> dict:
-
-        batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
-        if not batimentos:
-            return {"error": True, "media": "Nenhum dado disponível."}
-
-        df = pd.DataFrame(batimentos)
+    def obter_media_ultimos_5_dias_validos(self, dados: List[dict]) -> dict:
+        if not dados:
+            return {}
+        df = pd.DataFrame(dados)
 
         if 'data' not in df.columns or 'frequenciaMedia' not in df.columns:
             logger.error(f"Colunas esperadas não encontradas. Colunas encontradas: {df.columns.tolist()}",)
@@ -289,12 +334,10 @@ class EstatisticaService:
         resultado = {str(data): int(round(float(media))) for data, media in ultimos_5_dias.sort_index().items()}
         return resultado
 
-    def media_ultimas_5_horas_registradas(self, animal_id: str, token: str) -> dict:
-        batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
-        if not batimentos:
-            return {"error": True, "media": "Nenhum dado disponível."}
-
-        df = pd.DataFrame(batimentos)
+    def obter_media_ultimas_5_horas_registradas(self, dados: List[dict]) -> dict:
+        if not dados:
+            return {"media": None, "media_por_hora": {}, "mensagem": "Nenhum dado disponível."}
+        df = pd.DataFrame(dados)
         if df.empty:
             return {"media": None, "media_por_hora": {}, "mensagem": "Nenhum dado disponível."}
 
@@ -330,8 +373,6 @@ class EstatisticaService:
             "media": media_geral,
             "media_por_hora": medias_formatadas
         }
-
-
 
     def executar_regressao(self, batimentos: List[dict], movimentos: List[dict]) -> Dict:
         df_bat = pd.DataFrame(batimentos)
@@ -390,4 +431,102 @@ class EstatisticaService:
             "padronizacao": scaler_info
         }
 
+    # ---------------------------------------------------------
+    # Métodos de Orquestração (Integração com JavaAPIClient)
+    # ---------------------------------------------------------
 
+    def batimentos_calcular_estatisticas(self, animal_id: str, token: str) -> dict:
+        batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
+        if not batimentos:
+            return {"error": True, "mensagem": "Nenhum batimento disponível."}
+        return self.calcular_estatisticas(batimentos)
+
+    def media_batimentos_por_intervalo(self, animal_id: str, token: str, inicio: date, fim: date) -> Dict:
+        batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
+        if not batimentos:
+            return {"error": True, "media": None, "mensagem": "Nenhum dado disponível."}
+        return self.media_por_intervalo(batimentos, inicio, fim)
+
+    def probabilidade_batimento(self, animal_id: str, token: str, valor: int) -> dict:
+        try:
+            batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
+            if not batimentos:
+                return {"error": True, "mensagem": "Nenhum dado disponível."}
+
+            valores_batimentos = [batimento["frequenciaMedia"] for batimento in batimentos if isinstance(batimento.get("frequenciaMedia"), (int, float))]
+            if not valores_batimentos:
+                return {"error": True, "mensagem": "Nenhum dado de batimentos disponível."}
+
+            return self.calcular_probabilidade(valor=valor, valores_batimentos=valores_batimentos)
+        except Exception as e:
+            logger.exception("Erro ao calcular probabilidade do batimento")
+            return {"error": True, "mensagem": "Erro ao calcular probabilidade do batimento"}
+
+    def probabilidade_ultimo_batimento(self, animal_id: str, token: str) -> dict:
+        try:
+            status_code, response = self.java_api_client.get_animal_ultimo_batimento(animal_id, token)
+            if status_code != 200 or not response:
+                return {"error": True, "mensagem": "Erro ao buscar último batimento do animal"}
+
+            valor_ultimo_batimento = response.get("frequenciaMedia", None)
+            if valor_ultimo_batimento is None:
+                return {"error": True, "mensagem": "Não foi possível obter o último batimento"}
+
+            batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
+            if not batimentos:
+                return {"error": True, "mensagem": "Nenhum dado disponível."}
+
+            valores_batimentos = [batimento["frequenciaMedia"] for batimento in batimentos if isinstance(batimento.get("frequenciaMedia"), (int, float))]
+            if not valores_batimentos:
+                return {"error": True, "mensagem": "Nenhum dado de batimentos disponível."}
+
+            return self.calcular_probabilidade_ultimo_batimento(valor=valor_ultimo_batimento, valores_batimentos=valores_batimentos)
+        except Exception as e:
+            logger.exception("Erro ao calcular probabilidade do último batimento")
+            return {"error": True, "mensagem": "Erro ao calcular probabilidade do último batimento"}
+
+    def media_ultimos_5_dias_validos(self, animal_id: str, token: str) -> dict:
+        batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
+        if not batimentos:
+            return {}
+        return self.obter_media_ultimos_5_dias_validos(batimentos)
+
+    def media_ultimas_5_horas_registradas(self, animal_id: str, token: str) -> dict:
+        batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
+        if not batimentos:
+            return {"media": None, "media_por_hora": {}, "mensagem": "Nenhum dado disponível."}
+        return self.obter_media_ultimas_5_horas_registradas(batimentos)
+
+    def analise_regressao_batimentos(self, animal_id: str, token: str) -> dict:
+        batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
+        movimentos = self._get_animal_movimentos_todos(animal_id, token, max_pages=3)
+        if not batimentos or not movimentos:
+            return {"erro": "Dados insuficientes para análise."}
+        return self.executar_regressao(batimentos, movimentos)
+
+    def predizer_batimento(self, animal_id: str, token: str, acelerometroX: float, acelerometroY: float, acelerometroZ: float) -> dict:
+        resultado = self.analise_regressao_batimentos(animal_id, token)
+        if "erro" in resultado:
+            return {"erro": "Dados insuficientes para gerar o modelo de regressão."}
+
+        coef = resultado["coeficientes"]
+        intercepto = resultado["coeficiente_geral"]
+        padronizacao = resultado["padronizacao"]
+
+        entrada_padronizada = {
+            "acelerometroX": (acelerometroX - padronizacao["media"][0]) / padronizacao["desvio"][0],
+            "acelerometroY": (acelerometroY - padronizacao["media"][1]) / padronizacao["desvio"][1],
+            "acelerometroZ": (acelerometroZ - padronizacao["media"][2]) / padronizacao["desvio"][2]
+        }
+
+        frequencia_prevista = (
+            intercepto
+            + coef["acelerometroX"] * entrada_padronizada["acelerometroX"]
+            + coef["acelerometroY"] * entrada_padronizada["acelerometroY"]
+            + coef["acelerometroZ"] * entrada_padronizada["acelerometroZ"]
+        )
+
+        return {
+            "frequencia_prevista": round(frequencia_prevista, 2),
+            "funcao_usada": resultado["funcao_regressao"]
+        }
