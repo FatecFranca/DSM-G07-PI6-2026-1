@@ -23,28 +23,40 @@ export async function GET(req: NextRequest) {
         },
         cache: "no-store",
       }),
-      fetch(`${JAVA_API}/batimentos/animal/${animalId}/ultimo`, {
-        headers: {
-          Authorization: token || "",
-        },
-        cache: "no-store",
-      }),
+      fetch(
+        `${JAVA_API}/batimentos/animal/${animalId}/ultimo`,
+        {
+          headers: {
+            Authorization: token || "",
+          },
+          cache: "no-store",
+        }
+      ),
     ]);
 
-    if (!animalRes.ok || !heartbeatRes.ok) {
+    if (!animalRes.ok) {
       return NextResponse.json(
-        { error: "Erro ao buscar dados" },
+        { error: "Erro ao buscar dados do animal" },
         { status: 500 }
       );
     }
 
     const animal = await animalRes.json();
-    const heartbeat = await heartbeatRes.json();
+    let bpm: number | null = null;
+
+    if (heartbeatRes.ok) {
+      try {
+        const heartbeat = await heartbeatRes.json();
+        bpm = heartbeat?.frequenciaMedia ?? null;
+      } catch (err) {
+        console.warn("Falha ao analisar JSON do ultimo batimento", err);
+      }
+    }
 
     return NextResponse.json({
       nome: animal.nome,
       sexo: animal.sexo,
-      bpm: heartbeat?.frequenciaMedia ?? null,
+      bpm,
     });
   } catch (e) {
     return NextResponse.json(

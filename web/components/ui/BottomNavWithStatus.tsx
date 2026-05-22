@@ -8,6 +8,7 @@ interface Props {
   onChange: (index: number) => void;
   lastBpm?: number | null;
   isConnected?: boolean;
+  animalId?: string;
 }
 
 export default function BottomNavWithStatus({
@@ -15,6 +16,7 @@ export default function BottomNavWithStatus({
   onChange,
   lastBpm,
   isConnected = false,
+  animalId,
 }: Props) {
   return (
     <>
@@ -24,6 +26,7 @@ export default function BottomNavWithStatus({
           isConnected={isConnected}
           animalName="Uno"
           lastBpm={lastBpm ?? undefined}
+          animalId={animalId}
         />
 
         <NavBar
@@ -39,6 +42,7 @@ export default function BottomNavWithStatus({
             isConnected={isConnected}
             animalName="Uno"
             lastBpm={lastBpm ?? undefined}
+            animalId={animalId}
           />
         </div>
 

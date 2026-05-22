@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 
 import MapScreen from "@/components/screens/MapScreen/MapScreen";
 import LocationScreen from "@/components/screens/LocationScreen/LocationScreen";
+import HealthScreen from "@/components/screens/HealthScreen/HealthScreen";
 import BottomNavWithStatus from "@/components/ui/BottomNavWithStatus";
 
 import { getAnimalData } from "@/services/animalService";
-import { subscribeConnection } from "@/services/websocketService";
+import { connectWebSocket, subscribe, subscribeConnection } from "@/services/websocketService";
 
 export default function AppShell() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -18,12 +19,28 @@ export default function AppShell() {
   const animalId = "68194120636f719fcd5ee5fd";
 
   useEffect(() => {
+    // Inicializa a conexão do WebSocket de forma global para o animal
+    connectWebSocket(animalId);
+
     const unsubscribeConnection = subscribeConnection((status) => {
       setIsConnected(status);
     });
 
+    const unsubscribeTelemetry = subscribe((data) => {
+      const payload = data.payload || data;
+      const wsAnimalId = payload.animalId || payload.animal || data.animalId || data.animal;
+
+      if (wsAnimalId === animalId) {
+        if (payload.tipo === "batimento" || payload.frequenciaMedia !== undefined) {
+          console.log("❤️ [AppShell] BPM atualizado via WS:", payload.frequenciaMedia);
+          setLastBpm(payload.frequenciaMedia);
+        }
+      }
+    });
+
     return () => {
       unsubscribeConnection();
+      unsubscribeTelemetry();
     };
   }, []);
 
@@ -52,7 +69,11 @@ export default function AppShell() {
       key="map"
       setLastBpm={setLastBpm}
     />,
-    <div key="health">Health</div>,
+    <HealthScreen
+      key="health"
+      animalId={animalId}
+      animalName="Uno"
+    />,
     <div key="checkup">Checkup</div>,
     <LocationScreen
       key="location"
@@ -70,6 +91,7 @@ export default function AppShell() {
         onChange={setCurrentIndex}
         lastBpm={lastBpm}
         isConnected={isConnected}
+        animalId={animalId}
       />
     </div>
   );

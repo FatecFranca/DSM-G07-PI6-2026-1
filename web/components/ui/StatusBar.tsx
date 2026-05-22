@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   FaMars,
@@ -10,6 +10,8 @@ import {
   FaChevronUp,
   FaChevronDown,
 } from "react-icons/fa";
+import HeartLineChart from "@/components/screens/HealthScreen/HeartLineChart";
+import { animalStatsService, HeartbeatData } from "@/services/animalStatsService";
 
 interface StatusBarProps {
   isConnected: boolean;
@@ -17,6 +19,7 @@ interface StatusBarProps {
   sex?: "M" | "F";
   lastBpm?: number;
   battery?: number;
+  animalId?: string;
 }
 
 export default function StatusBar({
@@ -25,13 +28,36 @@ export default function StatusBar({
   sex = "M",
   lastBpm,
   battery = 96,
+  animalId = "68194120636f719fcd5ee5fd",
 }: StatusBarProps) {
 
   const [isExpanded, setIsExpanded] = useState(false);
+  const [chartData, setChartData] = useState<HeartbeatData[]>([]);
 
   function toggle() {
     setIsExpanded(!isExpanded);
   }
+
+  useEffect(() => {
+    let active = true;
+    async function fetchChartData() {
+      try {
+        console.log("📈 Fetching status bar 5-hour heart rate average...");
+        const data = await animalStatsService.getMediaUltimas5HorasRegistradas(animalId);
+        if (active) {
+          setChartData(data);
+        }
+      } catch (err) {
+        console.error("Error fetching 5-hour averages in status bar:", err);
+      }
+    }
+
+    fetchChartData();
+
+    return () => {
+      active = false;
+    };
+  }, [animalId, lastBpm]);
 
   return (
     <div
@@ -41,8 +67,9 @@ export default function StatusBar({
         rounded-t-[30px]
         p-4
         flex flex-col
+                shadow-[0_-5px_10px_rgba(0,0,0,0.08)]
         transition-all duration-300
-        ${isExpanded ? "h-[220px]" : "h-[110px]"}
+        ${isExpanded ? "h-[310px]" : "h-[110px]"}
       `}
     >
       <div className="h-[28px] flex items-center justify-center mb-2">
@@ -122,8 +149,14 @@ export default function StatusBar({
       </div>
 
       {isExpanded && (
-        <div className="mt-3 text-center text-sm text-[var(--color-brown)]">
-          Mais informações em breve...
+        <div className="mt-3 flex-none">
+          <HeartLineChart
+            title="Batimentos - Últimas 5 horas"
+            data={chartData}
+            backgroundColor="var(--color-sand-900)"
+            chartHeight={120}
+            compact={true}
+          />
         </div>
       )}
     </div>

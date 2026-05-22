@@ -19,8 +19,11 @@ export default function MapOverlay({
     <>
       {/* LOADING */}
       {(!isLoaded || isLoadingLocation) && (
-        <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-50">
-          <span className="text-white">Carregando mapa...</span>
+        <div className="absolute inset-0 bg-[var(--color-sand-100)] flex flex-col items-center justify-center z-50">
+          <div className="w-8 h-8 border-4 border-[var(--color-orange-900)] border-t-transparent rounded-full animate-spin mb-3"></div>
+          <span className="text-[var(--color-orange-900)] font-bold text-[16px]">
+            Carregando mapa...
+          </span>
         </div>
       )}
 
