@@ -2,7 +2,6 @@ import json
 import os
 import joblib
 import pandas as pd
-import numpy as np
 from datetime import datetime, timezone
 import math
 
@@ -13,88 +12,242 @@ def carregar_arquivos_ia():
     try:
         modelo = joblib.load(os.path.join(PASTA_MODELOS, 'modelo_xgboost_otimizado.pkl'))
         encoders = joblib.load(os.path.join(PASTA_MODELOS, 'label_encoders.pkl'))
+        
+        # Carrega os novos modelos de Estilo de Vida Saudável
+        modelo_peso = joblib.load(os.path.join(PASTA_MODELOS, 'modelo_peso_ideal.pkl'))
+        modelo_caminhada = joblib.load(os.path.join(PASTA_MODELOS, 'modelo_caminhada_ideal.pkl'))
+        modelo_dieta = joblib.load(os.path.join(PASTA_MODELOS, 'modelo_dieta_ideal.pkl'))
+        modelo_atividade = joblib.load(os.path.join(PASTA_MODELOS, 'modelo_atividade_ideal.pkl'))
+        
         with open(os.path.join(PASTA_MODELOS, 'db-food.json'), 'r', encoding='utf-8') as f:
             catalogo = json.load(f)
-        return modelo, encoders, catalogo
+            
+        return {
+            "modelo_marca": modelo,
+            "encoders": encoders,
+            "modelo_peso": modelo_peso,
+            "modelo_caminhada": modelo_caminhada,
+            "modelo_dieta": modelo_dieta,
+            "modelo_atividade": modelo_atividade,
+            "catalogo": catalogo
+        }
     except Exception as e:
         print(f"Erro ao carregar arquivos da IA: {e}")
-        return None, None, []
+        return None
 
 def calcular_idade(data_nascimento_str):
     if not data_nascimento_str:
-        return 2 # Idade padrão
+        return None
     try:
         data_nascimento = datetime.fromisoformat(data_nascimento_str.replace("Z", "+00:00"))
         if data_nascimento.tzinfo is None:
             data_nascimento = data_nascimento.replace(tzinfo=timezone.utc)
         hoje = datetime.now(timezone.utc)
+        if hoje < data_nascimento:
+            return None
         anos = (hoje - data_nascimento).total_seconds() / (86400.0 * 365.2425)
         return max(1, int(math.floor(anos + 0.5)))
     except:
-        return 2
+        return None
 
 def gerar_sugestao_nutricional(dados_animal):
     """
-    Usa o modelo de Machine Learning (XGBoost) para prever a Marca da Ração.
+    Usa predições em cadeia com modelos de Machine Learning para prever o peso ideal,
+    as metas saudáveis de estilo de vida, e a marca ideal de ração.
     """
-    modelo, encoders, catalogo = carregar_arquivos_ia()
-    
-    # Validações e extrações básicas
-    raca = dados_animal.get("racaNome", "SRD (Sem Raça Definida)")
-    peso_kg = float(dados_animal.get("peso") or 10.0)
-    idade = calcular_idade(dados_animal.get("dataNascimento"))
-    
-    # 1. PREPARANDO AS 4 FEATURES QUE A IA SELECIONOU:
-    # ['Idade', 'peso_kg', 'caminhada_diaria_km', 'calorias_diarias_RER']
-    caminhada_diaria_km = 1.6 # Valor médio (já que a API não informa isso diretamente)
-    calorias_diarias_RER = round(70 * (peso_kg ** 0.75), 2)
-    
-    # Criar dataframe para a inferência
-    X_infer = pd.DataFrame([{
-        'Idade': idade,
-        'peso_kg': peso_kg,
-        'caminhada_diaria_km': caminhada_diaria_km,
-        'calorias_diarias_RER': calorias_diarias_RER
-    }])
+    # Carrega os modelos
+    artefatos = carregar_arquivos_ia()
+    if not artefatos:
+        raise ValueError("Arquivos do modelo de IA não foram carregados corretamente no servidor.")
 
-    # 2. INFERÊNCIA DO MODELO DE ML
-    marca_prevista_nome = "Royal Canin" # Fallback
+    modelo_marca = artefatos["modelo_marca"]
+    encoders = artefatos["encoders"]
+    modelo_peso = artefatos["modelo_peso"]
+    modelo_caminhada = artefatos["modelo_caminhada"]
+    modelo_dieta = artefatos["modelo_dieta"]
+    modelo_atividade = artefatos["modelo_atividade"]
+    catalogo = artefatos["catalogo"]
+
+    # 1. VALIDAÇÃO E EXTRAÇÃO DOS INPUTS OBRIGATÓRIOS
+    # Peso Atual
+    peso_val = dados_animal.get("peso") or dados_animal.get("peso_kg")
+    if peso_val is None:
+        raise ValueError("O peso do animal é obrigatório para gerar a recomendação.")
     try:
-        if modelo and encoders:
-            predicao_num = modelo.predict(X_infer)[0]
-            # Usar o LabelEncoder para descobrir o nome da marca a partir do número
-            le_marca = encoders['Marca_Racao']
-            marca_prevista_nome = le_marca.inverse_transform([predicao_num])[0]
-    except Exception as e:
-        print(f"Erro na inferência do XGBoost: {e}")
+        peso_kg = float(peso_val)
+        if peso_kg <= 0:
+            raise ValueError
+    except ValueError:
+        raise ValueError("Peso do animal inválido. Deve ser um número maior que zero.")
 
-    # 3. MATCH COM O DB-FOOD.JSON BASEADO NA MARCA PREVISTA E PORTE DO CÃO
-    porte_pet_original = dados_animal.get("porte", "Médio") 
+    # Idade
+    data_nasc = dados_animal.get("dataNascimento")
+    if not data_nasc:
+        raise ValueError("A data de nascimento do animal é obrigatória.")
+    idade = calcular_idade(data_nasc)
+    if idade is None:
+        raise ValueError("Idade do animal inválida ou não pôde ser calculada a partir da data de nascimento.")
+
+    # Caminhada Diária Atual (KM)
+    caminhada_val = dados_animal.get("caminhada_diaria_km") or dados_animal.get("caminhadaDiariaKm") or dados_animal.get("caminhada_diaria") or dados_animal.get("caminhadaDiaria")
+    if caminhada_val is None:
+        raise ValueError("A distância de caminhada diária do animal é obrigatória.")
+    try:
+        caminhada_diaria_km = float(caminhada_val)
+        if caminhada_diaria_km < 0:
+            raise ValueError
+    except ValueError:
+        raise ValueError("Distância de caminhada inválida. Deve ser um número maior ou igual a zero.")
+
+    # 2. CODIFICAÇÃO DAS CATEGORIAS DO ANIMAL
+    le_raca = encoders['Raca']
+    le_sexo = encoders['Sexo']
+
+    # Normalização da raça (fallback para SRD se desconhecida)
+    raca_crua = dados_animal.get("racaNome") or dados_animal.get("raca") or "SRD (Sem Raça Definida)"
+    raca_nome = "SRD (Sem Raça Definida)"
+    for classe in le_raca.classes_:
+        if raca_crua.strip().lower() == classe.strip().lower():
+            raca_nome = classe
+            break
+    
+    # Normalização do sexo
+    sexo_cru = dados_animal.get("sexo") or dados_animal.get("sex") or "Macho"
+    if (sexo_cru or "").lower() in ['f', 'femea', 'fêmea', 'female']:
+        sexo_nome = 'Fêmea'
+    else:
+        sexo_nome = 'Macho'
+
+    raca_encoded = le_raca.transform([raca_nome])[0]
+    sexo_encoded = le_sexo.transform([sexo_nome])[0]
+
+    # 3. FLUXO DE INFERÊNCIAS EM CADEIA (LIFESTYLE SAUDÁVEL)
+    try:
+        # A. Predição de Peso Ideal
+        X_peso = pd.DataFrame([{
+            'Raca': raca_encoded,
+            'Sexo': sexo_encoded,
+            'Idade': idade
+        }])
+        peso_ideal = round(float(modelo_peso.predict(X_peso)[0]), 2)
+
+        # B. Cálculo de Calorias RER com base no Peso Ideal
+        calorias_diarias_RER = round(70 * (peso_ideal ** 0.75), 2)
+
+        # C. Predição da Meta de Caminhada Recomendada (com base no Peso Ideal)
+        X_caminhada = pd.DataFrame([{
+            'Raca': raca_encoded,
+            'Sexo': sexo_encoded,
+            'Idade': idade,
+            'peso_kg': peso_ideal
+        }])
+        caminhada_diaria_km_meta = round(float(modelo_caminhada.predict(X_caminhada)[0]), 2)
+
+        # D. Predição da Dieta Recomendada
+        X_dieta = pd.DataFrame([{
+            'Raca': raca_encoded,
+            'Sexo': sexo_encoded,
+            'Idade': idade,
+            'peso_kg': peso_ideal
+        }])
+        dieta_pred_num = modelo_dieta.predict(X_dieta)[0]
+        dieta_recomendada = encoders['Dieta_Atual'].inverse_transform([dieta_pred_num])[0]
+
+        # E. Predição de Nível de Atividade Recomendado
+        X_atividade = pd.DataFrame([{
+            'Raca': raca_encoded,
+            'Sexo': sexo_encoded,
+            'Idade': idade,
+            'peso_kg': peso_ideal
+        }])
+        atividade_pred_num = modelo_atividade.predict(X_atividade)[0]
+        atividade_recomendada = encoders['Nivel_Atividade_Pet'].inverse_transform([atividade_pred_num])[0]
+
+        # F. Predição da Marca de Ração Ideal (XGBoost) usando as metas saudáveis
+        X_brand = pd.DataFrame([{
+            'Idade': idade,
+            'peso_kg': peso_ideal,
+            'caminhada_diaria_km': caminhada_diaria_km_meta,
+            'calorias_diarias_RER': calorias_diarias_RER
+        }])
+        predicao_brand_num = modelo_marca.predict(X_brand)[0]
+        marca_prevista_nome = encoders['Marca_Racao'].inverse_transform([predicao_brand_num])[0]
+
+    except Exception as e:
+        raise ValueError(f"Não foi possível obter a recomendação da IA devido a uma falha nos modelos: {str(e)}")
+
+    # 4. DIAGNÓSTICO CORPORAL COMPARATIVO
+    if peso_kg > (peso_ideal * 1.15):
+        status_corpo = 'Sobrepeso'
+    elif peso_kg < (peso_ideal * 0.85):
+        status_corpo = 'Abaixo do Peso'
+    else:
+        status_corpo = 'Peso Ideal'
+
+    # 5. FILTRAR CATÁLOGO DE PRODUTOS COM BASE NA MARCA, PORTE E STATUS CORPORAL
+    porte_pet_original = dados_animal.get("porte") or dados_animal.get("porte_animal") or "Médio"
     mapa_porte = {'Pequeno': 'Small', 'Médio': 'Medium', 'Grande': 'Large'}
     porte_busca = mapa_porte.get(porte_pet_original, 'All')
 
     sugestoes = []
     for produto in catalogo:
-        # Pega as marcas e portes iguais
         match_marca = (produto.get('brand') == marca_prevista_nome)
         match_porte = (produto.get('animalSize') == "All" or produto.get('animalSize') == porte_busca)
         
-        if match_marca and match_porte:
+        # Filtro de nutrição baseada no status corporal
+        match_nutricao = False
+        if status_corpo == 'Sobrepeso':
+            match_nutricao = produto.get('condition') in ['Overweight', 'Weight Management', 'Weight Care', 'Active/Weight Management']
+        elif status_corpo == 'Abaixo do Peso':
+            match_nutricao = produto.get('condition') is None or "Puppy" in produto.get('name', '')
+        else:
+            match_nutricao = produto.get('condition') in [None, 'Everyday Health']
+
+        if match_marca and match_porte and match_nutricao:
             sugestoes.append(produto['name'])
 
-    # Se não achou com a marca exata para o porte, tenta só a marca
+    # Fallbacks de relaxamento de filtros se nenhum for encontrado
+    if not sugestoes:
+        for produto in catalogo:
+            if produto.get('brand') == marca_prevista_nome and (produto.get('animalSize') == "All" or produto.get('animalSize') == porte_busca):
+                sugestoes.append(produto['name'])
     if not sugestoes:
         for produto in catalogo:
             if produto.get('brand') == marca_prevista_nome:
                 sugestoes.append(produto['name'])
-    
-    # Último fallback se o catálogo estiver vazio
     if not sugestoes:
         sugestoes = [f"Ração recomendada da marca {marca_prevista_nome}"]
 
+    # 6. JUSTIFICATIVA E METAS DE ESTILO DE VIDA
+    if status_corpo == 'Sobrepeso':
+        justificativa = (
+            f"O pet esta com sobrepeso (Peso Atual: {peso_kg:.1f} kg vs. Peso Ideal: {peso_ideal:.1f} kg). "
+            f"Recomenda-se reduzir a ingestao calorica diaria para {calorias_diarias_RER} kcal e "
+            f"elevar a atividade fisica do animal para a meta '{atividade_recomendada}'."
+        )
+    elif status_corpo == 'Abaixo do Peso':
+        justificativa = (
+            f"O pet esta abaixo do peso (Peso Atual: {peso_kg:.1f} kg vs. Peso Ideal: {peso_ideal:.1f} kg). "
+            f"Recomenda-se adotar uma dieta do tipo '{dieta_recomendada}' de alto teor energetico "
+            f"e limitar atividades exaustivas temporariamente para acumulo de massa."
+        )
+    else:
+        justificativa = (
+            f"Parabens! O pet esta na faixa de peso ideal ({peso_kg:.1f} kg). "
+            f"Mantenha a dieta atual equilibrada e siga a rotina de exercicios para preservar a saude."
+        )
+
     return {
-        "status_corporal": "Análise por IA Concluída",
-        "peso_referencia": peso_kg, # Não usamos mais peso_referencia heurístico
+        "status_corporal": status_corpo,
+        "peso_atual": peso_kg,
+        "peso_referencia": peso_ideal,
         "recomendacoes": sugestoes[:2],
-        "marca_prevista": marca_prevista_nome
+        "marca_prevista": marca_prevista_nome,
+        "recomendacoes_estilo_vida": {
+            "caminhada_diaria_km_meta": caminhada_diaria_km_meta,
+            "nivel_atividade_meta": atividade_recomendada,
+            "tempo_brincadeira_horas_meta": 1.5 if status_corpo == 'Sobrepeso' else 1.0,
+            "tipo_dieta_meta": dieta_recomendada,
+            "justificativa": justificativa
+        }
     }
