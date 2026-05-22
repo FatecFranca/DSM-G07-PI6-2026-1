@@ -50,7 +50,7 @@ const CustomTooltip = ({ active, payload }: any) => {
     return (
       <div className="bg-white p-2.5 rounded-[12px] shadow-[0_4px_10px_rgba(0,0,0,0.12)] border-0 text-xs text-[var(--color-brown)] font-medium">
         <div className="text-[10px] text-gray-400 mb-0.5">{formattedLabel}</div>
-        <div className="text-[var(--color-orange-900)] font-bold text-[13px]">
+        <div className="text-[var(--color-primary)] font-bold text-[13px]">
           {bpmValue} <span className="text-[10px] font-semibold text-[var(--color-brown)]">BPM</span>
         </div>
       </div>
@@ -166,8 +166,8 @@ export default function HeartChartToggle({ horasData, diasData }: Props) {
             >
               <defs>
                 <linearGradient id="colorBpmToggle" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--color-orange-900)" stopOpacity={0.2} />
-                  <stop offset="95%" stopColor="var(--color-orange-900)" stopOpacity={0.0} />
+                  <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.2} />
+                  <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0.0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(117, 72, 25, 0.15)" />
@@ -186,18 +186,18 @@ export default function HeartChartToggle({ horasData, diasData }: Props) {
                 tick={{ fill: "var(--color-brown)", fontSize: 11 }}
               />
               <Tooltip
-                cursor={{ stroke: "var(--color-orange-900)", strokeWidth: 1, strokeDasharray: "3 3" }}
+                cursor={{ stroke: "var(--color-primary)", strokeWidth: 1, strokeDasharray: "3 3" }}
                 content={<CustomTooltip />}
               />
               <Area
                 type="monotone"
                 dataKey="bpm"
-                stroke="var(--color-orange-900)"
+                stroke="var(--color-primary)"
                 strokeWidth={3}
                 fillOpacity={1}
                 fill="url(#colorBpmToggle)"
-                activeDot={{ r: 6, fill: "var(--color-orange-900)", strokeWidth: 2, stroke: "#fff" }}
-                dot={{ r: 3.5, fill: "var(--color-orange-900)", strokeWidth: 1.5, stroke: "#fff" }}
+                activeDot={{ r: 6, fill: "var(--color-primary)", strokeWidth: 2, stroke: "#fff" }}
+                dot={{ r: 3.5, fill: "var(--color-primary)", strokeWidth: 1.5, stroke: "#fff" }}
               />
             </AreaChart>
           ) : (
@@ -216,6 +216,7 @@ export default function HeartChartToggle({ horasData, diasData }: Props) {
                 axisLine={false}
                 tickLine={false}
                 tick={{ fill: "var(--color-brown)", fontSize: 11 }}
+                tickFormatter={formatXAxis}
                 dy={10}
               />
               <YAxis
@@ -224,12 +225,12 @@ export default function HeartChartToggle({ horasData, diasData }: Props) {
                 tick={{ fill: "var(--color-brown)", fontSize: 11 }}
               />
               <Tooltip
-                cursor={{ fill: "rgba(191, 73, 4, 0.08)" }}
+                cursor={{ fill: "rgba(243, 146, 0, 0.08)" }}
                 content={<CustomTooltip />}
               />
               <Bar
                 dataKey="bpm"
-                fill="var(--color-orange-900)"
+                fill="var(--color-primary)"
                 radius={[4, 4, 0, 0]}
                 barSize={32}
               />

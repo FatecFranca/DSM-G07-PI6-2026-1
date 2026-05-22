@@ -94,8 +94,8 @@ export default function HeartLineChart({
           >
             <defs>
               <linearGradient id="colorBpm" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--color-orange-900)" stopOpacity={0.2} />
-                <stop offset="95%" stopColor="var(--color-orange-900)" stopOpacity={0.0} />
+                <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.2} />
+                <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0.0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(117, 72, 25, 0.15)" />
@@ -114,7 +114,7 @@ export default function HeartLineChart({
               tick={{ fill: "var(--color-brown)", fontSize: 11 }}
             />
             <Tooltip
-              cursor={{ stroke: "var(--color-orange-900)", strokeWidth: 1, strokeDasharray: "3 3" }}
+              cursor={{ stroke: "var(--color-primary)", strokeWidth: 1, strokeDasharray: "3 3" }}
               contentStyle={{
                 borderRadius: "12px",
                 border: "none",
@@ -123,17 +123,17 @@ export default function HeartLineChart({
                 backgroundColor: "#fff",
                 fontSize: "12px",
               }}
-              itemStyle={{ color: "var(--color-orange-900)", fontWeight: "bold" }}
+              itemStyle={{ color: "var(--color-primary)", fontWeight: "bold" }}
             />
             <Area
               type="monotone"
               dataKey="bpm"
-              stroke="var(--color-orange-900)"
+              stroke="var(--color-primary)"
               strokeWidth={3}
               fillOpacity={1}
               fill="url(#colorBpm)"
-              activeDot={{ r: 6, fill: "var(--color-orange-900)", strokeWidth: 2, stroke: "#fff" }}
-              dot={{ r: 3.5, fill: "var(--color-orange-900)", strokeWidth: 1.5, stroke: "#fff" }}
+              activeDot={{ r: 6, fill: "var(--color-primary)", strokeWidth: 2, stroke: "#fff" }}
+              dot={{ r: 3.5, fill: "var(--color-primary)", strokeWidth: 1.5, stroke: "#fff" }}
             />
           </AreaChart>
         </ResponsiveContainer>
