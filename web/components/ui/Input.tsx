@@ -14,6 +14,7 @@ interface InputProps {
   value?: string;
   centerText?: boolean;
   suffixText?: string;
+  textColor?: string;
 }
 
 export default function Input({
@@ -26,6 +27,7 @@ export default function Input({
   value,
   centerText = false,
   suffixText,
+  textColor,
 }: InputProps) {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -115,8 +117,8 @@ export default function Input({
             outline-none
             ${currentSize.input}
             ${currentSize.paddingY}
-            text-[var(--color-foreground)]
-            placeholder:text-zinc-400
+            ${textColor || "text-[var(--color-foreground)]"}
+            ${textColor ? "placeholder:text-[var(--color-brown)] placeholder:opacity-60" : "placeholder:text-zinc-400"}
             ${
               centerText
                 ? "text-center"
@@ -126,7 +128,7 @@ export default function Input({
         />
 
         {suffixText && (
-          <span className={`ml-2 ${currentSize.input}`}>
+          <span className={`ml-2 ${currentSize.input} ${textColor || "text-[var(--color-foreground)]"}`}>
             {suffixText}
           </span>
         )}
