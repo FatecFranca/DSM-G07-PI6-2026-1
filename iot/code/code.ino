@@ -359,7 +359,7 @@ void enviarBatimento(int media, String timestamp) {
   String endpoint = String(serverName) + "/telemetria/batimento";
   HTTPClient http;
   String jsonData = "{";
-  jsondata += "\"type\": \"heart_rate\", ";
+  jsonData += "\"type\": \"heart_rate\", ";
   jsonData += "\"frequenciaMedia\": \"" + String(media) + "\", ";
   jsonData += "\"coleira\": \"" + coleiraId + "\", ";
   jsonData += "\"animal\": \"" + animalId + "\", ";
