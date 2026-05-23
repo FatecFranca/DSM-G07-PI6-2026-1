@@ -8,7 +8,9 @@ from app.domain.utils.utils import DomainUtils
 
 logger = logging.getLogger("CheckupService")
 
-MODEL_PATH = "modelo_CART.pmml"
+# Resolve o caminho absoluto para o diretório base 'api-python'
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+MODEL_PATH = os.path.join(BASE_DIR, "models", "modelo_CART.pmml")
 _pmml_model = None
 
 class CheckupService:
@@ -29,9 +31,9 @@ class CheckupService:
                 logger.error(f"❌ Erro ao carregar modelo PMML: {e}")
                 # Tenta carregar modelos alternativos
                 alternative_models = [
-                    "modelo_decision_tree.pmml",
-                    "modelo_svm.pmml",
-                    "modelo_smo.pmml"
+                    os.path.join(BASE_DIR, "models", "modelo_decision_tree.pmml"),
+                    os.path.join(BASE_DIR, "models", "modelo_svm.pmml"),
+                    os.path.join(BASE_DIR, "models", "modelo_smo.pmml")
                 ]
                 for alt_model in alternative_models:
                     try:
