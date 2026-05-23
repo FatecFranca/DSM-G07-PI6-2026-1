@@ -108,7 +108,7 @@ export default function HeartLineChart({
             data={data}
             margin={{
               top: 5,
-              right: 10,
+              right: compact ? 20 : 10,
               left: -20,
               bottom: compact ? 22 : 5,
             }}
