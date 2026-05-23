@@ -14,7 +14,7 @@ interface Props {
 }
 
 const INITIAL_RESPONTAS = {
-  duracao: 0,
+  duracao: "" as string | number,
   perda_de_apetite: null as boolean | null,
   vomito: null as boolean | null,
   diarreia: null as boolean | null,
@@ -157,8 +157,9 @@ export default function CheckupScreen({ animalId, animalName }: Props) {
     setApiError(null);
 
     // Mapear booleanos para 1/0 para a API Python, mantendo 'duracao'
+    const duracaoNum = parseInt(respostas.duracao?.toString() || "0", 10);
     const payload: Record<string, any> = {
-      duracao: respostas.duracao || 0,
+      duracao: isNaN(duracaoNum) ? 0 : duracaoNum,
     };
 
     Object.keys(respostas).forEach((key) => {
@@ -578,12 +579,11 @@ export default function CheckupScreen({ animalId, animalName }: Props) {
                         centerText={true}
                         suffixText=" dias"
                         textColor="text-[var(--color-brown)]"
-                        value={respostas.duracao === 0 ? "" : respostas.duracao.toString()}
+                        value={respostas.duracao.toString()}
                         onChange={(text) => {
-                          const n = parseInt(text.trim(), 10);
                           setRespostas((prev) => ({
                             ...prev,
-                            duracao: isNaN(n) ? 0 : n,
+                            duracao: text,
                           }));
                         }}
                       />
