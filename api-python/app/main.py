@@ -4,7 +4,7 @@ from app.clients import java_api
 from app.services import stats
 from app.security import get_current_user
 from typing import Tuple
-from app.services import pmml_predictor
+from app.services import CheckupService
 from app.models.sintomas import AnimalSintomasInput, SintomasInput
 from app.schemas.respostas_ia import RespostaCheckupAnimal, RespostaCheckupTeste
 from app.schemas.respostas_batimentos import (
@@ -97,48 +97,7 @@ def custom_openapi():
 
 app.openapi = custom_openapi
 
-
-def calcular_idade(data_nascimento_str: str):
-    """
-    Retorna a idade em anos como inteiro:
-    - se idade < 1: retorna 1
-    - se idade >= 1: arredonda para o inteiro mais próximo
-    - em caso de data futura ou erro: retorna None
-    Aceita ISO strings: "YYYY-MM-DD", "YYYY-MM-DDTHH:MM:SSZ", "+00:00" etc.
-    """
-    if not data_nascimento_str:
-        return None
-    try:
-        from datetime import datetime, timezone
-        import math
-
-        # Normaliza 'Z' para '+00:00' e parse
-        data_nascimento = datetime.fromisoformat(
-            data_nascimento_str.replace("Z", "+00:00"))
-
-        # Garante datetime aware em UTC
-        if data_nascimento.tzinfo is None:
-            data_nascimento = data_nascimento.replace(tzinfo=timezone.utc)
-        else:
-            data_nascimento = data_nascimento.astimezone(timezone.utc)
-
-        hoje = datetime.now(timezone.utc)
-
-        # Data futura => inválida
-        if hoje < data_nascimento:
-            return None
-
-        # Calcula anos (mais preciso usando 365.2425 dias)
-        dias = (hoje - data_nascimento).total_seconds() / 86400.0
-        anos = dias / 365.2425
-
-        if anos < 1:
-            return 1
-
-        # Arredonda para o inteiro mais próximo (0.5 -> para cima)
-        return int(math.floor(anos + 0.5))
-    except Exception:
-        return None
+# calcular_idade foi migrado para DomainUtils dentro de app/domain/utils/utils.py
 
 # --------------------- Health ---------------------
 
@@ -172,18 +131,6 @@ async def health_check():
 
 
 # --------------------- IA (PMML) ---------------------
-""" @app.post("/ia/animal/{id_animal}", tags=["IA"])
-async def analisar_animal(id_animal: str, sintomas: SintomasInput):
-
-    #Recebe sintomas e retorna a predição de problema/doença via PMML.
-
-    response = await java_api.buscar_dados_animal(id_animal)
-    if not response:
-        raise HTTPException(
-            status_code=404, detail="Animal não encontrado na API Java")
-
-    resultado = pmml_predictor.predict_with_pmml(response, sintomas.dict())
-    return {"animalId": id_animal, "resultado": resultado} """
 
 
 @app.post(
@@ -237,67 +184,15 @@ async def checkup_animal(
     - **500**: Erro ao processar o modelo PMML
     """
     user_id, token = credentials
-    response = await java_api.buscar_dados_animal(id_animal, token)
-
-    print(f"Response da API: \n {response}")
-    if not response:
-        raise HTTPException(
-            status_code=404, detail="Animal não encontrado na API Java")
-
-     # Monta dados combinados somente para inspeção / logs (o pmml_predictor aceita response + sintomas)
-
-    # calcula idade aproximada em anos (fallback seguro caso dataNascimento falhe)
-    data_nasc = response.get("dataNascimento")
-    raca = response.get("racaNome")
-    idade = calcular_idade(data_nasc)
-
-    if raca == "SRD (Sem Raça Definida)":
-        raca = "sem_raca_definida_(srd)"
-    else:
-        raca = (raca or "").lower().replace(" ", "_")
+    service = CheckupService()
+    resultado = service.analisar_sintomas_animal(id_animal, sintomas.dict(exclude_none=True), token)
     
-    dados_modelo = {
-        "tipo_do_animal": (response.get("especieNome") or "").lower(),
-        "raca": raca,
-        "idade": idade,
-        # modelo espera número (1/0) para gênero nas versões que testamos
-        "genero": 1 if (response.get("sexo") or "").lower() == "m" else 0,
-        "peso": response.get("peso"),
-        "batimento_cardiaco": response.get("ultimo_batimento"),
-        # merge só para inspeção — os sintomas reais vêm do body (SintomasInput)
-        **sintomas.dict(exclude_none=True)
-    }
-    
-    print (f"\n\nDados modelo: \n {dados_modelo}")
-
-    # Executa a predição usando o módulo que já estava funcionando
-    resultado = pmml_predictor.predict_with_pmml_animal(dados_modelo)
-    
-    print(f"\n\n Resultado: {resultado}")
-
-    # Substitui todos os nan por None para evitar erro JSON
-    import math
-    resultado_sanitizado = {}
-    classe_prevista = None
-    if isinstance(resultado, dict):
-        for k, v in resultado.items():
-            if isinstance(v, float) and math.isnan(v):
-                resultado_sanitizado[k] = None
-            else:
-                resultado_sanitizado[k] = v
-
-        # Extrai a classe com maior probabilidade
-        max_prob = -1
-        for key, value in resultado_sanitizado.items():
-            if key.startswith("probability(") and isinstance(value, (int, float)) and value is not None:
-                if value > max_prob:
-                    max_prob = value
-                    classe_prevista = key.replace("probability(", "").replace(")", "")
-    else:
-        # caso o predictor retorne outro formato (string/erro), encapsula
-        resultado_sanitizado = {"raw_result": resultado}
-
-    return {"animalId": id_animal, "dados_entrada": dados_modelo, "probabilidades": resultado_sanitizado, "resultado": classe_prevista}
+    if "erro" in resultado:
+        if resultado.get("status_code") == 404:
+            raise HTTPException(status_code=404, detail=resultado.get("erro"))
+        raise HTTPException(status_code=500, detail=resultado.get("erro"))
+        
+    return resultado
 
 
 @app.post(
@@ -344,28 +239,12 @@ async def checkup(sintomas: AnimalSintomasInput):
     - Todos os campos são opcionais, mas quanto mais dados fornecidos, melhor a predição
     """
     try:
-        # Converte o modelo recebido (SintomasInput) em dicionário
+        service = CheckupService()
         dados_teste = sintomas.dict()
-
-        # Faz a predição diretamente com o PMML
-        from app.services import pmml_predictor
-        resultado = pmml_predictor.predict_with_pmml({}, dados_teste)
-
-        # Extrai a classe com maior probabilidade
-        classe_prevista = None
-        if isinstance(resultado, dict):
-            max_prob = -1
-            for key, value in resultado.items():
-                if key.startswith("probability(") and isinstance(value, (int, float)) and value is not None:
-                    if value > max_prob:
-                        max_prob = value
-                        classe_prevista = key.replace("probability(", "").replace(")", "")
-
-        return {
-            "entrada": dados_teste,
-            "probabilidades": resultado,
-            "resultado": classe_prevista
-        }
+        resultado = service.testar_predicao(dados_teste)
+        if "erro" in resultado:
+            raise HTTPException(status_code=500, detail=resultado["erro"])
+        return resultado
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro no teste de predição: {str(e)}")
 

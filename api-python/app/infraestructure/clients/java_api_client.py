@@ -7,7 +7,7 @@ load_dotenv()
 logger = logging.getLogger("API Java Integration")
 
 class JavaAPIClient:
-    def __init(self) -> tuple[int, dict]:
+    def __init__(self):
         self.base_url = os.getenv("API_URL", "localhost:8080")
 
     def _get_headers(self, token: str) -> dict:
