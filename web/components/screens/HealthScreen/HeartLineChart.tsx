@@ -58,6 +58,11 @@ export default function HeartLineChart({
           const timePart = tickItem.includes(" ")
             ? tickItem.split(" ")[1].substring(0, 5)
             : tickItem.split("T")[1].substring(0, 5); // "20:00"
+          
+          if (compact) {
+            // Se for compacto (statusbar), mostra apenas a hora para evitar sobreposição
+            return timePart;
+          }
           return `${formattedDate} ${timePart}`;
         }
         return formattedDate;
@@ -103,7 +108,7 @@ export default function HeartLineChart({
               dataKey="data"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "var(--color-brown)", fontSize: 10, fontWeight: 500 }}
+              tick={{ fill: "var(--color-brown)", fontSize: compact ? 9 : 10, fontWeight: 500 }}
               tickFormatter={formatXAxis}
               dy={10}
               interval={0}
