@@ -106,6 +106,7 @@ export default function HeartLineChart({
               tick={{ fill: "var(--color-brown)", fontSize: 10, fontWeight: 500 }}
               tickFormatter={formatXAxis}
               dy={10}
+              interval={0}
             />
             <YAxis
               domain={[minY, maxY]}

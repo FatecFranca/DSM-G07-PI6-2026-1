@@ -178,6 +178,7 @@ export default function HeartChartToggle({ horasData, diasData }: Props) {
                 tick={{ fill: "var(--color-brown)", fontSize: 10, fontWeight: 500 }}
                 tickFormatter={formatXAxis}
                 dy={10}
+                interval={0}
               />
               <YAxis
                 domain={[minY, maxY]}
@@ -218,6 +219,7 @@ export default function HeartChartToggle({ horasData, diasData }: Props) {
                 tick={{ fill: "var(--color-brown)", fontSize: 11 }}
                 tickFormatter={formatXAxis}
                 dy={10}
+                interval={0}
               />
               <YAxis
                 axisLine={false}
