@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 
 
-class AnimalSintomasInput(BaseModel):
+class AnimalSintomasInputDTO(BaseModel):
     """
     Modelo para entrada de dados de sintomas do animal com informações demográficas.
 
@@ -226,7 +226,8 @@ class AnimalSintomasInput(BaseModel):
             }
         }
 
-class SintomasInput(BaseModel):
+
+class SintomasInputDTO(BaseModel):
     """
     Modelo para entrada de dados de sintomas (sem informações demográficas).
 

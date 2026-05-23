@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Optional, Dict, Any
 
 
-class EstatisticasBatimentos(BaseModel):
+class EstatisticasBatimentosDTO(BaseModel):
     """
     Estatísticas gerais dos batimentos cardíacos de um animal.
     
@@ -53,7 +53,7 @@ class EstatisticasBatimentos(BaseModel):
         }
 
 
-class MediaPorIntervalo(BaseModel):
+class MediaPorIntervaloDTO(BaseModel):
     """
     Média de batimentos em um intervalo de datas específico.
     """
@@ -71,7 +71,7 @@ class MediaPorIntervalo(BaseModel):
         }
 
 
-class ProbabilidadeBatimento(BaseModel):
+class ProbabilidadeBatimentoDTO(BaseModel):
     """
     Análise de probabilidade de um valor de batimento ocorrer.
     
@@ -134,7 +134,7 @@ class ProbabilidadeBatimento(BaseModel):
         }
 
 
-class AnaliseBatimentoUltimo(BaseModel):
+class AnaliseBatimentoUltimoDTO(BaseModel):
     """
     Análise do último batimento registrado.
     
@@ -202,7 +202,7 @@ class AnaliseBatimentoUltimo(BaseModel):
         }
 
 
-class MediaUltimos5Dias(BaseModel):
+class MediaUltimos5DiasDTO(BaseModel):
     """
     Médias de batimentos dos últimos 5 dias válidos.
     """
@@ -232,7 +232,7 @@ class MediaUltimos5Dias(BaseModel):
         }
 
 
-class MediaUltimas5Horas(BaseModel):
+class MediaUltimas5HorasDTO(BaseModel):
     """
     Média de batimentos das últimas 5 horas registradas.
     """
@@ -266,4 +266,3 @@ class MediaUltimas5Horas(BaseModel):
                 }
             }
         }
-

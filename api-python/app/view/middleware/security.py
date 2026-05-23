@@ -5,7 +5,7 @@ Validates JWT tokens from incoming requests.
 
 from fastapi import HTTPException, Depends, status, Header
 from typing import Optional, Tuple
-from app.security.jwt_service import jwt_service
+from app.application.services.jwt_service import jwt_service
 
 
 async def verify_jwt_token(authorization: Optional[str] = Header(None)) -> Tuple[str, str]:
@@ -90,4 +90,3 @@ def get_token_from_header(authorization: Optional[str] = None) -> Optional[str]:
         return None
     
     return authorization[7:]  # Remove "Bearer " prefix
-

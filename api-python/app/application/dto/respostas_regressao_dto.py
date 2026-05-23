@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Dict, Any
 
 
-class AnaliseRegressao(BaseModel):
+class AnaliseRegressaoDTO(BaseModel):
     """
     Resultado da análise de regressão entre batimentos e movimentos.
     
@@ -101,7 +101,7 @@ class AnaliseRegressao(BaseModel):
         }
 
 
-class PredicaoBatimento(BaseModel):
+class PredicaoBatimentoDTO(BaseModel):
     """
     Predição de frequência cardíaca baseada em valores de aceleração.
     
@@ -126,4 +126,3 @@ class PredicaoBatimento(BaseModel):
                 "funcao_usada": "frequenciaMedia = 72.5 + (0.125 * acelerometroX) + (-0.085 * acelerometroY) + (0.215 * acelerometroZ)"
             }
         }
-

@@ -174,4 +174,3 @@ class JwtService:
 
 # Create a singleton instance
 jwt_service = JwtService()
-

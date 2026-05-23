@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Optional, Dict, Any
 
 
-class RespostaCheckupAnimal(BaseModel):
+class RespostaCheckupAnimalDTO(BaseModel):
     """
     Resposta da análise de checkup de um animal com sintomas.
     
@@ -89,7 +89,7 @@ class RespostaCheckupAnimal(BaseModel):
         }
 
 
-class RespostaCheckupTeste(BaseModel):
+class RespostaCheckupTesteDTO(BaseModel):
     """
     Resposta da análise de checkup de teste (sem dados da API Java).
     
@@ -155,4 +155,3 @@ class RespostaCheckupTeste(BaseModel):
                 "resultado": "gastrointestinal"
             }
         }
-

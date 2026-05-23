@@ -1,4 +1,4 @@
-from app.schemas import respostas_batimentos
+from app.application.dto import respostas_batimentos_dto
 from requests import status_codes
 from concurrent.futures import Executor
 import pandas as pd
