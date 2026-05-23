@@ -60,6 +60,49 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 
+const CustomizedTick = ({ x, y, payload }: any) => {
+  const tickItem = payload.value;
+  let datePart = "";
+  let timePart = "";
+
+  try {
+    if (tickItem && typeof tickItem === "string" && tickItem.includes("-") && tickItem.length >= 10) {
+      const baseDate = tickItem.split("T")[0].split(" ")[0]; // "2025-10-17"
+      const parts = baseDate.split("-");
+      datePart = parts.length >= 3 ? `${parts[2]}/${parts[1]}` : tickItem;
+
+      if (tickItem.includes(" ") || tickItem.includes("T")) {
+        timePart = tickItem.includes(" ")
+          ? tickItem.split(" ")[1].substring(0, 5)
+          : tickItem.split("T")[1].substring(0, 5); // "20:00"
+      }
+    } else {
+      datePart = tickItem;
+    }
+  } catch {
+    datePart = tickItem;
+  }
+
+  if (timePart) {
+    return (
+      <g transform={`translate(${x},${y})`}>
+        <text x={0} y={0} textAnchor="middle" fill="var(--color-brown)" fontSize={9.5} fontWeight={500}>
+          <tspan x={0} dy={10}>{datePart}</tspan>
+          <tspan x={0} dy={11}>{timePart}</tspan>
+        </text>
+      </g>
+    );
+  }
+
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text x={0} y={0} dy={10} textAnchor="middle" fill="var(--color-brown)" fontSize={11} fontWeight={500}>
+        {datePart}
+      </text>
+    </g>
+  );
+};
+
 export default function HeartChartToggle({ horasData, diasData }: Props) {
   const [activeTab, setActiveTab] = useState<"horas" | "dias">("dias");
 
@@ -87,30 +130,6 @@ export default function HeartChartToggle({ horasData, diasData }: Props) {
     minY = Math.max(0, Math.floor(minValue / 10) * 10 - 10);
     maxY = Math.ceil((maxValue + 1) / 10) * 10 + 10;
   }
-
-  // Formatação de data/hora no eixo X do gráfico de linha
-  const formatXAxis = (tickItem: string) => {
-    try {
-      if (!tickItem || typeof tickItem !== "string") return tickItem;
-      if (tickItem.includes("-") && tickItem.length >= 10) {
-        const baseDate = tickItem.split("T")[0].split(" ")[0]; // "2025-10-17"
-        const parts = baseDate.split("-");
-        const formattedDate = parts.length >= 3 ? `${parts[2]}/${parts[1]}` : tickItem;
-
-        // Se houver hora no timestamp
-        if (tickItem.includes(" ") || tickItem.includes("T")) {
-          const timePart = tickItem.includes(" ")
-            ? tickItem.split(" ")[1].substring(0, 5)
-            : tickItem.split("T")[1].substring(0, 5); // "20:00"
-          return `${formattedDate} ${timePart}`;
-        }
-        return formattedDate;
-      }
-      return tickItem;
-    } catch {
-      return tickItem;
-    }
-  };
 
   return (
     <div className="w-full bg-[var(--color-sand-900)] rounded-[24px] p-5 shadow-md flex flex-col">
@@ -159,9 +178,9 @@ export default function HeartChartToggle({ horasData, diasData }: Props) {
               data={horasData}
               margin={{
                 top: 5,
-                right: 10,
+                right: 20,
                 left: -22,
-                bottom: 5,
+                bottom: 22,
               }}
             >
               <defs>
@@ -175,9 +194,7 @@ export default function HeartChartToggle({ horasData, diasData }: Props) {
                 dataKey="data"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "var(--color-brown)", fontSize: 10, fontWeight: 500 }}
-                tickFormatter={formatXAxis}
-                dy={10}
+                tick={(props: any) => <CustomizedTick {...props} />}
                 interval={0}
               />
               <YAxis
@@ -216,9 +233,7 @@ export default function HeartChartToggle({ horasData, diasData }: Props) {
                 dataKey="data"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "var(--color-brown)", fontSize: 11 }}
-                tickFormatter={formatXAxis}
-                dy={10}
+                tick={(props: any) => <CustomizedTick {...props} />}
                 interval={0}
               />
               <YAxis
