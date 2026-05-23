@@ -6,7 +6,11 @@ networks:
 services:
   api-java:
     image: ${DOCKERHUB_USERNAME}/api-java:${TAG}
-
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
     networks:
       - petdex-network
     ports:
@@ -31,3 +35,8 @@ services:
       - API_URL=http://api-java:8080
       - JWT_SECRET=${JWT_SECRET}
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
