@@ -14,7 +14,6 @@ def carregar_arquivos_ia():
         encoders = joblib.load(os.path.join(PASTA_MODELOS, 'label_encoders.pkl'))
         
         # Carrega os novos modelos de Estilo de Vida Saudável
-        modelo_peso = joblib.load(os.path.join(PASTA_MODELOS, 'modelo_peso_ideal.pkl'))
         modelo_caminhada = joblib.load(os.path.join(PASTA_MODELOS, 'modelo_caminhada_ideal.pkl'))
         modelo_dieta = joblib.load(os.path.join(PASTA_MODELOS, 'modelo_dieta_ideal.pkl'))
         modelo_atividade = joblib.load(os.path.join(PASTA_MODELOS, 'modelo_atividade_ideal.pkl'))
@@ -25,7 +24,6 @@ def carregar_arquivos_ia():
         return {
             "modelo_marca": modelo,
             "encoders": encoders,
-            "modelo_peso": modelo_peso,
             "modelo_caminhada": modelo_caminhada,
             "modelo_dieta": modelo_dieta,
             "modelo_atividade": modelo_atividade,
@@ -50,11 +48,21 @@ def calcular_idade(data_nascimento_str):
     except:
         return None
 
-def gerar_sugestao_nutricional(dados_animal):
+def gerar_sugestao_nutricional(dados_animal, peso_ideal=None):
     """
-    Usa predições em cadeia com modelos de Machine Learning para prever o peso ideal,
-    as metas saudáveis de estilo de vida, e a marca ideal de ração.
+    Usa predições em cadeia com modelos de Machine Learning para prever
+    as metas saudáveis de estilo de vida, e a marca ideal de ração,
+    utilizando o peso ideal recebido como parâmetro.
     """
+    if peso_ideal is None:
+        raise ValueError("O peso ideal recomendado do animal é obrigatório.")
+    try:
+        peso_ideal = float(peso_ideal)
+        if peso_ideal <= 0:
+            raise ValueError
+    except ValueError:
+        raise ValueError("Peso ideal recomendado inválido. Deve ser um número maior que zero.")
+
     # Carrega os modelos
     artefatos = carregar_arquivos_ia()
     if not artefatos:
@@ -62,15 +70,14 @@ def gerar_sugestao_nutricional(dados_animal):
 
     modelo_marca = artefatos["modelo_marca"]
     encoders = artefatos["encoders"]
-    modelo_peso = artefatos["modelo_peso"]
     modelo_caminhada = artefatos["modelo_caminhada"]
     modelo_dieta = artefatos["modelo_dieta"]
     modelo_atividade = artefatos["modelo_atividade"]
     catalogo = artefatos["catalogo"]
 
     # 1. VALIDAÇÃO E EXTRAÇÃO DOS INPUTS OBRIGATÓRIOS
-    # Peso Atual
-    peso_val = dados_animal.get("peso") or dados_animal.get("peso_kg")
+    # Peso Atual (Usando apenas o parâmetro oficial 'peso' retornado pela API Java)
+    peso_val = dados_animal.get("peso")
     if peso_val is None:
         raise ValueError("O peso do animal é obrigatório para gerar a recomendação.")
     try:
@@ -88,23 +95,24 @@ def gerar_sugestao_nutricional(dados_animal):
     if idade is None:
         raise ValueError("Idade do animal inválida ou não pôde ser calculada a partir da data de nascimento.")
 
-    # Caminhada Diária Atual (KM)
+    # Caminhada Diária Atual (KM) - Sem erro caso ausente (mantém fallback 0.0)
     caminhada_val = dados_animal.get("caminhada_diaria_km") or dados_animal.get("caminhadaDiariaKm") or dados_animal.get("caminhada_diaria") or dados_animal.get("caminhadaDiaria")
-    if caminhada_val is None:
-        raise ValueError("A distância de caminhada diária do animal é obrigatória.")
-    try:
-        caminhada_diaria_km = float(caminhada_val)
-        if caminhada_diaria_km < 0:
-            raise ValueError
-    except ValueError:
-        raise ValueError("Distância de caminhada inválida. Deve ser um número maior ou igual a zero.")
+    if caminhada_val is not None:
+        try:
+            caminhada_diaria_km = float(caminhada_val)
+            if caminhada_diaria_km < 0:
+                caminhada_diaria_km = 0.0
+        except ValueError:
+            caminhada_diaria_km = 0.0
+    else:
+        caminhada_diaria_km = 0.0
 
     # 2. CODIFICAÇÃO DAS CATEGORIAS DO ANIMAL
     le_raca = encoders['Raca']
     le_sexo = encoders['Sexo']
 
-    # Normalização da raça (fallback para SRD se desconhecida)
-    raca_crua = dados_animal.get("racaNome") or dados_animal.get("raca") or "SRD (Sem Raça Definida)"
+    # Normalização da raça usando racaNome
+    raca_crua = dados_animal.get("racaNome") or "SRD (Sem Raça Definida)"
     raca_nome = "SRD (Sem Raça Definida)"
     for classe in le_raca.classes_:
         if raca_crua.strip().lower() == classe.strip().lower():
@@ -123,13 +131,8 @@ def gerar_sugestao_nutricional(dados_animal):
 
     # 3. FLUXO DE INFERÊNCIAS EM CADEIA (LIFESTYLE SAUDÁVEL)
     try:
-        # A. Predição de Peso Ideal
-        X_peso = pd.DataFrame([{
-            'Raca': raca_encoded,
-            'Sexo': sexo_encoded,
-            'Idade': idade
-        }])
-        peso_ideal = round(float(modelo_peso.predict(X_peso)[0]), 2)
+        # A. Peso Ideal recebido como parâmetro
+        peso_ideal = round(peso_ideal, 2)
 
         # B. Cálculo de Calorias RER com base no Peso Ideal
         calorias_diarias_RER = round(70 * (peso_ideal ** 0.75), 2)
@@ -185,7 +188,14 @@ def gerar_sugestao_nutricional(dados_animal):
         status_corpo = 'Peso Ideal'
 
     # 5. FILTRAR CATÁLOGO DE PRODUTOS COM BASE NA MARCA, PORTE E STATUS CORPORAL
-    porte_pet_original = dados_animal.get("porte") or dados_animal.get("porte_animal") or "Médio"
+    # O porte é calculado dinamicamente com base no peso real do animal
+    if peso_kg <= 10:
+        porte_pet_original = 'Pequeno'
+    elif peso_kg <= 25:
+        porte_pet_original = 'Médio'
+    else:
+        porte_pet_original = 'Grande'
+
     mapa_porte = {'Pequeno': 'Small', 'Médio': 'Medium', 'Grande': 'Large'}
     porte_busca = mapa_porte.get(porte_pet_original, 'All')
 

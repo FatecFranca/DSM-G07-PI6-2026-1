@@ -21,7 +21,7 @@ def testar_casos():
     print("[INFO] Iniciando testes de recomendacao nutricional e lifestyle por IA...")
     print("=" * 60)
 
-    # Caso 1: Cão em Sobrepeso (Labrador Retriever, ideal ~23-32kg, atual 45kg)
+    # Caso 1: Cão em Sobrepeso (Labrador Retriever, ideal 23.26kg, atual 45kg)
     print("\n[TESTE 1] Testando cao com Sobrepeso (Labrador de 45kg)")
     pet_sobrepeso = {
         "racaNome": "Labrador Retriever",
@@ -31,7 +31,7 @@ def testar_casos():
         "porte": "Grande",
         "caminhada_diaria_km": 1.0
     }
-    res1 = recomendacao_ia.gerar_sugestao_nutricional(pet_sobrepeso)
+    res1 = recomendacao_ia.gerar_sugestao_nutricional(pet_sobrepeso, peso_ideal=23.26)
     print(f"  - Diagnostico corporal: {res1['status_corporal']}")
     print(f"  - Peso atual: {res1['peso_atual']} kg")
     print(f"  - Peso ideal previsto: {res1['peso_referencia']} kg")
@@ -54,7 +54,7 @@ def testar_casos():
         "porte": "Grande",
         "caminhada_diaria_km": 3.0
     }
-    res2 = recomendacao_ia.gerar_sugestao_nutricional(pet_abaixo)
+    res2 = recomendacao_ia.gerar_sugestao_nutricional(pet_abaixo, peso_ideal=21.7)
     print(f"  - Diagnostico corporal: {res2['status_corporal']}")
     print(f"  - Peso atual: {res2['peso_atual']} kg")
     print(f"  - Peso ideal previsto: {res2['peso_referencia']} kg")
@@ -75,7 +75,7 @@ def testar_casos():
         "porte": "Médio",
         "caminhada_diaria_km": 2.0
     }
-    res3 = recomendacao_ia.gerar_sugestao_nutricional(pet_ideal)
+    res3 = recomendacao_ia.gerar_sugestao_nutricional(pet_ideal, peso_ideal=23.38)
     print(f"  - Diagnostico corporal: {res3['status_corporal']}")
     print(f"  - Peso atual: {res3['peso_atual']} kg")
     print(f"  - Peso ideal previsto: {res3['peso_referencia']} kg")
@@ -95,7 +95,7 @@ def testar_casos():
         "porte": "Pequeno",
         "caminhada_diaria_km": 1.5
     }
-    res4 = recomendacao_ia.gerar_sugestao_nutricional(pet_srd)
+    res4 = recomendacao_ia.gerar_sugestao_nutricional(pet_srd, peso_ideal=7.0)
     print(f"  - Diagnostico corporal: {res4['status_corporal']}")
     print(f"  - Peso atual: {res4['peso_atual']} kg")
     print(f"  - Peso ideal previsto: {res4['peso_referencia']} kg")
@@ -110,31 +110,53 @@ def testar_casos():
     
     # Sem peso
     try:
-        recomendacao_ia.gerar_sugestao_nutricional({"racaNome": "Poodle"})
+        recomendacao_ia.gerar_sugestao_nutricional({"racaNome": "Poodle"}, peso_ideal=5.0)
         assert False, "Deveria falhar sem peso"
     except ValueError as e:
         print(f"  - Falhou corretamente (sem peso): {e}")
 
     # Sem data de nascimento
     try:
-        recomendacao_ia.gerar_sugestao_nutricional({"racaNome": "Poodle", "peso": 8.0})
+        recomendacao_ia.gerar_sugestao_nutricional({"racaNome": "Poodle", "peso": 8.0}, peso_ideal=5.0)
         assert False, "Deveria falhar sem data de nascimento"
     except ValueError as e:
         print(f"  - Falhou corretamente (sem nascimento): {e}")
 
-    # Sem caminhada diária
+    # Sem caminhada diária (agora é opcional com fallback)
+    try:
+        res_sem_caminhada = recomendacao_ia.gerar_sugestao_nutricional({
+            "racaNome": "Poodle",
+            "peso": 8.0,
+            "dataNascimento": "2020-01-01T00:00:00Z"
+        }, peso_ideal=5.0)
+        print("  - Passou corretamente (sem caminhada diária agora é opcional com fallback)")
+    except ValueError as e:
+        assert False, f"Não deveria falhar sem caminhada diária: {e}"
+
+    # Sem peso ideal
     try:
         recomendacao_ia.gerar_sugestao_nutricional({
             "racaNome": "Poodle",
             "peso": 8.0,
             "dataNascimento": "2020-01-01T00:00:00Z"
-        })
-        assert False, "Deveria falhar sem caminhada diária"
+        }, peso_ideal=None)
+        assert False, "Deveria falhar sem peso ideal"
     except ValueError as e:
-        print(f"  - Falhou corretamente (sem caminhada): {e}")
+        print(f"  - Falhou corretamente (sem peso ideal): {e}")
+
+    # Peso ideal inválido
+    try:
+        recomendacao_ia.gerar_sugestao_nutricional({
+            "racaNome": "Poodle",
+            "peso": 8.0,
+            "dataNascimento": "2020-01-01T00:00:00Z"
+        }, peso_ideal=-2.0)
+        assert False, "Deveria falhar com peso ideal negativo"
+    except ValueError as e:
+        print(f"  - Falhou corretamente (peso ideal inválido): {e}")
 
     print("\n" + "=" * 60)
-    print("[INFO] Todos os 5 testes de recomendacao foram concluidos com sucesso!")
+    print("[INFO] Todos os testes de recomendacao foram concluidos com sucesso!")
     print("=" * 60)
 
 if __name__ == "__main__":

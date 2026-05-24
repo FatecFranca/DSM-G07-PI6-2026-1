@@ -743,10 +743,11 @@ async def predizer_batimento(
 @app.get("/animal/{animalId}/ia-recomendacao", tags=["IA - Recomendação"])
 async def obter_recomendacao_ia(
     animalId: str, 
+    pesoIdeal: float = Query(..., description="Peso ideal recomendado para o animal"),
     credentials: Tuple[str, str] = Depends(get_current_user)
 ):
     """
-    Rota que integra a inteligência de peso ideal com os dados reais do animal.
+    Rota que integra a inteligência de recomendação com os dados reais do animal e o peso ideal.
     """
     _, token = credentials
     
@@ -758,7 +759,7 @@ async def obter_recomendacao_ia(
 
     # 2. Chama a inteligência de predição
     try:
-        resultado = recomendacao_ia.gerar_sugestao_nutricional(dados_animal)
+        resultado = recomendacao_ia.gerar_sugestao_nutricional(dados_animal, pesoIdeal)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     
