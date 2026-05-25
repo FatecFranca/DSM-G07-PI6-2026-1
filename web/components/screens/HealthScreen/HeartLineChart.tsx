@@ -11,6 +11,50 @@ import {
 } from "recharts";
 import { HeartbeatData } from "@/services/animalStatsService";
 
+const CustomizedTick = ({ x, y, payload, compact }: any) => {
+  const tickItem = payload.value;
+  let datePart = "";
+  let timePart = "";
+
+  try {
+    if (tickItem && typeof tickItem === "string" && tickItem.includes("-") && tickItem.length >= 10) {
+      const baseDate = tickItem.split("T")[0].split(" ")[0]; // "2025-10-17"
+      const parts = baseDate.split("-");
+      datePart = parts.length >= 3 ? `${parts[2]}/${parts[1]}` : tickItem;
+
+      if (tickItem.includes(" ") || tickItem.includes("T")) {
+        timePart = tickItem.includes(" ")
+          ? tickItem.split(" ")[1].substring(0, 5)
+          : tickItem.split("T")[1].substring(0, 5); // "20:00"
+      }
+    } else {
+      datePart = tickItem;
+    }
+  } catch {
+    datePart = tickItem;
+  }
+
+  if (compact && timePart) {
+    return (
+      <g transform={`translate(${x},${y})`}>
+        <text x={0} y={0} textAnchor="middle" fill="var(--color-brown)" fontSize={9} fontWeight={500}>
+          <tspan x={0} dy={10}>{datePart}</tspan>
+          <tspan x={0} dy={11}>{timePart}</tspan>
+        </text>
+      </g>
+    );
+  }
+
+  const fullText = timePart ? `${datePart} ${timePart}` : datePart;
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text x={0} y={0} dy={10} textAnchor="middle" fill="var(--color-brown)" fontSize={10} fontWeight={500}>
+        {fullText}
+      </text>
+    </g>
+  );
+};
+
 interface Props {
   title: string;
   data: HeartbeatData[];
@@ -45,29 +89,6 @@ export default function HeartLineChart({
   const minY = Math.max(0, Math.floor(minValue / 10) * 10 - 10);
   const maxY = Math.ceil((maxValue + 1) / 10) * 10 + 10;
 
-  const formatXAxis = (tickItem: string) => {
-    try {
-      if (!tickItem || typeof tickItem !== "string") return tickItem;
-      if (tickItem.includes("-") && tickItem.length >= 10) {
-        const baseDate = tickItem.split("T")[0].split(" ")[0]; // "2025-10-17"
-        const parts = baseDate.split("-");
-        const formattedDate = parts.length >= 3 ? `${parts[2]}/${parts[1]}` : tickItem;
-
-        // Check if there is time component
-        if (tickItem.includes(" ") || tickItem.includes("T")) {
-          const timePart = tickItem.includes(" ")
-            ? tickItem.split(" ")[1].substring(0, 5)
-            : tickItem.split("T")[1].substring(0, 5); // "20:00"
-          return `${formattedDate} ${timePart}`;
-        }
-        return formattedDate;
-      }
-      return tickItem;
-    } catch {
-      return tickItem;
-    }
-  };
-
   return (
     <div
       style={{ backgroundColor }}
@@ -87,9 +108,9 @@ export default function HeartLineChart({
             data={data}
             margin={{
               top: 5,
-              right: 10,
+              right: compact ? 20 : 10,
               left: -20,
-              bottom: 5,
+              bottom: compact ? 22 : 5,
             }}
           >
             <defs>
@@ -103,9 +124,8 @@ export default function HeartLineChart({
               dataKey="data"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "var(--color-brown)", fontSize: 10, fontWeight: 500 }}
-              tickFormatter={formatXAxis}
-              dy={10}
+              tick={(props: any) => <CustomizedTick {...props} compact={compact} />}
+              interval={0}
             />
             <YAxis
               domain={[minY, maxY]}
