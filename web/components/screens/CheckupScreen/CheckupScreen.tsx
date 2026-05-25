@@ -256,7 +256,7 @@ export default function CheckupScreen({ animalId, animalName }: Props) {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full overflow-y-auto bg-[var(--color-sand-100)] px-4 py-6 pb-[250px] scrollbar-hide flex flex-col items-center"
+      className="w-full h-full overflow-y-auto bg-[var(--color-sand-100)] px-4 py-6 pb-[250px] md:pb-6 scrollbar-hide flex flex-col items-center"
     >
       <div className="flex flex-col items-center max-w-md w-full mt-auto mb-auto">
         
