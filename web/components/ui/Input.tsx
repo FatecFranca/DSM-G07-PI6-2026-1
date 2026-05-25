@@ -34,19 +34,19 @@ export default function Input({
   const sizeStyles = {
     small: {
       label: "text-xs",
-      input: "text-xs",
+      input: "text-xs w-full",
       icon: "text-[18px]",
       paddingY: "py-3",
     },
     medium: {
       label: "text-sm",
-      input: "text-sm",
+      input: "text-sm w-full",
       icon: "text-[20px]",
       paddingY: "py-3.5",
     },
     large: {
       label: "text-base",
-      input: "text-base",
+      input: "text-base w-full",
       icon: "text-[22px]",
       paddingY: "py-2.5",
     },
@@ -56,7 +56,7 @@ export default function Input({
 
   return (
     <div
-      className={`flex flex-col ${
+      className={`w-full flex flex-col ${
         centerText ? "items-center text-center" : "items-start"
       }`}
     >
@@ -93,6 +93,7 @@ export default function Input({
 
       <div
         className={`
+          w-full
           flex items-center
           rounded-full
           border

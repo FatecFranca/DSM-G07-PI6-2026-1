@@ -6,7 +6,6 @@ import MapOverlay from "./MapOverlay";
 import MapActions from "./MapActions";
 import { getUltimaLocalizacaoAnimal } from "@/services/locationService";
 import { getSafeAreaByAnimalId, SafeArea } from "@/services/safeAreaService";
-import { authService } from "@/services/authService";
 import {
   connectWebSocket,
   subscribe,
@@ -26,11 +25,15 @@ function getDistanceInMeters(lat1: number, lon1: number, lat2: number, lon2: num
 }
 
 interface MapScreenProps {
-  setLastBpm: (bpm: number) => void;
+  setLastBpm: (bpm: number | null) => void;
+  animalId: string;
+  animalName: string;
 }
 
 export default function MapScreen({
   setLastBpm,
+  animalId,
+  animalName,
 }: MapScreenProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isLoadingLocation, setIsLoadingLocation] = useState(true);
@@ -40,8 +43,6 @@ export default function MapScreen({
 
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
-
-  const animalId = "68194120636f719fcd5ee5fd";
 
   async function loadLocation() {
     try {
@@ -94,23 +95,13 @@ export default function MapScreen({
   }, [lat, lng, safeArea]);
 
   useEffect(() => {
+    if (!animalId) return;
+
     let unsubscribe: (() => void) | undefined;
 
     async function init() {
       try {
         console.log("🚀 Iniciando MapScreen...");
-
-        authService.init();
-
-        if (!authService.isAuthenticated()) {
-          console.log("🔐 Fazendo login...");
-
-          await authService.login(
-            "henriquealmeidaflorentino@gmail.com",
-            "senha123"
-          );
-        }
-
         console.log("🔑 Token carregado");
 
         connectWebSocket(animalId);
@@ -181,7 +172,7 @@ export default function MapScreen({
         unsubscribe();
       }
     };
-  }, []);
+  }, [animalId]);
 
   return (
     <div className="w-full h-screen relative overflow-hidden">
