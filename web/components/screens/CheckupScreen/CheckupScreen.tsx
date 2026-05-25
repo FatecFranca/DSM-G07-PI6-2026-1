@@ -256,9 +256,9 @@ export default function CheckupScreen({ animalId, animalName }: Props) {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full overflow-y-auto bg-[var(--color-sand-100)] px-4 py-6 pb-[250px] md:pb-6 scrollbar-hide flex flex-col items-center"
+      className="w-full h-full overflow-y-auto bg-[var(--color-sand-100)] px-4 pt-6 scrollbar-hide flex flex-col items-center"
     >
-      <div className="flex flex-col items-center max-w-md w-full mt-auto mb-auto">
+      <div className="flex flex-col items-center max-w-md w-full min-h-[calc(100vh-120px)] my-auto justify-center shrink-0">
         
         {/* TELA DE INTRODUÇÃO */}
         {!mostrouIntroducao && !mostrouResultado && (
@@ -650,6 +650,9 @@ export default function CheckupScreen({ animalId, animalName }: Props) {
           </div>
         )}
       </div>
+
+      {/* Espaçador na base para permitir a rolagem passar da barra de navegação no mobile */}
+      <div className="h-[220px] w-full shrink-0" />
     </div>
   );
 }
