@@ -256,9 +256,9 @@ export default function CheckupScreen({ animalId, animalName }: Props) {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full overflow-y-auto bg-[var(--color-sand-100)] px-4 py-6 pb-[250px] scrollbar-hide flex flex-col items-center"
+      className="w-full h-full overflow-y-auto bg-[var(--color-sand-100)] px-4 py-6 pb-[250px] scrollbar-hide"
     >
-      <div className="flex flex-col items-center max-w-md w-full my-auto">
+      <div className="flex flex-col items-center max-w-md mx-auto w-full min-h-[60vh] md:min-h-[70vh] justify-center">
         
         {/* TELA DE INTRODUÇÃO */}
         {!mostrouIntroducao && !mostrouResultado && (
