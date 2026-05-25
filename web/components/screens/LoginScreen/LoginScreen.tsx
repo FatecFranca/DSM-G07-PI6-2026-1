@@ -43,6 +43,27 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
     }
   };
 
+  const handleTestUserLogin = async () => {
+    setIsLoading(true);
+    setErrorMessage(null);
+    try {
+      console.log("[LoginScreen] Tentando realizar login com usuário teste...");
+      const success = await authService.login("henriquealmeidaflorentino@gmail.com", "senha123");
+
+      if (success) {
+        console.log("[LoginScreen] Login de teste bem-sucedido!");
+        onLoginSuccess();
+      } else {
+        setErrorMessage("Erro ao conectar com a conta de teste. Tente novamente.");
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorMessage("Erro ao tentar fazer login com usuário teste.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-[var(--color-sand-100)] flex flex-col md:flex-row items-stretch font-sans">
 
@@ -117,19 +138,27 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 
             <div className="h-6" />
 
-            {/* BOTÃO ENTRAR */}
             {isLoading ? (
               <div className="flex flex-col items-center justify-center py-2">
                 <div className="w-8 h-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin"></div>
                 <span className="text-xs font-semibold text-[var(--color-brown)] mt-2">Conectando...</span>
               </div>
             ) : (
-              <button
-                type="submit"
-                className="flex items-center justify-center gap-2 h-[50px] bg-[var(--color-orange-900)] hover:brightness-110 active:scale-95 text-white font-bold text-lg rounded-full cursor-pointer shadow-md transition-all duration-300 font-poppins"
-              >
-                Entrar
-              </button>
+              <div className="flex flex-col items-stretch">
+                <button
+                  type="submit"
+                  className="flex items-center justify-center gap-2 h-[50px] bg-[var(--color-orange-900)] hover:brightness-110 active:scale-95 text-white font-bold text-lg rounded-full cursor-pointer shadow-md transition-all duration-300 font-poppins"
+                >
+                  Entrar
+                </button>
+                <button
+                  type="button"
+                  onClick={handleTestUserLogin}
+                  className="mt-3 text-sm font-semibold text-[var(--color-primary)] hover:text-[var(--color-primary-active)] cursor-pointer text-center transition-all duration-300 focus:outline-none"
+                >
+                  Entrar com usuário teste
+                </button>
+              </div>
             )}
           </form>
 

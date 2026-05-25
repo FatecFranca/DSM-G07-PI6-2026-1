@@ -9,7 +9,6 @@ import {
   FaBatteryFull,
   FaChevronUp,
   FaChevronDown,
-  FaSignOutAlt,
 } from "react-icons/fa";
 import HeartLineChart from "@/components/screens/HealthScreen/HeartLineChart";
 import { animalStatsService, HeartbeatData } from "@/services/animalStatsService";
@@ -21,7 +20,6 @@ interface StatusBarProps {
   lastBpm?: number;
   battery?: number;
   animalId?: string;
-  onLogout?: () => void;
 }
 
 export default function StatusBar({
@@ -31,7 +29,6 @@ export default function StatusBar({
   lastBpm,
   battery = 96,
   animalId,
-  onLogout,
 }: StatusBarProps) {
 
   const [isExpanded, setIsExpanded] = useState(false);
@@ -76,8 +73,7 @@ export default function StatusBar({
         ${isExpanded ? "h-[310px]" : "h-[110px]"}
       `}
     >
-      <div className="h-[28px] flex items-center justify-between mb-2 px-1 relative">
-        <div className="w-7" /> {/* spacer to balance logout button and keep center toggle aligned */}
+      <div className="h-[28px] flex items-center justify-center mb-2">
         <div
           onClick={toggle}
           className="w-[80px] h-[24px] rounded-full bg-[var(--color-sand-900)] border border-[var(--color-sand-900)] flex items-center justify-center cursor-pointer"
@@ -88,20 +84,6 @@ export default function StatusBar({
             <FaChevronUp className="text-[var(--color-orange-900)] text-xs" />
           )}
         </div>
-        {onLogout ? (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onLogout();
-            }}
-            title="Sair"
-            className="w-7 h-7 rounded-full bg-[var(--color-sand-900)] flex items-center justify-center text-[var(--color-orange-900)] hover:text-red-500 transition-all duration-200 cursor-pointer"
-          >
-            <FaSignOutAlt className="text-xs" />
-          </button>
-        ) : (
-          <div className="w-7" />
-        )}
       </div>
 
       <div className="flex justify-between items-center flex-1">

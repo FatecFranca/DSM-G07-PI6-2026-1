@@ -135,6 +135,7 @@ export default function AppShell() {
       setLastBpm={setLastBpm}
       animalId={animalId}
       animalName={petName}
+      onLogout={handleLogout}
     />,
     <HealthScreen
       key="health"
@@ -163,7 +164,6 @@ export default function AppShell() {
         lastBpm={lastBpm}
         isConnected={isConnected}
         animalId={animalId}
-        onLogout={handleLogout}
         animalName={petName}
       />
     </div>

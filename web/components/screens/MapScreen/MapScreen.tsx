@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { FaSignOutAlt } from "react-icons/fa";
 import MapView from "./MapView";
 import MapOverlay from "./MapOverlay";
 import MapActions from "./MapActions";
@@ -28,12 +29,14 @@ interface MapScreenProps {
   setLastBpm: (bpm: number | null) => void;
   animalId: string;
   animalName: string;
+  onLogout?: () => void;
 }
 
 export default function MapScreen({
   setLastBpm,
   animalId,
   animalName,
+  onLogout,
 }: MapScreenProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isLoadingLocation, setIsLoadingLocation] = useState(true);
@@ -194,6 +197,17 @@ export default function MapScreen({
       <div className="absolute right-4 z-40 bottom-[200px] sm:bottom-[160px] md:bottom-28">
         <MapActions onRefresh={loadLocation} />
       </div>
+
+      {/* 🚪 LOGOUT BUTTON (Only on Map Screen, Floating top-right) */}
+      {onLogout && (
+        <button
+          onClick={onLogout}
+          title="Sair"
+          className="fixed top-5 right-5 w-11 h-11 rounded-full bg-[var(--color-primary)] hover:brightness-110 active:scale-95 text-white flex items-center justify-center shadow-md transition-all duration-300 z-50 cursor-pointer"
+        >
+          <FaSignOutAlt className="text-xl" />
+        </button>
+      )}
     </div>
   );
 }

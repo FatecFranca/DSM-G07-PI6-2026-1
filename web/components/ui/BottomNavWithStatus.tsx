@@ -9,7 +9,6 @@ interface Props {
   lastBpm?: number | null;
   isConnected?: boolean;
   animalId?: string;
-  onLogout?: () => void;
   animalName?: string;
 }
 
@@ -19,7 +18,6 @@ export default function BottomNavWithStatus({
   lastBpm,
   isConnected = false,
   animalId,
-  onLogout,
   animalName = "Pet",
 }: Props) {
   return (
@@ -31,7 +29,6 @@ export default function BottomNavWithStatus({
           animalName={animalName}
           lastBpm={lastBpm ?? undefined}
           animalId={animalId}
-          onLogout={onLogout}
         />
 
         <NavBar
@@ -48,7 +45,6 @@ export default function BottomNavWithStatus({
             animalName={animalName}
             lastBpm={lastBpm ?? undefined}
             animalId={animalId}
-            onLogout={onLogout}
           />
         </div>
 

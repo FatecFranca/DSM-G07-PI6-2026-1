@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 type InputSize = "small" | "medium" | "large";
 
@@ -30,6 +31,10 @@ export default function Input({
   textColor,
 }: InputProps) {
   const [isFocused, setIsFocused] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const isPasswordType = type === "password";
+  const inputType = isPasswordType ? (showPassword ? "text" : "password") : type;
 
   const sizeStyles = {
     small: {
@@ -107,7 +112,7 @@ export default function Input({
         `}
       >
         <input
-          type={type}
+          type={inputType}
           value={value}
           onChange={(e) => onChange?.(e.target.value)}
           onFocus={() => setIsFocused(true)}
@@ -127,6 +132,16 @@ export default function Input({
             }
           `}
         />
+
+        {isPasswordType && (
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="ml-2 text-[var(--color-primary)] hover:text-[var(--color-primary-active)] transition-colors focus:outline-none cursor-pointer"
+          >
+            {showPassword ? <FaEyeSlash className="text-lg" /> : <FaEye className="text-lg" />}
+          </button>
+        )}
 
         {suffixText && (
           <span className={`ml-2 ${currentSize.input} ${textColor || "text-[var(--color-foreground)]"}`}>
