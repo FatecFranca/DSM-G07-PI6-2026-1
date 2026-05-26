@@ -28,7 +28,7 @@ export default function StatusBar({
   sex = "M",
   lastBpm,
   battery = 96,
-  animalId = "68194120636f719fcd5ee5fd",
+  animalId,
 }: StatusBarProps) {
 
   const [isExpanded, setIsExpanded] = useState(false);
@@ -41,6 +41,7 @@ export default function StatusBar({
   useEffect(() => {
     let active = true;
     async function fetchChartData() {
+      if (!animalId) return;
       try {
         console.log("📈 Fetching status bar 5-hour heart rate average...");
         const data = await animalStatsService.getMediaUltimas5HorasRegistradas(animalId);

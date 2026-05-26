@@ -12,7 +12,7 @@ interface AuthResponse {
 class AuthService {
   private authData: AuthResponse | null = null;
 
-  // 🔄 INIT + AUTO LOGIN
+  // 🔄 INIT
   async init() {
     try {
       const stored = localStorage.getItem("auth");
@@ -22,17 +22,7 @@ class AuthService {
         console.log("[AuthService] carregado do storage");
         return;
       }
-
-      console.log("[AuthService] fazendo auto login...");
-
-      const success = await this.login(
-        "henriquealmeidaflorentino@gmail.com",
-        "senha123"
-      );
-
-      if (!success) {
-        console.error("[AuthService] falha no auto login");
-      }
+      console.log("[AuthService] nenhuma credencial salva encontrada.");
     } catch (e) {
       console.error("[AuthService] erro init:", e);
     }
@@ -75,6 +65,22 @@ class AuthService {
 
   getAnimalId() {
     return this.authData?.animalId;
+  }
+
+  getUserId() {
+    return this.authData?.userId;
+  }
+
+  getNome() {
+    return this.authData?.nome;
+  }
+
+  getEmail() {
+    return this.authData?.email;
+  }
+
+  getPetName() {
+    return this.authData?.petName;
   }
 
   isAuthenticated() {

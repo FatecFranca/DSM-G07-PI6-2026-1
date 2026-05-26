@@ -40,3 +40,18 @@ services:
       options:
         max-size: "50m"
         max-file: "3"
+
+  web:
+    image: ${DOCKERHUB_USERNAME}/petdex-web:${TAG}
+    ports:
+      - "8082:8082"
+    environment:
+      - JAVA_API_URL=http://api-java:8080
+    networks:
+      - petdex-network
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
