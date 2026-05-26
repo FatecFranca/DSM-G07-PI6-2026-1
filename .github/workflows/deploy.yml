@@ -113,11 +113,17 @@ jobs:
 
             cd ~/petdex
 
+            echo "🧹 Limpando cache e imagens antigas do Docker na VM..."
+            docker system prune -af
+
             echo "🔍 Imagens antes do pull:"
             docker images
 
             docker compose pull
             docker compose up -d --force-recreate
+
+            echo "🧹 Limpando a imagem antiga que ficou órfã..."
+            docker image prune -f
 
             echo "🔍 Imagens após o pull e up:"
             docker images
