@@ -40,6 +40,21 @@ jobs:
             docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/api-python:${{ env.BRANCH_NAME }} .
             docker push ${{ secrets.DOCKERHUB_USERNAME }}/api-python:${{ env.BRANCH_NAME }}
 
+      - name: 🌐 Build e Push do Frontend Web
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 2
+          command: |
+            cd web
+            docker build \
+              --build-arg NEXT_PUBLIC_JAVA_API_URL="http://api-java:8080" \
+              --build-arg NEXT_PUBLIC_API_PYTHON_URL="http://api-python:8083" \
+              --build-arg NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}" \
+              --build-arg NEXT_PUBLIC_WEBSOCKET_URL="http://api-java:8080/ws-petdex" \
+              -t ${{ secrets.DOCKERHUB_USERNAME }}/petdex-web:${{ env.BRANCH_NAME }} .
+            docker push ${{ secrets.DOCKERHUB_USERNAME }}/petdex-web:${{ env.BRANCH_NAME }}
+
   deploy:
     runs-on: ubuntu-latest
     needs: build
