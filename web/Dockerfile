@@ -14,6 +14,18 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Declare build arguments for Next.js client-side variables
+ARG NEXT_PUBLIC_JAVA_API_URL
+ARG NEXT_PUBLIC_API_PYTHON_URL
+ARG NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+ARG NEXT_PUBLIC_WEBSOCKET_URL
+
+# Set them as environment variables during build time
+ENV NEXT_PUBLIC_JAVA_API_URL=$NEXT_PUBLIC_JAVA_API_URL
+ENV NEXT_PUBLIC_API_PYTHON_URL=$NEXT_PUBLIC_API_PYTHON_URL
+ENV NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=$NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+ENV NEXT_PUBLIC_WEBSOCKET_URL=$NEXT_PUBLIC_WEBSOCKET_URL
+
 # Disable Next.js telemetry during build
 ENV NEXT_TELEMETRY_DISABLED=1
 
@@ -43,9 +55,9 @@ COPY --from=builder /app/package.json ./package.json
 
 USER nextjs
 
-EXPOSE 3000
+EXPOSE 8082
 
-ENV PORT=3000
+ENV PORT=8082
 
 # Start Next.js server using package scripts
 CMD ["npm", "run", "start"]
