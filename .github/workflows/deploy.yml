@@ -113,7 +113,19 @@ jobs:
 
             cd ~/petdex
 
+            echo "🔍 Imagens antes do pull:"
+            docker images
+
             docker compose pull
             docker compose up -d --force-recreate
+
+            echo "🔍 Imagens após o pull e up:"
+            docker images
+
+            echo "🔍 Container id e status:"
+            docker compose ps
+
+            echo "🔍 Procurando ws-petdex nos arquivos estáticos do container:"
+            docker compose exec -T web grep -rn "ws-petdex" .next/ || true
 
             echo "✅ Deploy concluído com sucesso!"
