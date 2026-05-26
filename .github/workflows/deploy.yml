@@ -47,11 +47,6 @@ jobs:
           max_attempts: 2
           command: |
             cd web
-            echo "🔍 Debugging variables (reversed to bypass masking):"
-            echo "Google Maps API Key (Secret, reversed):  $(echo '${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}' | rev)"
-            echo "Google Maps API Key (Variable, reversed): $(echo '${{ vars.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}' | rev)"
-            echo "WebSocket URL (Secret, reversed):        $(echo '${{ secrets.NEXT_PUBLIC_WEBSOCKET_URL }}' | rev)"
-            echo "WebSocket URL (Variable, reversed):      $(echo '${{ vars.NEXT_PUBLIC_WEBSOCKET_URL }}' | rev)"
             
             docker build \
               --build-arg NEXT_PUBLIC_JAVA_API_URL="http://api-java:8080" \
