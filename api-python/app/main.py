@@ -1,12 +1,17 @@
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 import os
+from app.infraestructure.messaging.pubsub_consumer import start_pubsub_consumer
 
 app = FastAPI(
     title="API PetDex - Estatísticas",
     description="API para exibir dados e estatísticas dos batimentos cardíacos dos animais monitorados pela coleira inteligente",
     version="1.0.0"
 )
+
+@app.on_event("startup")
+def startup_event():
+    start_pubsub_consumer()
 
 def custom_openapi():
     """

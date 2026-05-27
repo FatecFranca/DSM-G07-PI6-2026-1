@@ -31,6 +31,9 @@ public class ImplMovimentoService implements MovimentoService {
     @Autowired
     private ValidationService validation;
 
+    @Autowired
+    private com.petdex.api.application.services.messaging.publisher.StatisticPublisherService statisticPublisherService;
+
     @Override
     public MovimentoResDTO save(MovimentoReqDTO movimentoReq) {
 
@@ -46,6 +49,9 @@ public class ImplMovimentoService implements MovimentoService {
 
         MovimentoResDTO res = mapper.map(movimentoRepository.save(mapper.map(movimentoReq, Movimento.class)), MovimentoResDTO.class);
         logger.info("Movimento cadastrado com sucesso para o animal: {}", movimentoReq.getAnimal());
+        
+        statisticPublisherService.publishEvent(movimentoReq.getAnimal(), "MOVIMENTO");
+        
         return res;
     }
 

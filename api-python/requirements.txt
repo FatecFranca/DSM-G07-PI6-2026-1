@@ -12,3 +12,5 @@ python-dotenv
 pypmml
 PyJWT
 requests
+redis>=5.0.0
+google-cloud-pubsub>=2.19.0

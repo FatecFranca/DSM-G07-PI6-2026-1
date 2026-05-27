@@ -37,6 +37,9 @@ public class ImplBatimentoService implements BatimentoService {
     @Autowired
     private NotificationService notificationService;
 
+    @Autowired
+    private com.petdex.api.application.services.messaging.publisher.StatisticPublisherService statisticPublisherService;
+
     public BatimentoResDTO save(BatimentoReqDTO batimentoReq) {
 
         if (!validation.existAnimal(batimentoReq.getAnimal())) {
@@ -63,6 +66,8 @@ public class ImplBatimentoService implements BatimentoService {
                 batimentoReq.getAnimal(),
                 webSocketDTO
         );
+
+        statisticPublisherService.publishEvent(batimentoReq.getAnimal(), "BATIMENTO");
 
         return batimentoResDTO;
     }

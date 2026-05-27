@@ -13,6 +13,7 @@ from sklearn.metrics import mean_squared_error
 from scipy.stats import pearsonr
 from sklearn.preprocessing import StandardScaler
 from app.infraestructure.clients.java_api_client import JavaAPIClient
+from app.infraestructure.cache.redis_client import RedisClient
 import logging
 
 logger = logging.getLogger("EstatisticaService")
@@ -20,6 +21,7 @@ logger = logging.getLogger("EstatisticaService")
 class EstatisticaService:
     def __init__(self):
         self.java_api_client = JavaAPIClient()
+        self.redis = RedisClient()
 
     def _get_animal_todos_batimentos(self, animal_id: str, token: str, max_pages: int = 3) -> list[dict]:
         batimentos = []
@@ -436,10 +438,17 @@ class EstatisticaService:
     # ---------------------------------------------------------
 
     def batimentos_calcular_estatisticas(self, animal_id: str, token: str) -> dict:
+        cache_key = f"cache:animal:{animal_id}:batimentos:estatisticas"
+        cached = self.redis.get(cache_key)
+        if cached:
+            return cached
+
         batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
         if not batimentos:
             return {"error": True, "mensagem": "Nenhum batimento disponível."}
-        return self.calcular_estatisticas(batimentos)
+        resultado = self.calcular_estatisticas(batimentos)
+        self.redis.set(cache_key, resultado)
+        return resultado
 
     def media_batimentos_por_intervalo(self, animal_id: str, token: str, inicio: date, fim: date) -> Dict:
         batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
@@ -486,23 +495,44 @@ class EstatisticaService:
             return {"error": True, "mensagem": "Erro ao calcular probabilidade do último batimento"}
 
     def media_ultimos_5_dias_validos(self, animal_id: str, token: str) -> dict:
+        cache_key = f"cache:animal:{animal_id}:batimentos:ultimos_dias"
+        cached = self.redis.get(cache_key)
+        if cached:
+            return cached
+
         batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
         if not batimentos:
             return {}
-        return self.obter_media_ultimos_5_dias_validos(batimentos)
+        resultado = self.obter_media_ultimos_5_dias_validos(batimentos)
+        self.redis.set(cache_key, resultado)
+        return resultado
 
     def media_ultimas_5_horas_registradas(self, animal_id: str, token: str) -> dict:
+        cache_key = f"cache:animal:{animal_id}:batimentos:ultimas_horas"
+        cached = self.redis.get(cache_key)
+        if cached:
+            return cached
+
         batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
         if not batimentos:
             return {"media": None, "media_por_hora": {}, "mensagem": "Nenhum dado disponível."}
-        return self.obter_media_ultimas_5_horas_registradas(batimentos)
+        resultado = self.obter_media_ultimas_5_horas_registradas(batimentos)
+        self.redis.set(cache_key, resultado)
+        return resultado
 
     def analise_regressao_batimentos(self, animal_id: str, token: str) -> dict:
+        cache_key = f"cache:animal:{animal_id}:regressao:batimentos_movimentos"
+        cached = self.redis.get(cache_key)
+        if cached:
+            return cached
+
         batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
         movimentos = self._get_animal_movimentos_todos(animal_id, token, max_pages=3)
         if not batimentos or not movimentos:
             return {"erro": "Dados insuficientes para análise."}
-        return self.executar_regressao(batimentos, movimentos)
+        resultado = self.executar_regressao(batimentos, movimentos)
+        self.redis.set(cache_key, resultado)
+        return resultado
 
     def predizer_batimento(self, animal_id: str, token: str, acelerometroX: float, acelerometroY: float, acelerometroZ: float) -> dict:
         resultado = self.analise_regressao_batimentos(animal_id, token)

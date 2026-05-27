@@ -25,6 +25,14 @@ services:
       - ./app/google-cloud-key.json:/app/google-cloud-key.json
     restart: always
 
+  redis:
+    image: redis:alpine
+    ports:
+      - "8081:6379"
+    networks:
+      - petdex-network
+    restart: always
+
   api-python:
     image: ${DOCKERHUB_USERNAME}/api-python:${TAG}
     networks:
@@ -34,6 +42,14 @@ services:
     environment:
       - API_URL=http://api-java:8080
       - JWT_SECRET=${JWT_SECRET}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CACHE_TTL_MINUTES=10
+      - PUBSUB_TOPIC=petdex-statistic
+      - PUBSUB_SUBSCRIPTION=petdex-statistic-sub
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/google-cloud-key.json
+    volumes:
+      - ./app/google-cloud-key.json:/app/google-cloud-key.json
     restart: always
     logging:
       driver: "json-file"
