@@ -1,3 +1,3 @@
-from app.view.CheckupController import router as checkup_router
-from app.view.EstatisticaController import router as estatistica_router
-from app.view.RecomendacaoController import router as recomendacao_router
+from app.view.checkup_controller import router as checkup_router
+from app.view.estatistica_controller import router as estatistica_router
+from app.view.recomendacao_controller import router as recomendacao_router

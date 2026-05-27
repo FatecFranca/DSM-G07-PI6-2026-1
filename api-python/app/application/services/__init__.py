@@ -1,6 +1,6 @@
-from app.application.services.CheckupService import CheckupService
-from app.application.services.EstatisticaService import EstatisticaService
-from app.application.services.RecomendacaoService import RecomendacaoService
+from app.application.services.checkup_service import CheckupService
+from app.application.services.estatistica_service import EstatisticaService
+from app.application.services.recomendacao_service import RecomendacaoService
 from app.application.services.jwt_service import jwt_service, JwtService
 
 __all__ = [
