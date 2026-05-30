@@ -1,12 +1,15 @@
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 import os
+from app.view.exception_handlers import setup_exception_handlers
 
 app = FastAPI(
     title="API PetDex - Estatísticas",
     description="API para exibir dados e estatísticas dos batimentos cardíacos dos animais monitorados pela coleira inteligente",
     version="1.0.0"
 )
+
+setup_exception_handlers(app)
 
 def custom_openapi():
     """
@@ -71,6 +74,44 @@ def custom_openapi():
                 if method in ["get", "post", "put", "delete", "patch"]:
                     if "security" not in path_item[method]:
                         path_item[method]["security"] = [{"Bearer": []}]
+
+    # ------------------ Injeta respostas de erro globais ------------------
+    if "schemas" not in openapi_schema["components"]:
+        openapi_schema["components"]["schemas"] = {}
+        
+    openapi_schema["components"]["schemas"]["ErrorResponseDTO"] = {
+        "type": "object",
+        "properties": {
+            "path": {"type": "string", "example": "/endpoint"},
+            "message": {"type": "string", "example": "Mensagem de erro"},
+            "success": {"type": "boolean", "default": False},
+            "timestamp": {"type": "string", "format": "date-time"}
+        }
+    }
+
+    error_content = {
+        "application/json": {
+            "schema": {"$ref": "#/components/schemas/ErrorResponseDTO"}
+        }
+    }
+
+    for path, path_item in openapi_schema["paths"].items():
+        if path != "/health":
+            for method in path_item:
+                if method in ["get", "post", "put", "delete", "patch"]:
+                    responses = path_item[method].get("responses", {})
+                    if "400" not in responses:
+                        responses["400"] = {"description": "Requisição inválida (Bad Request) - Erro genérico ou de lógica", "content": error_content}
+                    if "401" not in responses:
+                        responses["401"] = {"description": "Não autorizado (Unauthorized) - Falha ou falta de autenticação", "content": error_content}
+                    if "403" not in responses:
+                        responses["403"] = {"description": "Acesso negado (Forbidden) - Você não tem permissão", "content": error_content}
+                    if "404" not in responses:
+                        responses["404"] = {"description": "Recurso ou endpoint não encontrado", "content": error_content}
+                    if "409" not in responses:
+                        responses["409"] = {"description": "Conflito (Já existe um registro correspondente)", "content": error_content}
+                    if "500" not in responses:
+                        responses["500"] = {"description": "Erro interno inesperado no servidor", "content": error_content}
 
     app.openapi_schema = openapi_schema
     return app.openapi_schema
