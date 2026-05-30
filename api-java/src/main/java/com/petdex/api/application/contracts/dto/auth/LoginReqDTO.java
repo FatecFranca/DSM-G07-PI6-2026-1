@@ -10,11 +10,11 @@ import jakarta.validation.constraints.NotBlank;
 @Schema(
         name = "Requisição Login",
         description = "Credenciais necessárias para autenticação no sistema",
-        example = "{\"email\": \"usuario@petdex.com\", \"senha\": \"senha123\"}"
+        example = "{\"email\": \"henriquealmeidaflorentino@gmail.com\", \"senha\": \"senha123\"}"
 )
 public class LoginReqDTO {
 
-    @Schema(description = "Email do usuário para autenticação", example = "usuario@petdex.com", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Email do usuário para autenticação", example = "henriquealmeidaflorentino@gmail.com", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "Email não pode ser nulo ou vazio")
     @Email(message = "Email deve ser válido")
     private String email;
