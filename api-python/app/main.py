@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 import os
-from app.view.exception_handlers import setup_exception_handlers
+from app.view.exception.exception_handlers import setup_exception_handlers
 
 app = FastAPI(
     title="API PetDex - Estatísticas",
