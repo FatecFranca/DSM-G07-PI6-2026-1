@@ -22,17 +22,13 @@ class EstatisticaService:
     def __init__(self):
         self.java_api_client = JavaAPIClient()
 
-    def _get_animal_todos_batimentos(self, animal_id: str, token: str, max_pages: int = 3) -> list[dict]:
+    def _get_animal_todos_batimentos(self, animal_id: str, token: str, max_pages: int = None, sort_by: str = None, direction: str = None, data_inicio: str = None, data_fim: str = None) -> list[dict]:
         batimentos = []
         page = 0
         size = 100
 
-        if not max_pages:
-            logger.info("max_pages não informado. Definindo como 3")
-            max_pages = 3
-
         try:
-            status_code, response = self.java_api_client.get_animal_batimentos(animal_id, token, page, size)
+            status_code, response = self.java_api_client.get_animal_batimentos(animal_id, token, page, size, sort_by, direction, data_inicio, data_fim)
 
             if status_code != 200:
                 logger.error(f"API retornou {status_code}. Response: {response.text[:300] if hasattr(response, 'text') else str(response)[:300]}")
@@ -42,12 +38,13 @@ class EstatisticaService:
                 logger.error("API não retornou conteúdo ao buscar batimentos do animal.")
                 return []
             
-            total_pages = min(response.get("totalPages", 1), max_pages)
+            total_pages_response = response.get("totalPages", 1)
+            total_pages = min(total_pages_response, max_pages) if max_pages is not None else total_pages_response
             batimentos.extend(response.get("content", []))
             
             if total_pages > 1:
                 for page in range(1, total_pages):
-                    status_code, response = self.java_api_client.get_animal_batimentos(animal_id, token, page, size)
+                    status_code, response = self.java_api_client.get_animal_batimentos(animal_id, token, page, size, sort_by, direction, data_inicio, data_fim)
                     if response:
                         batimentos.extend(response.get("content", []))
     
@@ -57,17 +54,13 @@ class EstatisticaService:
 
         return batimentos
 
-    def _get_animal_movimentos_todos(self, animal_id: str, token: str, max_pages: int = 3) -> list[dict]:
+    def _get_animal_movimentos_todos(self, animal_id: str, token: str, max_pages: int = None, sort_by: str = None, direction: str = None, data_inicio: str = None, data_fim: str = None) -> list[dict]:
         movimentos = []
         page = 0
         size = 100
 
-        if not max_pages:
-            logger.info("max_pages não informado. Definindo como 3.")
-            max_pages = 3
-        
         try:
-            status_code, response = self.java_api_client.get_animal_movimentos(animal_id, token, page, size)
+            status_code, response = self.java_api_client.get_animal_movimentos(animal_id, token, page, size, sort_by, direction, data_inicio, data_fim)
 
             if status_code != 200:
                 logger.error(f"API retornou {status_code}. Response: {response.text[:300] if hasattr(response, 'text') else str(response)[:300]}")
@@ -77,12 +70,13 @@ class EstatisticaService:
                 logger.error("API não retornou conteúdo ao buscar movimentos do animal.")
                 return []
 
-            total_pages = min(response.get("totalPages", 1), max_pages)
+            total_pages_response = response.get("totalPages", 1)
+            total_pages = min(total_pages_response, max_pages) if max_pages is not None else total_pages_response
             movimentos.extend(response.get("content", []))
 
             if total_pages > 1:
                 for page in range(1, total_pages):
-                    status_code, response = self.java_api_client.get_animal_movimentos(animal_id, token, page, size)
+                    status_code, response = self.java_api_client.get_animal_movimentos(animal_id, token, page, size, sort_by, direction, data_inicio, data_fim)
                     if response:
                         movimentos.extend(response.get("content", []))
             
@@ -160,25 +154,22 @@ class EstatisticaService:
         }
 
     def media_por_intervalo(self, dados: List[dict], inicio: date, fim: date) -> Dict:
+        # Nota: Os dados já vêm filtrados da API Java
         if not dados:
             raise BadRequestException("Nenhum dado disponível.")
 
         df = pd.DataFrame(dados)
 
-        if 'data' not in df.columns or 'frequenciaMedia' not in df.columns:
+        if 'frequenciaMedia' not in df.columns:
             raise BadRequestException("Colunas esperadas não encontradas.")
 
-        df['data'] = pd.to_datetime(df['data'], errors='coerce').dt.date
         df['frequenciaMedia'] = pd.to_numeric(df['frequenciaMedia'], errors='coerce')
+        df = df.dropna(subset=['frequenciaMedia'])
 
-        df = df.dropna(subset=['data', 'frequenciaMedia'])
-
-        df_filtrado = df[(df['data'] >= inicio) & (df['data'] <= fim)]
-
-        if df_filtrado.empty:
+        if df.empty:
             raise ResourceNotFoundException("Nenhum dado encontrado para o intervalo fornecido.")
 
-        media = int(round(float(df_filtrado['frequenciaMedia'].mean())))
+        media = int(round(float(df['frequenciaMedia'].mean())))
         return {"media": media}
 
     def calcular_probabilidade(self, valor: int, valores_batimentos: list) -> dict:
@@ -439,7 +430,9 @@ class EstatisticaService:
         return self.calcular_estatisticas(batimentos)
 
     def media_batimentos_por_intervalo(self, animal_id: str, token: str, inicio: date, fim: date) -> Dict:
-        batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
+        inicio_str = inicio.isoformat()
+        fim_str = fim.isoformat()
+        batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=None, sort_by="data", direction="desc", data_inicio=inicio_str, data_fim=fim_str)
         if not batimentos:
             raise BadRequestException("Nenhum dado disponível.")
         return self.media_por_intervalo(batimentos, inicio, fim)
@@ -487,20 +480,80 @@ class EstatisticaService:
             raise BadRequestException("Erro ao calcular probabilidade do último batimento")
 
     def media_ultimos_5_dias_validos(self, animal_id: str, token: str) -> dict:
-        batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
+        page = 0
+        size = 100
+        batimentos = []
+        dias_unicos = set()
+
+        while True:
+            status_code, response = self.java_api_client.get_animal_batimentos(
+                animal_id, token, page, size, sort_by="data", direction="desc"
+            )
+            if status_code != 200 or not response:
+                break
+            
+            content = response.get("content", [])
+            if not content:
+                break
+                
+            batimentos.extend(content)
+            
+            for b in content:
+                if b.get("data"):
+                    dias_unicos.add(str(b["data"]).split("T")[0])
+            
+            if len(dias_unicos) > 5:
+                break
+                
+            total_pages = response.get("totalPages", 1)
+            page += 1
+            if page >= total_pages:
+                break
+
         if not batimentos:
             raise BadRequestException("Nenhum dado disponível.")
+            
         return self.obter_media_ultimos_5_dias_validos(batimentos)
 
     def media_ultimas_5_horas_registradas(self, animal_id: str, token: str) -> dict:
-        batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
+        page = 0
+        size = 100
+        batimentos = []
+        horas_unicas = set()
+
+        while True:
+            status_code, response = self.java_api_client.get_animal_batimentos(
+                animal_id, token, page, size, sort_by="data", direction="desc"
+            )
+            if status_code != 200 or not response:
+                break
+            
+            content = response.get("content", [])
+            if not content:
+                break
+                
+            batimentos.extend(content)
+            
+            for b in content:
+                if b.get("data"):
+                    horas_unicas.add(str(b["data"])[:13])
+            
+            if len(horas_unicas) > 5:
+                break
+                
+            total_pages = response.get("totalPages", 1)
+            page += 1
+            if page >= total_pages:
+                break
+
         if not batimentos:
             raise BadRequestException("Nenhum dado disponível.")
+            
         return self.obter_media_ultimas_5_horas_registradas(batimentos)
 
     def analise_regressao_batimentos(self, animal_id: str, token: str) -> dict:
-        batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
-        movimentos = self._get_animal_movimentos_todos(animal_id, token, max_pages=3)
+        batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3, sort_by="data", direction="desc")
+        movimentos = self._get_animal_movimentos_todos(animal_id, token, max_pages=3, sort_by="data", direction="desc")
         if not batimentos or not movimentos:
             raise ResourceNotFoundException("Dados insuficientes para análise.")
         return self.executar_regressao(batimentos, movimentos)

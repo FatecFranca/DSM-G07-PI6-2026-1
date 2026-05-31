@@ -44,11 +44,16 @@ class JavaAPIClient:
             logger.exception(f"[EXCEPTION ERROR] Último batimento do animal {animal_id}")
             return 0, {}
     
-    def get_animal_batimentos(self, animal_id: str, token: str, page: int = 0, size: int = 10) -> tuple[int,dict]:
+    def get_animal_batimentos(self, animal_id: str, token: str, page: int = 0, size: int = 10, sort_by: str = None, direction: str = None, data_inicio: str = None, data_fim: str = None) -> tuple[int,dict]:
         if not size:
             size = 10
     
         url = f"{self.base_url}/batimentos/animal/{animal_id}?page={page}&size={size}"
+        if sort_by: url += f"&sortBy={sort_by}"
+        if direction: url += f"&direction={direction}"
+        if data_inicio: url += f"&dataInicio={data_inicio}"
+        if data_fim: url += f"&dataFim={data_fim}"
+        
         headers = self._get_headers(token)
         try:
             response = req.get(url=url, headers=headers)
@@ -63,10 +68,15 @@ class JavaAPIClient:
             return 0, {}
         
     
-    def get_animal_movimentos(self, animal_id: str, token:str, page: int = 0, size: int = 10) -> tuple[int,dict]:
+    def get_animal_movimentos(self, animal_id: str, token:str, page: int = 0, size: int = 10, sort_by: str = None, direction: str = None, data_inicio: str = None, data_fim: str = None) -> tuple[int,dict]:
         if not size:
             size = 10
         url = f"{self.base_url}/movimentos/animal/{animal_id}?page={page}&size={size}"
+        if sort_by: url += f"&sortBy={sort_by}"
+        if direction: url += f"&direction={direction}"
+        if data_inicio: url += f"&dataInicio={data_inicio}"
+        if data_fim: url += f"&dataFim={data_fim}"
+
         headers = self._get_headers(token)
 
         try:
@@ -77,4 +87,25 @@ class JavaAPIClient:
             return response.status_code, response.json()
         except Exception as e:
             logger.exception(f"[EXCEPTION ERROR] Buscar movimentos do animal {animal_id}")
+            return 0, {}
+
+    def get_animal_localizacao(self, animal_id: str, token:str, page: int = 0, size: int = 10, sort_by: str = None, direction: str = None, data_inicio: str = None, data_fim: str = None) -> tuple[int,dict]:
+        if not size:
+            size = 10
+        url = f"{self.base_url}/localizacoes/animal/{animal_id}?page={page}&size={size}"
+        if sort_by: url += f"&sortBy={sort_by}"
+        if direction: url += f"&direction={direction}"
+        if data_inicio: url += f"&dataInicio={data_inicio}"
+        if data_fim: url += f"&dataFim={data_fim}"
+
+        headers = self._get_headers(token)
+
+        try:
+            response = req.get(url=url, headers=headers)
+            if response.status_code != 200:
+                logger.error(f"[API ERROR] Buscar localizacoes do animal {animal_id}. Status: {response.status_code} / Response: {response.text[:300]}")
+                return response.status_code, {}
+            return response.status_code, response.json()
+        except Exception as e:
+            logger.exception(f"[EXCEPTION ERROR] Buscar localizacoes do animal {animal_id}")
             return 0, {}
