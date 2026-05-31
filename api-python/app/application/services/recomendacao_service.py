@@ -17,7 +17,8 @@ class RecomendacaoService:
         # Caminho absoluto para os artefatos de ML
         PASTA_MODELOS = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'modelos_ia'))
         try:
-            self.modelo_marca = joblib.load(os.path.join(PASTA_MODELOS, 'modelo_xgboost_otimizado.pkl'))
+            self.modelo_marca = joblib.load(os.path.join(PASTA_MODELOS, 'modelo_knn_racao.pkl'))
+            self.scaler_marca = joblib.load(os.path.join(PASTA_MODELOS, 'scaler_knn_brand.pkl'))
             self.encoders = joblib.load(os.path.join(PASTA_MODELOS, 'label_encoders.pkl'))
             self.modelo_caminhada = joblib.load(os.path.join(PASTA_MODELOS, 'modelo_caminhada_ideal.pkl'))
             self.modelo_dieta = joblib.load(os.path.join(PASTA_MODELOS, 'modelo_dieta_ideal.pkl'))
@@ -29,6 +30,7 @@ class RecomendacaoService:
         except Exception as e:
             logger.error(f"Erro ao carregar arquivos da IA no RecomendacaoService: {e}")
             self.modelo_marca = None
+            self.scaler_marca = None
             self.encoders = None
             self.modelo_caminhada = None
             self.modelo_dieta = None
@@ -40,7 +42,7 @@ class RecomendacaoService:
         Recebe os dados do animal vindos da API Java e gera a recomendação utilizando
         o cascade de Inteligência Artificial com base no peso ideal recebido.
         """
-        if self.modelo_marca is None or self.encoders is None:
+        if self.modelo_marca is None or self.scaler_marca is None or self.encoders is None:
             raise ValueError("Os modelos de recomendação da IA não foram carregados corretamente no servidor.")
 
         # 1. VALIDAÇÃO E EXTRAÇÃO DOS INPUTS OBRIGATÓRIOS
@@ -134,14 +136,16 @@ class RecomendacaoService:
             atividade_pred_num = self.modelo_atividade.predict(X_atividade)[0]
             atividade_recomendada = self.encoders['Nivel_Atividade_Pet'].inverse_transform([atividade_pred_num])[0]
 
-            # F. Predição da Marca de Ração Ideal (XGBoost) usando as metas saudáveis
+            # F. Predição da Marca de Ração Ideal (KNN) usando as metas saudáveis
             X_brand = pd.DataFrame([{
-                'Idade': idade,
-                'peso_kg': peso_ideal,
+                'Age': idade,
+                'Weight (kg)': peso_ideal,
                 'caminhada_diaria_km': caminhada_diaria_km_meta,
                 'calorias_diarias_RER': calorias_diarias_RER
             }])
-            predicao_brand_num = self.modelo_marca.predict(X_brand)[0]
+            # Normalizar os dados usando o scaler treinado antes da predição KNN
+            X_brand_scaled = self.scaler_marca.transform(X_brand)
+            predicao_brand_num = self.modelo_marca.predict(X_brand_scaled)[0]
             marca_prevista_nome = self.encoders['Marca_Racao'].inverse_transform([predicao_brand_num])[0]
 
         except Exception as e:
