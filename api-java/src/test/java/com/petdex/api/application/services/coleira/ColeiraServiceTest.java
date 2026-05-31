@@ -15,7 +15,7 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.modelmapper.ModelMapper;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.web.client.HttpServerErrorException;
+import com.petdex.api.infrastructure.exception.ResourceNotFoundException;
 
 import java.util.Optional;
 
@@ -84,6 +84,6 @@ public class ColeiraServiceTest {
 
         // ação e verificação
         Assertions.assertThatThrownBy(() -> service.create(req))
-                .isInstanceOf(HttpServerErrorException.class);
+                .isInstanceOf(ResourceNotFoundException.class);
     }
 }
