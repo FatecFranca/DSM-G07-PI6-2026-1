@@ -19,6 +19,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Date;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 @Service
 public class ImplBatimentoService implements BatimentoService {
@@ -76,9 +79,22 @@ public class ImplBatimentoService implements BatimentoService {
                 });
     }
 
-    public Page<BatimentoResDTO> findAllByAnimalId(String animalId, PageDTO pageDTO) {
+    public Page<BatimentoResDTO> findAllByAnimalId(String animalId, LocalDate dataInicio, LocalDate dataFim, PageDTO pageDTO) {
         pageDTO.sortByNewest();
-        Page<Batimento> batimentosPage = batimentoRepository.findAllByAnimal(animalId, pageDTO.mapPage());
+        Page<Batimento> batimentosPage;
+        
+        if (dataInicio != null) {
+            Date start = Date.from(dataInicio.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            Date end;
+            if (dataFim != null) {
+                end = Date.from(dataFim.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant());
+            } else {
+                end = Date.from(dataInicio.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant());
+            }
+            batimentosPage = batimentoRepository.findAllByAnimalAndDataBetween(animalId, start, end, pageDTO.mapPage());
+        } else {
+            batimentosPage = batimentoRepository.findAllByAnimal(animalId, pageDTO.mapPage());
+        }
 
         List<BatimentoResDTO> dtoList = batimentosPage.getContent().stream()
                 .map(b -> mapper.map(b, BatimentoResDTO.class))
@@ -87,9 +103,22 @@ public class ImplBatimentoService implements BatimentoService {
         return new PageImpl<BatimentoResDTO>(dtoList, pageDTO.mapPage(), batimentosPage.getTotalElements());
     }
 
-    public Page<BatimentoResDTO> findAllByColeiraId(String coleiraId, PageDTO pageDTO) {
+    public Page<BatimentoResDTO> findAllByColeiraId(String coleiraId, LocalDate dataInicio, LocalDate dataFim, PageDTO pageDTO) {
         pageDTO.sortByNewest();
-        Page<Batimento> batimentosPage = batimentoRepository.findAllByColeira(coleiraId, pageDTO.mapPage());
+        Page<Batimento> batimentosPage;
+        
+        if (dataInicio != null) {
+            Date start = Date.from(dataInicio.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            Date end;
+            if (dataFim != null) {
+                end = Date.from(dataFim.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant());
+            } else {
+                end = Date.from(dataInicio.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant());
+            }
+            batimentosPage = batimentoRepository.findAllByColeiraAndDataBetween(coleiraId, start, end, pageDTO.mapPage());
+        } else {
+            batimentosPage = batimentoRepository.findAllByColeira(coleiraId, pageDTO.mapPage());
+        }
 
         List<BatimentoResDTO> dtoList = batimentosPage.getContent().stream()
                 .map(b -> mapper.map(b, BatimentoResDTO.class))

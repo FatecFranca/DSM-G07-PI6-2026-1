@@ -17,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.format.annotation.DateTimeFormat;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/batimentos")
@@ -79,6 +81,18 @@ public class BatimentoController {
                                     "- **desc**: Ordena de forma descendente",
                             example = "desc",
                             schema = @Schema(implementation = String.class)
+                    ),
+                    @Parameter(
+                            name = "dataInicio",
+                            description = "Filtro opcional para buscar registros a partir desta data (formato yyyy-MM-dd)",
+                            example = "2026-05-30",
+                            schema = @Schema(implementation = String.class)
+                    ),
+                    @Parameter(
+                            name = "dataFim",
+                            description = "Filtro opcional para buscar registros até esta data (formato yyyy-MM-dd)",
+                            example = "2026-06-05",
+                            schema = @Schema(implementation = String.class)
                     )
             },
             responses = {
@@ -93,8 +107,12 @@ public class BatimentoController {
             }
     )
     @GetMapping("/animal/{idAnimal}")
-    public ResponseEntity<Page<BatimentoResDTO>> findAllByAnimal(@PathVariable String idAnimal, @ParameterObject @ModelAttribute PageDTO pageDTO) {
-        return new ResponseEntity<>(batimentoService.findAllByAnimalId(idAnimal, pageDTO),
+    public ResponseEntity<Page<BatimentoResDTO>> findAllByAnimal(
+            @PathVariable String idAnimal, 
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim,
+            @ParameterObject @ModelAttribute PageDTO pageDTO) {
+        return new ResponseEntity<>(batimentoService.findAllByAnimalId(idAnimal, dataInicio, dataFim, pageDTO),
             HttpStatus.OK
         );
     }
@@ -125,6 +143,18 @@ public class BatimentoController {
                                     "- **desc**: Ordena de forma descendente",
                             example = "desc",
                             schema = @Schema(implementation = String.class)
+                    ),
+                    @Parameter(
+                            name = "dataInicio",
+                            description = "Filtro opcional para buscar registros a partir desta data (formato yyyy-MM-dd)",
+                            example = "2026-05-30",
+                            schema = @Schema(implementation = String.class)
+                    ),
+                    @Parameter(
+                            name = "dataFim",
+                            description = "Filtro opcional para buscar registros até esta data (formato yyyy-MM-dd)",
+                            example = "2026-06-05",
+                            schema = @Schema(implementation = String.class)
                     )
             },
             responses = {
@@ -139,9 +169,13 @@ public class BatimentoController {
             }
     )
     @GetMapping("/coleira/{idColeira}")
-    public ResponseEntity<Page<BatimentoResDTO>> findAllByColeira(@PathVariable String idColeira, @ParameterObject @ModelAttribute PageDTO pageDTO) {
+    public ResponseEntity<Page<BatimentoResDTO>> findAllByColeira(
+            @PathVariable String idColeira, 
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim,
+            @ParameterObject @ModelAttribute PageDTO pageDTO) {
         return new ResponseEntity<>(
-                batimentoService.findAllByColeiraId(idColeira, pageDTO),
+                batimentoService.findAllByColeiraId(idColeira, dataInicio, dataFim, pageDTO),
                 HttpStatus.OK
         );
     }

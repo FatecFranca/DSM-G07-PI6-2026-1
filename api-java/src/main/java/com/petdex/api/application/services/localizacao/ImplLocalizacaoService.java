@@ -21,6 +21,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Date;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 @Service
 public class ImplLocalizacaoService implements LocalizacaoService {
@@ -133,9 +136,22 @@ public class ImplLocalizacaoService implements LocalizacaoService {
     }
 
     @Override
-    public Page<LocalizacaoResDTO> findAllByAnimalId(String animalId, PageDTO pageDTO) {
+    public Page<LocalizacaoResDTO> findAllByAnimalId(String animalId, LocalDate dataInicio, LocalDate dataFim, PageDTO pageDTO) {
         pageDTO.sortByNewest();
-        Page<Localizacao> localizacaosPage = localizacaoRepository.findAllByAnimal(animalId, pageDTO.mapPage());
+        Page<Localizacao> localizacaosPage;
+        
+        if (dataInicio != null) {
+            Date start = Date.from(dataInicio.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            Date end;
+            if (dataFim != null) {
+                end = Date.from(dataFim.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant());
+            } else {
+                end = Date.from(dataInicio.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant());
+            }
+            localizacaosPage = localizacaoRepository.findAllByAnimalAndDataBetween(animalId, start, end, pageDTO.mapPage());
+        } else {
+            localizacaosPage = localizacaoRepository.findAllByAnimal(animalId, pageDTO.mapPage());
+        }
 
         List<LocalizacaoResDTO> dtoList = localizacaosPage.getContent().stream()
                 .map(localizacao -> {
@@ -170,9 +186,22 @@ public class ImplLocalizacaoService implements LocalizacaoService {
     }
 
     @Override
-    public Page<LocalizacaoResDTO> findAllByColeiraId(String coleiraId, PageDTO pageDTO) {
+    public Page<LocalizacaoResDTO> findAllByColeiraId(String coleiraId, LocalDate dataInicio, LocalDate dataFim, PageDTO pageDTO) {
         pageDTO.sortByNewest();
-        Page<Localizacao> localizacaosPage = localizacaoRepository.findAllByColeira(coleiraId, pageDTO.mapPage());
+        Page<Localizacao> localizacaosPage;
+        
+        if (dataInicio != null) {
+            Date start = Date.from(dataInicio.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            Date end;
+            if (dataFim != null) {
+                end = Date.from(dataFim.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant());
+            } else {
+                end = Date.from(dataInicio.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant());
+            }
+            localizacaosPage = localizacaoRepository.findAllByColeiraAndDataBetween(coleiraId, start, end, pageDTO.mapPage());
+        } else {
+            localizacaosPage = localizacaoRepository.findAllByColeira(coleiraId, pageDTO.mapPage());
+        }
 
         List<LocalizacaoResDTO> dtoList = localizacaosPage.getContent().stream()
                 .map(localizacao -> {

@@ -17,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.format.annotation.DateTimeFormat;
+import java.time.LocalDate;
 
 @RestController
 @Tag(name = "Localizacao", description = "Operações de gestão de localizações dos animais")
@@ -79,6 +81,18 @@ public class LocalizacaoController {
                                     "- **desc**: Ordena de forma descendente pelo atributo definido",
                             example = "desc",
                             schema = @Schema(implementation = String.class)
+                    ),
+                    @Parameter(
+                            name = "dataInicio",
+                            description = "Filtro opcional para buscar registros a partir desta data (formato yyyy-MM-dd)",
+                            example = "2026-05-30",
+                            schema = @Schema(implementation = String.class)
+                    ),
+                    @Parameter(
+                            name = "dataFim",
+                            description = "Filtro opcional para buscar registros até esta data (formato yyyy-MM-dd)",
+                            example = "2026-06-05",
+                            schema = @Schema(implementation = String.class)
                     )
             },
             responses = {
@@ -93,9 +107,13 @@ public class LocalizacaoController {
             }
     )
     @GetMapping("/animal/{idAnimal}")
-    public ResponseEntity<Page<LocalizacaoResDTO>> findAllByAnimal(@PathVariable String idAnimal, @ParameterObject PageDTO pageDTO) {
+    public ResponseEntity<Page<LocalizacaoResDTO>> findAllByAnimal(
+            @PathVariable String idAnimal, 
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim,
+            @ParameterObject PageDTO pageDTO) {
 
-        return new ResponseEntity<>(localizacaoService.findAllByAnimalId(idAnimal, pageDTO),
+        return new ResponseEntity<>(localizacaoService.findAllByAnimalId(idAnimal, dataInicio, dataFim, pageDTO),
                 HttpStatus.OK
         );
     }
@@ -127,6 +145,18 @@ public class LocalizacaoController {
                                     "- **desc**: Ordena de forma descendente pelo atributo definido",
                             example = "desc",
                             schema = @Schema(implementation = String.class)
+                    ),
+                    @Parameter(
+                            name = "dataInicio",
+                            description = "Filtro opcional para buscar registros a partir desta data (formato yyyy-MM-dd)",
+                            example = "2026-05-30",
+                            schema = @Schema(implementation = String.class)
+                    ),
+                    @Parameter(
+                            name = "dataFim",
+                            description = "Filtro opcional para buscar registros até esta data (formato yyyy-MM-dd)",
+                            example = "2026-06-05",
+                            schema = @Schema(implementation = String.class)
                     )
             },
             responses = {
@@ -141,9 +171,13 @@ public class LocalizacaoController {
             }
     )
     @GetMapping("/coleira/{idColeira}")
-    public ResponseEntity<Page<LocalizacaoResDTO>> findAllByColeira(@PathVariable String idColeira, @ParameterObject PageDTO pageDTO) {
+    public ResponseEntity<Page<LocalizacaoResDTO>> findAllByColeira(
+            @PathVariable String idColeira, 
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim,
+            @ParameterObject PageDTO pageDTO) {
         return new ResponseEntity<>(
-                localizacaoService.findAllByColeiraId(idColeira, pageDTO),
+                localizacaoService.findAllByColeiraId(idColeira, dataInicio, dataFim, pageDTO),
                 HttpStatus.OK
         );
     }
