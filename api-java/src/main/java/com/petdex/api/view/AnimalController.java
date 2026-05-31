@@ -4,6 +4,7 @@ import com.petdex.api.application.services.animal.AnimalService;
 import com.petdex.api.application.contracts.dto.PageDTO;
 import com.petdex.api.application.contracts.dto.animal.AnimalReqDTO;
 import com.petdex.api.application.contracts.dto.animal.AnimalResDTO;
+import com.petdex.api.infrastructure.exception.ResourceNotFoundException;
 import com.petdex.api.swagger.respostas.ExemploRespostaDeletarAnimal;
 import com.petdex.api.swagger.respostas.ExemploRespostaPageAnimal;
 import com.petdex.api.swagger.respostas.ExemploRespostaSalvarImagemAnimal;
@@ -85,7 +86,7 @@ public class AnimalController {
         Optional<AnimalResDTO> animal = animalService.findByUsuarioId(usuarioId);
         return animal
                 .map(a -> new ResponseEntity<>(a, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException("Animal", "Usuario ID", usuarioId));
     }
 
     @Operation(

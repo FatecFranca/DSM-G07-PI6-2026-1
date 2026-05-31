@@ -48,6 +48,8 @@ class EstatisticaService:
                     if response:
                         batimentos.extend(response.get("content", []))
     
+        except ResourceNotFoundException:
+            raise
         except Exception as e:
             logger.exception("Erro ao buscar todos batimentos")
             pass
@@ -80,6 +82,8 @@ class EstatisticaService:
                     if response:
                         movimentos.extend(response.get("content", []))
             
+        except ResourceNotFoundException:
+            raise
         except Exception as e:
             logger.exception("Erro ao buscar movimentos do animal")
             pass
@@ -424,12 +428,14 @@ class EstatisticaService:
     # ---------------------------------------------------------
 
     def batimentos_calcular_estatisticas(self, animal_id: str, token: str) -> dict:
+        self.java_api_client.get_animal(animal_id, token)
         batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
         if not batimentos:
             raise BadRequestException("Nenhum batimento disponível.")
         return self.calcular_estatisticas(batimentos)
 
     def media_batimentos_por_intervalo(self, animal_id: str, token: str, inicio: date, fim: date) -> Dict:
+        self.java_api_client.get_animal(animal_id, token)
         inicio_str = inicio.isoformat()
         fim_str = fim.isoformat()
         batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=None, sort_by="data", direction="desc", data_inicio=inicio_str, data_fim=fim_str)
@@ -439,6 +445,7 @@ class EstatisticaService:
 
     def probabilidade_batimento(self, animal_id: str, token: str, valor: int) -> dict:
         try:
+            self.java_api_client.get_animal(animal_id, token)
             batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
             if not batimentos:
                 raise BadRequestException("Nenhum dado disponível.")
@@ -448,7 +455,7 @@ class EstatisticaService:
                 raise BadRequestException("Nenhum dado de batimentos disponível.")
 
             return self.calcular_probabilidade(valor=valor, valores_batimentos=valores_batimentos)
-        except BadRequestException:
+        except (BadRequestException, ResourceNotFoundException):
             raise
         except Exception as e:
             logger.exception("Erro ao calcular probabilidade do batimento")
@@ -456,6 +463,7 @@ class EstatisticaService:
 
     def probabilidade_ultimo_batimento(self, animal_id: str, token: str) -> dict:
         try:
+            self.java_api_client.get_animal(animal_id, token)
             status_code, response = self.java_api_client.get_animal_ultimo_batimento(animal_id, token)
             if status_code != 200 or not response:
                 raise BadRequestException("Erro ao buscar último batimento do animal")
@@ -473,13 +481,14 @@ class EstatisticaService:
                 raise BadRequestException("Nenhum dado de batimentos disponível.")
 
             return self.calcular_probabilidade_ultimo_batimento(valor=valor_ultimo_batimento, valores_batimentos=valores_batimentos)
-        except BadRequestException:
+        except (BadRequestException, ResourceNotFoundException):
             raise
         except Exception as e:
             logger.exception("Erro ao calcular probabilidade do último batimento")
             raise BadRequestException("Erro ao calcular probabilidade do último batimento")
 
     def media_ultimos_5_dias_validos(self, animal_id: str, token: str) -> dict:
+        self.java_api_client.get_animal(animal_id, token)
         page = 0
         size = 100
         batimentos = []
@@ -516,6 +525,7 @@ class EstatisticaService:
         return self.obter_media_ultimos_5_dias_validos(batimentos)
 
     def media_ultimas_5_horas_registradas(self, animal_id: str, token: str) -> dict:
+        self.java_api_client.get_animal(animal_id, token)
         page = 0
         size = 100
         batimentos = []
@@ -552,6 +562,7 @@ class EstatisticaService:
         return self.obter_media_ultimas_5_horas_registradas(batimentos)
 
     def analise_regressao_batimentos(self, animal_id: str, token: str) -> dict:
+        self.java_api_client.get_animal(animal_id, token)
         batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3, sort_by="data", direction="desc")
         movimentos = self._get_animal_movimentos_todos(animal_id, token, max_pages=3, sort_by="data", direction="desc")
         if not batimentos or not movimentos:
@@ -560,6 +571,7 @@ class EstatisticaService:
 
     def predizer_batimento(self, animal_id: str, token: str, acelerometroX: float, acelerometroY: float, acelerometroZ: float) -> dict:
         try:
+            self.java_api_client.get_animal(animal_id, token)
             resultado = self.analise_regressao_batimentos(animal_id, token)
         except ResourceNotFoundException:
             raise ResourceNotFoundException("Dados insuficientes para gerar o modelo de regressão.")

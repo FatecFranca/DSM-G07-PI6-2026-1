@@ -60,6 +60,9 @@ public class ImplMovimentoService implements MovimentoService {
 
     @Override
     public Page<MovimentoResDTO> findAllByAnimalId(String animalId, LocalDate dataInicio, LocalDate dataFim, PageDTO pageDTO) {
+        if (!validation.existAnimal(animalId)) {
+            throw new ResourceNotFoundException("Animal", "ID", animalId);
+        }
         pageDTO.sortByNewest();
         Page<Movimento> batimentosPage;
         
@@ -85,6 +88,9 @@ public class ImplMovimentoService implements MovimentoService {
 
     @Override
     public Page<MovimentoResDTO> findAllByColeiraId(String coleiraId, LocalDate dataInicio, LocalDate dataFim, PageDTO pageDTO) {
+        if (!validation.existColeira(coleiraId)) {
+            throw new ResourceNotFoundException("Coleira", "ID", coleiraId);
+        }
         pageDTO.sortByNewest();
         Page<Movimento> batimentosPage;
         

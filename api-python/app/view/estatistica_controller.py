@@ -31,7 +31,7 @@ estatistica_service = EstatisticaService()
     }
 )
 async def get_estatisticas(
-    animalId: str = Path(..., description="Identificador único do animal", example="123"),
+    animalId: str = Path(..., description="Identificador único do animal", example="68194120636f719fcd5ee5fd"),
     credentials: Tuple[str, str] = Depends(get_current_user)
 ):
     """
@@ -69,7 +69,7 @@ async def get_estatisticas(
     }
 )
 async def media_batimentos_por_data(
-    animalId: str = Path(..., description="Identificador único do animal", example="123"),
+    animalId: str = Path(..., description="Identificador único do animal", example="68194120636f719fcd5ee5fd"),
     inicio: date = Query(..., description="Data de início do intervalo (formato: YYYY-MM-DD)", example="2024-01-15"),
     fim: date = Query(..., description="Data de fim do intervalo (formato: YYYY-MM-DD)", example="2024-01-19"),
     credentials: Tuple[str, str] = Depends(get_current_user)
@@ -111,7 +111,7 @@ async def media_batimentos_por_data(
     }
 )
 async def probabilidade_batimento(
-    animalId: str = Path(..., description="Identificador único do animal", example="123"),
+    animalId: str = Path(..., description="Identificador único do animal", example="68194120636f719fcd5ee5fd"),
     valor: int = Query(..., gt=0, description="Valor de batimento para calcular a probabilidade em BPM (deve ser > 0)", example="85"),
     credentials: Tuple[str, str] = Depends(get_current_user)
 ):
@@ -151,7 +151,7 @@ async def probabilidade_batimento(
     }
 )
 async def probabilidade_ultimo_batimento(
-    animalId: str = Path(..., description="Identificador único do animal", example="123"),
+    animalId: str = Path(..., description="Identificador único do animal", example="68194120636f719fcd5ee5fd"),
     credentials: Tuple[str, str] = Depends(get_current_user)
 ):
     """
@@ -189,7 +189,7 @@ async def probabilidade_ultimo_batimento(
     }
 )
 async def media_batimentos_ultimos_5_dias(
-    animalId: str = Path(..., description="Identificador único do animal", example="123"),
+    animalId: str = Path(..., description="Identificador único do animal", example="68194120636f719fcd5ee5fd"),
     credentials: Tuple[str, str] = Depends(get_current_user)
 ):
     """
@@ -227,7 +227,7 @@ async def media_batimentos_ultimos_5_dias(
     }
 )
 async def media_batimentos_ultimas_5_horas(
-    animalId: str = Path(..., description="Identificador único do animal", example="123"),
+    animalId: str = Path(..., description="Identificador único do animal", example="68194120636f719fcd5ee5fd"),
     credentials: Tuple[str, str] = Depends(get_current_user)
 ):
     """
@@ -265,7 +265,7 @@ async def media_batimentos_ultimas_5_horas(
     }
 )
 async def analise_regressao_batimentos(
-    animalId: str = Path(..., description="Identificador único do animal", example="123"),
+    animalId: str = Path(..., description="Identificador único do animal", example="68194120636f719fcd5ee5fd"),
     credentials: Tuple[str, str] = Depends(get_current_user)
 ):
     """
@@ -303,7 +303,7 @@ async def analise_regressao_batimentos(
     }
 )
 async def predizer_batimento(
-    animalId: str = Path(..., description="Identificador único do animal", example="123"),
+    animalId: str = Path(..., description="Identificador único do animal", example="68194120636f719fcd5ee5fd"),
     acelerometroX: float = Query(..., description="Valor do acelerômetro no eixo X", example="0.5"),
     acelerometroY: float = Query(..., description="Valor do acelerômetro no eixo Y", example="0.3"),
     acelerometroZ: float = Query(..., description="Valor do acelerômetro no eixo Z", example="0.2"),

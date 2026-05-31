@@ -27,7 +27,7 @@ checkup_service = CheckupService()
     }
 )
 async def checkup_animal(
-    id_animal: str = Path(..., description="Identificador único do animal a ser analisado", example="123"),
+    id_animal: str = Path(..., description="Identificador único do animal a ser analisado", example="68194120636f719fcd5ee5fd"),
     sintomas: SintomasInputDTO = None,
     credentials: Tuple[str, str] = Depends(get_current_user)
 ):

@@ -4,6 +4,7 @@ import com.petdex.api.application.services.batimento.BatimentoService;
 import com.petdex.api.application.contracts.dto.batimento.BatimentoReqDTO;
 import com.petdex.api.application.contracts.dto.batimento.BatimentoResDTO;
 import com.petdex.api.application.contracts.dto.PageDTO;
+import com.petdex.api.infrastructure.exception.ResourceNotFoundException;
 import com.petdex.api.swagger.respostas.ExemploRespostaPageBatimento;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -202,7 +203,7 @@ public class BatimentoController {
     public ResponseEntity<BatimentoResDTO> findLastByAnimal(@PathVariable String idAnimal) {
         return batimentoService.findLastByAnimalId(idAnimal)
                 .map(batimento -> new ResponseEntity<>(batimento, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException("Batimento", "Animal ID", idAnimal));
     }
 
     @Operation(

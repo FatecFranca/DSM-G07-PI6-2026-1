@@ -137,6 +137,9 @@ public class ImplLocalizacaoService implements LocalizacaoService {
 
     @Override
     public Page<LocalizacaoResDTO> findAllByAnimalId(String animalId, LocalDate dataInicio, LocalDate dataFim, PageDTO pageDTO) {
+        if (!validation.existAnimal(animalId)) {
+            throw new ResourceNotFoundException("Animal", "ID", animalId);
+        }
         pageDTO.sortByNewest();
         Page<Localizacao> localizacaosPage;
         
@@ -187,6 +190,9 @@ public class ImplLocalizacaoService implements LocalizacaoService {
 
     @Override
     public Page<LocalizacaoResDTO> findAllByColeiraId(String coleiraId, LocalDate dataInicio, LocalDate dataFim, PageDTO pageDTO) {
+        if (!validation.existColeira(coleiraId)) {
+            throw new ResourceNotFoundException("Coleira", "ID", coleiraId);
+        }
         pageDTO.sortByNewest();
         Page<Localizacao> localizacaosPage;
         
@@ -237,6 +243,9 @@ public class ImplLocalizacaoService implements LocalizacaoService {
 
     @Override
     public Optional<LocalizacaoResDTO> findLastByAnimalId(String animalId) {
+        if (!validation.existAnimal(animalId)) {
+            throw new ResourceNotFoundException("Animal", "ID", animalId);
+        }
         Optional<Localizacao> ultimaLocalizacao = localizacaoRepository.findFirstByAnimalOrderByDataDesc(animalId);
 
         return ultimaLocalizacao.map(localizacao -> {

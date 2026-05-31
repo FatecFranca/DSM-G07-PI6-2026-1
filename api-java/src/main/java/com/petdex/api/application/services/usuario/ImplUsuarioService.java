@@ -34,7 +34,9 @@ public class ImplUsuarioService implements UsuarioService {
 
     @Override
     public UsuarioResDTO findById(String id) {
-        return mapper.map(usuarioRepository.findById(id), UsuarioResDTO.class);
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário", "ID", id));
+        return mapper.map(usuario, UsuarioResDTO.class);
     }
 
     @Override

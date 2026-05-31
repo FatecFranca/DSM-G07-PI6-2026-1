@@ -12,7 +12,7 @@ class RespostaCheckupAnimalDTO(BaseModel):
     animalId: str = Field(
         ...,
         description="Identificador único do animal analisado",
-        example="123"
+        example="68194120636f719fcd5ee5fd"
     )
     dados_entrada: Dict[str, Any] = Field(
         ...,
@@ -57,7 +57,7 @@ class RespostaCheckupAnimalDTO(BaseModel):
     class Config:
         schema_extra = {
             "example": {
-                "animalId": "123",
+                "animalId": "68194120636f719fcd5ee5fd",
                 "dados_entrada": {
                     "tipo_do_animal": "cachorro",
                     "raca": "sem_raca_definida_(srd)",
@@ -161,7 +161,7 @@ class RecomendacaoIADTO(BaseModel):
     """
     Recomendação nutricional gerada pela IA.
     """
-    animalId: str = Field(..., example="123")
+    animalId: str = Field(..., example="68194120636f719fcd5ee5fd")
     nome: str = Field(..., example="Rex")
     diagnostico: str = Field(..., example="Sobrepeso")
     peso_ideal_esperado: float = Field(..., example=20.0)
@@ -170,7 +170,7 @@ class RecomendacaoIADTO(BaseModel):
     class Config:
         schema_extra = {
             "example": {
-                "animalId": "123",
+                "animalId": "68194120636f719fcd5ee5fd",
                 "nome": "Rex",
                 "diagnostico": "Sobrepeso",
                 "peso_ideal_esperado": 20.0,

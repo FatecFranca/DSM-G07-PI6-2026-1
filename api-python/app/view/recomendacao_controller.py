@@ -21,7 +21,7 @@ recomendacao_service = RecomendacaoService()
     }
 )
 async def obter_recomendacao_ia(
-    animalId: str = Path(..., description="Identificador único do animal"), 
+    animalId: str = Path(..., description="Identificador único do animal", example="68194120636f719fcd5ee5fd"), 
     credentials: Tuple[str, str] = Depends(get_current_user)
 ):
     """

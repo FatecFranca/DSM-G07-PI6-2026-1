@@ -80,6 +80,9 @@ public class ImplBatimentoService implements BatimentoService {
     }
 
     public Page<BatimentoResDTO> findAllByAnimalId(String animalId, LocalDate dataInicio, LocalDate dataFim, PageDTO pageDTO) {
+        if (!validation.existAnimal(animalId)) {
+            throw new ResourceNotFoundException("Animal", "ID", animalId);
+        }
         pageDTO.sortByNewest();
         Page<Batimento> batimentosPage;
         
@@ -104,6 +107,9 @@ public class ImplBatimentoService implements BatimentoService {
     }
 
     public Page<BatimentoResDTO> findAllByColeiraId(String coleiraId, LocalDate dataInicio, LocalDate dataFim, PageDTO pageDTO) {
+        if (!validation.existColeira(coleiraId)) {
+            throw new ResourceNotFoundException("Coleira", "ID", coleiraId);
+        }
         pageDTO.sortByNewest();
         Page<Batimento> batimentosPage;
         
@@ -129,6 +135,9 @@ public class ImplBatimentoService implements BatimentoService {
 
     @Override
     public Optional<BatimentoResDTO> findLastByAnimalId(String animalId) {
+        if (!validation.existAnimal(animalId)) {
+            throw new ResourceNotFoundException("Animal", "ID", animalId);
+        }
         Optional<Batimento> ultimoBatimento = batimentoRepository.findFirstByAnimalOrderByDataDesc(animalId);
         return ultimoBatimento.map(batimento -> mapper.map(batimento, BatimentoResDTO.class));
     }

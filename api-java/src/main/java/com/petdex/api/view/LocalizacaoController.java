@@ -4,6 +4,7 @@ import com.petdex.api.application.services.localizacao.LocalizacaoService;
 import com.petdex.api.application.contracts.dto.localizacao.LocalizacaoReqDTO;
 import com.petdex.api.application.contracts.dto.localizacao.LocalizacaoResDTO;
 import com.petdex.api.application.contracts.dto.PageDTO;
+import com.petdex.api.infrastructure.exception.ResourceNotFoundException;
 import com.petdex.api.swagger.respostas.ExemploRespostaPageLocalizacao;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -204,7 +205,7 @@ public class LocalizacaoController {
     public ResponseEntity<LocalizacaoResDTO> findLastByAnimal(@PathVariable String idAnimal) {
         return localizacaoService.findLastByAnimalId(idAnimal)
                 .map(localizacao -> new ResponseEntity<>(localizacao, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException("Localização", "Animal ID", idAnimal));
     }
 
     @Operation(

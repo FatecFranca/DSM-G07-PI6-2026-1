@@ -2,6 +2,7 @@ import logging
 import requests as req
 import os
 from dotenv import load_dotenv
+from app.infraestructure.exception.custom_exceptions import ResourceNotFoundException
 
 load_dotenv()
 logger = logging.getLogger("API Java Integration")
@@ -20,11 +21,15 @@ class JavaAPIClient:
 
         try:
             response = req.get(url=url, headers=headers)
+            if response.status_code == 404:
+                raise ResourceNotFoundException(f"Recurso não encontrado na API Java. (Animal {animal_id})")
             if response.status_code != 200:
                 logger.error(f"[API ERROR] Buscar dados do animal {animal_id}. Status: {response.status_code} / Response: {response.text[:300]}")
                 return response.status_code, {}
             return response.status_code, response.json()
 
+        except ResourceNotFoundException:
+            raise
         except Exception as e:
             logger.exception(f"[EXCEPTION ERROR] Buscar os dados do animal: {animal_id}")
             return 0, {}
@@ -36,10 +41,14 @@ class JavaAPIClient:
         
         try:
             response = req.get(url=url, headers=headers)
+            if response.status_code == 404:
+                raise ResourceNotFoundException(f"Recurso não encontrado na API Java. (Último batimento animal {animal_id})")
             if response.status_code != 200:
                 logger.error(f"[API ERROR] Último baitmento do animal {animal_id}. Status: {response.status_code} / Response: {response.text[:300]}")
                 return response.status_code, response.json()
             return response.status_code, response.json()
+        except ResourceNotFoundException:
+            raise
         except Exception as e:
             logger.exception(f"[EXCEPTION ERROR] Último batimento do animal {animal_id}")
             return 0, {}
@@ -57,12 +66,16 @@ class JavaAPIClient:
         headers = self._get_headers(token)
         try:
             response = req.get(url=url, headers=headers)
+            if response.status_code == 404:
+                raise ResourceNotFoundException(f"Recurso não encontrado na API Java. (Batimentos animal {animal_id})")
             if response.status_code != 200:
                 logger.error(f"[API ERROR] Buscar baitmentos do animal {animal_id}. Status: {response.status_code} / Response: {response.text[:300]}")
                 
                 return response.status_code, {}
             return response.status_code, response.json()
 
+        except ResourceNotFoundException:
+            raise
         except Exception as e:
             logger.exception(f"[EXCEPTION ERROR] Buscar batimentos do animal {animal_id}")
             return 0, {}
@@ -81,10 +94,14 @@ class JavaAPIClient:
 
         try:
             response = req.get(url=url, headers=headers)
+            if response.status_code == 404:
+                raise ResourceNotFoundException(f"Recurso não encontrado na API Java. (Movimentos animal {animal_id})")
             if response.status_code != 200:
                 logger.error(f"[API ERROR] Buscar movimentos do animal {animal_id}. Status: {response.status_code} / Response: {response.text[:300]}")
                 return response.status_code, {}
             return response.status_code, response.json()
+        except ResourceNotFoundException:
+            raise
         except Exception as e:
             logger.exception(f"[EXCEPTION ERROR] Buscar movimentos do animal {animal_id}")
             return 0, {}
@@ -102,10 +119,14 @@ class JavaAPIClient:
 
         try:
             response = req.get(url=url, headers=headers)
+            if response.status_code == 404:
+                raise ResourceNotFoundException(f"Recurso não encontrado na API Java. (Localizações animal {animal_id})")
             if response.status_code != 200:
                 logger.error(f"[API ERROR] Buscar localizacoes do animal {animal_id}. Status: {response.status_code} / Response: {response.text[:300]}")
                 return response.status_code, {}
             return response.status_code, response.json()
+        except ResourceNotFoundException:
+            raise
         except Exception as e:
             logger.exception(f"[EXCEPTION ERROR] Buscar localizacoes do animal {animal_id}")
             return 0, {}

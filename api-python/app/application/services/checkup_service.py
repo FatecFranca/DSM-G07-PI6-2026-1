@@ -136,8 +136,11 @@ class CheckupService:
         """
         if isinstance(data, str):
             token = os.getenv("JAVA_API_TOKEN")
-            status_code, res = self.java_api_client.get_animal(data, token)
-            if status_code != 200 or not res:
+            try:
+                status_code, res = self.java_api_client.get_animal(data, token)
+                if status_code != 200 or not res:
+                    return {}
+            except ResourceNotFoundException:
                 return {}
             data = res
 
