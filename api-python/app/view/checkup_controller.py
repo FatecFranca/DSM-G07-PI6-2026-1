@@ -11,6 +11,7 @@ checkup_service = CheckupService()
 
 @router.post(
     "/ia/checkup/animal/{id_animal}",
+    response_model=RespostaCheckupAnimalDTO,
     summary="Analisar sintomas de um animal",
     description="Analisa os sintomas de um animal específico e retorna a predição de diagnóstico utilizando o modelo PMML.\n\n**Requer autenticação JWT.**",
     responses={
@@ -65,6 +66,7 @@ async def checkup_animal(
 
 @router.post(
     "/ia/checkup",
+    response_model=RespostaCheckupTesteDTO,
     summary="Testar predição de diagnóstico",
     description="Rota de teste para validar a predição da IA com base em dados diretos, sem necessidade de integração com a API Java.\n\n**Não requer autenticação JWT** - Use esta rota para testar o modelo PMML.",
     responses={

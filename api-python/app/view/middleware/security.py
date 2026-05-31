@@ -3,42 +3,18 @@ JWT Authentication middleware and decorator for FastAPI.
 Validates JWT tokens from incoming requests.
 """
 
-from fastapi import HTTPException, Depends, status, Header
-from typing import Optional, Tuple
+from fastapi import HTTPException, Depends, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from typing import Tuple
 from app.application.services.jwt_service import jwt_service
 
+oauth2_scheme = HTTPBearer()
 
-async def verify_jwt_token(authorization: Optional[str] = Header(None)) -> Tuple[str, str]:
+async def verify_jwt_token(auth: HTTPAuthorizationCredentials = Depends(oauth2_scheme)) -> Tuple[str, str]:
     """
-    Dependency function to verify JWT token from Authorization header.
-
-    Extracts the token from the "Authorization: Bearer <token>" header
-    and validates it.
-
-    Args:
-        authorization: The Authorization header value
-
-    Returns:
-        Tuple[str, str]: A tuple of (user_id, token)
-
-    Raises:
-        HTTPException: If the token is invalid or missing
+    Dependency function to verify JWT token from Authorization header using HTTPBearer.
     """
-    if not authorization:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Missing authorization header",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    # Extract token from "Bearer <token>" format
-    token = get_token_from_header(authorization)
-    if not token:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authorization header format. Expected: Bearer <token>",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    token = auth.credentials
 
     # Validate the token
     if not jwt_service.validate_token(token):
@@ -73,20 +49,4 @@ async def get_current_user(credentials: Tuple[str, str] = Depends(verify_jwt_tok
     return credentials
 
 
-def get_token_from_header(authorization: Optional[str] = None) -> Optional[str]:
-    """
-    Extract JWT token from Authorization header.
-    
-    Args:
-        authorization: The Authorization header value
-        
-    Returns:
-        Optional[str]: The token if present and valid format, None otherwise
-    """
-    if not authorization:
-        return None
-    
-    if not authorization.startswith("Bearer "):
-        return None
-    
-    return authorization[7:]  # Remove "Bearer " prefix
+

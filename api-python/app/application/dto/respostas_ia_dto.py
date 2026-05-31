@@ -155,3 +155,25 @@ class RespostaCheckupTesteDTO(BaseModel):
                 "resultado": "gastrointestinal"
             }
         }
+
+
+class RecomendacaoIADTO(BaseModel):
+    """
+    Recomendação nutricional gerada pela IA.
+    """
+    animalId: str = Field(..., example="123")
+    nome: str = Field(..., example="Rex")
+    diagnostico: str = Field(..., example="Sobrepeso")
+    peso_ideal_esperado: float = Field(..., example=20.0)
+    sugestoes_racao: list[str] = Field(..., example=["Ração Light Plus", "Ração Weight Control"])
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "animalId": "123",
+                "nome": "Rex",
+                "diagnostico": "Sobrepeso",
+                "peso_ideal_esperado": 20.0,
+                "sugestoes_racao": ["Ração Light Plus", "Ração Weight Control"]
+            }
+        }

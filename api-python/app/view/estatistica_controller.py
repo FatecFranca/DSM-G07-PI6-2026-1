@@ -15,6 +15,7 @@ estatistica_service = EstatisticaService()
 
 @router.get(
     "/batimentos/animal/{animalId}/estatisticas",
+    response_model=EstatisticasBatimentosDTO,
     summary="Consultar estatísticas de batimentos",
     description="Obtém estatísticas gerais dos batimentos cardíacos de um animal, incluindo média, mediana, desvio padrão e outras medidas descritivas.\n\n**Requer autenticação JWT.**",
     responses={
@@ -52,6 +53,7 @@ async def get_estatisticas(
 
 @router.get(
     "/batimentos/animal/{animalId}/batimentos/media-por-data",
+    response_model=MediaPorIntervaloDTO,
     summary="Consultar média de batimentos por intervalo de datas",
     description="Calcula a média de batimentos cardíacos de um animal em um intervalo de datas específico.\n\n**Requer autenticação JWT.**",
     responses={
@@ -93,6 +95,7 @@ async def media_batimentos_por_data(
 
 @router.get(
     "/batimentos/animal/{animalId}/probabilidade",
+    response_model=ProbabilidadeBatimentoDTO,
     summary="Calcular probabilidade de um valor de batimento",
     description="Calcula a probabilidade estatística de um determinado valor de batimento cardíaco ocorrer com base no histórico do animal.\n\n**Requer autenticação JWT.**",
     responses={
@@ -132,6 +135,7 @@ async def probabilidade_batimento(
 
 @router.get(
     "/batimentos/animal/{animalId}/ultimo/analise",
+    response_model=AnaliseBatimentoUltimoDTO,
     summary="Analisar último batimento registrado",
     description="Analisa o último batimento cardíaco registrado pela coleira e calcula sua probabilidade em relação ao histórico do animal.\n\n**Requer autenticação JWT.**",
     responses={
@@ -169,6 +173,7 @@ async def probabilidade_ultimo_batimento(
 
 @router.get(
     "/batimentos/animal/{animalId}/media-ultimos-5-dias",
+    response_model=MediaUltimos5DiasDTO,
     summary="Consultar média de batimentos dos últimos 5 dias",
     description="Calcula a média de batimentos cardíacos de um animal para cada um dos últimos 5 dias com dados disponíveis.\n\n**Requer autenticação JWT.**",
     responses={
@@ -206,6 +211,7 @@ async def media_batimentos_ultimos_5_dias(
 
 @router.get(
     "/batimentos/animal/{animalId}/media-ultimas-5-horas-registradas",
+    response_model=MediaUltimas5HorasDTO,
     summary="Consultar média de batimentos das últimas 5 horas",
     description="Calcula a média de batimentos cardíacos de um animal para cada uma das últimas 5 horas com dados registrados.\n\n**Requer autenticação JWT.**",
     responses={
@@ -243,6 +249,7 @@ async def media_batimentos_ultimas_5_horas(
 
 @router.get(
     "/batimentos/animal/{animalId}/regressao",
+    response_model=AnaliseRegressaoDTO,
     summary="Analisar regressão entre batimentos e movimentos",
     description="Realiza análise de regressão linear entre os batimentos cardíacos e os dados de movimento (aceleração) de um animal, fornecendo coeficientes e correlações.\n\n**Requer autenticação JWT.**",
     responses={
@@ -280,6 +287,7 @@ async def analise_regressao_batimentos(
 
 @router.get(
     "/batimentos/animal/{animalId}/predizer",
+    response_model=PredicaoBatimentoDTO,
     summary="Prever frequência cardíaca baseada em aceleração",
     description="Prediz a frequência cardíaca de um animal baseado em valores de aceleração (acelerômetro) utilizando um modelo de regressão linear treinado com dados históricos.\n\n**Requer autenticação JWT.**",
     responses={
