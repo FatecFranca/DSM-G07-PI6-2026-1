@@ -4,6 +4,7 @@ from app.view.middleware.security import get_current_user
 from app.application.dto.sintomas_dto import SintomasInputDTO, AnimalSintomasInputDTO
 from app.application.dto.respostas_ia_dto import RespostaCheckupAnimalDTO, RespostaCheckupTesteDTO
 from app.application import CheckupService
+from app.view.exception.exception_handlers import STANDARD_ERRORS
 
 router = APIRouter(tags=["IA"])
 checkup_service = CheckupService()
@@ -20,7 +21,8 @@ checkup_service = CheckupService()
                     "schema": {"$ref": "#/components/schemas/RespostaCheckupAnimalDTO"}
                 }
             }
-        }
+        },
+        **STANDARD_ERRORS
     }
 )
 async def checkup_animal(
@@ -59,12 +61,6 @@ async def checkup_animal(
     """
     user_id, token = credentials
     resultado = checkup_service.analisar_sintomas_animal(id_animal, sintomas.dict(exclude_none=True), token)
-    
-    if "erro" in resultado:
-        if resultado.get("status_code") == 404:
-            raise HTTPException(status_code=404, detail=resultado.get("erro"))
-        raise HTTPException(status_code=500, detail=resultado.get("erro"))
-        
     return resultado
 
 @router.post(
@@ -79,7 +75,8 @@ async def checkup_animal(
                     "schema": {"$ref": "#/components/schemas/RespostaCheckupTesteDTO"}
                 }
             }
-        }
+        },
+        **STANDARD_ERRORS
     }
 )
 async def checkup(sintomas: AnimalSintomasInputDTO):
@@ -111,9 +108,6 @@ async def checkup(sintomas: AnimalSintomasInputDTO):
     """
     try:
         dados_teste = sintomas.dict()
-        resultado = checkup_service.testar_predicao(dados_teste)
-        if "erro" in resultado:
-            raise HTTPException(status_code=500, detail=resultado["erro"])
-        return resultado
+        return checkup_service.testar_predicao(dados_teste)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro no teste de predição: {str(e)}")

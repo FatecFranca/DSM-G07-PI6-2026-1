@@ -12,6 +12,14 @@ class ErrorResponseDTO(BaseModel):
     success: bool
     timestamp: datetime
 
+STANDARD_ERRORS = {
+    400: {"description": "Requisição inválida (Bad Request)", "model": ErrorResponseDTO},
+    401: {"description": "Não autorizado (Unauthorized)", "model": ErrorResponseDTO},
+    403: {"description": "Acesso negado (Forbidden)", "model": ErrorResponseDTO},
+    404: {"description": "Recurso não encontrado (Not Found)", "model": ErrorResponseDTO},
+    500: {"description": "Erro interno no servidor (Internal Server Error)", "model": ErrorResponseDTO},
+}
+
 def build_error_response(status_code: int, message: str, request: Request) -> JSONResponse:
     content = ErrorResponseDTO(
         path=request.url.path,

@@ -8,6 +8,7 @@ from app.application.dto.respostas_batimentos_dto import (
 )
 from app.application.dto.respostas_regressao_dto import AnaliseRegressaoDTO, PredicaoBatimentoDTO
 from app.application import EstatisticaService
+from app.view.exception.exception_handlers import STANDARD_ERRORS
 
 router = APIRouter(tags=["Batimentos"])
 estatistica_service = EstatisticaService()
@@ -24,7 +25,8 @@ estatistica_service = EstatisticaService()
                     "schema": {"$ref": "#/components/schemas/EstatisticasBatimentosDTO"}
                 }
             }
-        }
+        },
+        **STANDARD_ERRORS
     }
 )
 async def get_estatisticas(
@@ -46,10 +48,7 @@ async def get_estatisticas(
         401: Token JWT ausente, inválido ou expirado
     """
     _, token = credentials
-    resultado = estatistica_service.batimentos_calcular_estatisticas(animalId, token)
-    if isinstance(resultado, dict) and resultado.get("error"):
-        raise HTTPException(status_code=400, detail=resultado.get("mensagem"))
-    return resultado
+    return estatistica_service.batimentos_calcular_estatisticas(animalId, token)
 
 @router.get(
     "/batimentos/animal/{animalId}/batimentos/media-por-data",
@@ -63,7 +62,8 @@ async def get_estatisticas(
                     "schema": {"$ref": "#/components/schemas/MediaPorIntervaloDTO"}
                 }
             }
-        }
+        },
+        **STANDARD_ERRORS
     }
 )
 async def media_batimentos_por_data(
@@ -89,10 +89,7 @@ async def media_batimentos_por_data(
         401: Token JWT ausente, inválido ou expirado
     """
     _, token = credentials
-    resultado = estatistica_service.media_batimentos_por_intervalo(animalId, token, inicio, fim)
-    if isinstance(resultado, dict) and resultado.get("error"):
-        raise HTTPException(status_code=400, detail=resultado.get("mensagem"))
-    return resultado
+    return estatistica_service.media_batimentos_por_intervalo(animalId, token, inicio, fim)
 
 @router.get(
     "/batimentos/animal/{animalId}/probabilidade",
@@ -106,7 +103,8 @@ async def media_batimentos_por_data(
                     "schema": {"$ref": "#/components/schemas/ProbabilidadeBatimentoDTO"}
                 }
             }
-        }
+        },
+        **STANDARD_ERRORS
     }
 )
 async def probabilidade_batimento(
@@ -130,10 +128,7 @@ async def probabilidade_batimento(
         401: Token JWT ausente, inválido ou expirado
     """
     _, token = credentials
-    resultado = estatistica_service.probabilidade_batimento(animalId, token, valor)
-    if isinstance(resultado, dict) and resultado.get("error"):
-        raise HTTPException(status_code=400, detail=resultado.get("mensagem"))
-    return resultado
+    return estatistica_service.probabilidade_batimento(animalId, token, valor)
 
 @router.get(
     "/batimentos/animal/{animalId}/ultimo/analise",
@@ -147,7 +142,8 @@ async def probabilidade_batimento(
                     "schema": {"$ref": "#/components/schemas/AnaliseBatimentoUltimoDTO"}
                 }
             }
-        }
+        },
+        **STANDARD_ERRORS
     }
 )
 async def probabilidade_ultimo_batimento(
@@ -169,10 +165,7 @@ async def probabilidade_ultimo_batimento(
         401: Token JWT ausente, inválido ou expirado
     """
     _, token = credentials
-    resultado = estatistica_service.probabilidade_ultimo_batimento(animalId, token)
-    if isinstance(resultado, dict) and resultado.get("error"):
-        raise HTTPException(status_code=400, detail=resultado.get("mensagem"))
-    return resultado
+    return estatistica_service.probabilidade_ultimo_batimento(animalId, token)
 
 @router.get(
     "/batimentos/animal/{animalId}/media-ultimos-5-dias",
@@ -186,7 +179,8 @@ async def probabilidade_ultimo_batimento(
                     "schema": {"$ref": "#/components/schemas/MediaUltimos5DiasDTO"}
                 }
             }
-        }
+        },
+        **STANDARD_ERRORS
     }
 )
 async def media_batimentos_ultimos_5_dias(
@@ -208,10 +202,7 @@ async def media_batimentos_ultimos_5_dias(
         401: Token JWT ausente, inválido ou expirado
     """
     _, token = credentials
-    resultado = estatistica_service.media_ultimos_5_dias_validos(animalId, token)
-    if isinstance(resultado, dict) and resultado.get("error"):
-        raise HTTPException(status_code=400, detail=resultado.get("mensagem"))
-    return {"medias": resultado}
+    return {"medias": estatistica_service.media_ultimos_5_dias_validos(animalId, token)}
 
 @router.get(
     "/batimentos/animal/{animalId}/media-ultimas-5-horas-registradas",
@@ -225,7 +216,8 @@ async def media_batimentos_ultimos_5_dias(
                     "schema": {"$ref": "#/components/schemas/MediaUltimas5HorasDTO"}
                 }
             }
-        }
+        },
+        **STANDARD_ERRORS
     }
 )
 async def media_batimentos_ultimas_5_horas(
@@ -247,10 +239,7 @@ async def media_batimentos_ultimas_5_horas(
         401: Token JWT ausente, inválido ou expirado
     """
     _, token = credentials
-    resultado = estatistica_service.media_ultimas_5_horas_registradas(animalId, token)
-    if isinstance(resultado, dict) and resultado.get("error"):
-        raise HTTPException(status_code=400, detail=resultado.get("mensagem"))
-    return resultado
+    return estatistica_service.media_ultimas_5_horas_registradas(animalId, token)
 
 @router.get(
     "/batimentos/animal/{animalId}/regressao",
@@ -264,7 +253,8 @@ async def media_batimentos_ultimas_5_horas(
                     "schema": {"$ref": "#/components/schemas/AnaliseRegressaoDTO"}
                 }
             }
-        }
+        },
+        **STANDARD_ERRORS
     }
 )
 async def analise_regressao_batimentos(
@@ -286,10 +276,7 @@ async def analise_regressao_batimentos(
         401: Token JWT ausente, inválido ou expirado
     """
     _, token = credentials
-    resultado = estatistica_service.analise_regressao_batimentos(animalId, token)
-    if isinstance(resultado, dict) and "erro" in resultado:
-        raise HTTPException(status_code=404, detail=resultado.get("erro"))
-    return resultado
+    return estatistica_service.analise_regressao_batimentos(animalId, token)
 
 @router.get(
     "/batimentos/animal/{animalId}/predizer",
@@ -303,7 +290,8 @@ async def analise_regressao_batimentos(
                     "schema": {"$ref": "#/components/schemas/PredicaoBatimentoDTO"}
                 }
             }
-        }
+        },
+        **STANDARD_ERRORS
     }
 )
 async def predizer_batimento(
@@ -334,7 +322,4 @@ async def predizer_batimento(
         401: Token JWT ausente, inválido ou expirado
     """
     _, token = credentials
-    resultado = estatistica_service.predizer_batimento(animalId, token, acelerometroX, acelerometroY, acelerometroZ)
-    if isinstance(resultado, dict) and "erro" in resultado:
-        raise HTTPException(status_code=404, detail=resultado.get("erro"))
-    return resultado
+    return estatistica_service.predizer_batimento(animalId, token, acelerometroX, acelerometroY, acelerometroZ)

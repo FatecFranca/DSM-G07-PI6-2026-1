@@ -14,6 +14,7 @@ from scipy.stats import pearsonr
 from sklearn.preprocessing import StandardScaler
 from app.infraestructure.clients.java_api_client import JavaAPIClient
 import logging
+from app.infraestructure.exception.custom_exceptions import BadRequestException, ResourceNotFoundException
 
 logger = logging.getLogger("EstatisticaService")
 
@@ -160,12 +161,12 @@ class EstatisticaService:
 
     def media_por_intervalo(self, dados: List[dict], inicio: date, fim: date) -> Dict:
         if not dados:
-            return {"media": None, "mensagem": "Nenhum dado disponível."}
+            raise BadRequestException("Nenhum dado disponível.")
 
         df = pd.DataFrame(dados)
 
         if 'data' not in df.columns or 'frequenciaMedia' not in df.columns:
-            return {"media": None, "mensagem": "Colunas esperadas não encontradas."}
+            raise BadRequestException("Colunas esperadas não encontradas.")
 
         df['data'] = pd.to_datetime(df['data'], errors='coerce').dt.date
         df['frequenciaMedia'] = pd.to_numeric(df['frequenciaMedia'], errors='coerce')
@@ -175,7 +176,7 @@ class EstatisticaService:
         df_filtrado = df[(df['data'] >= inicio) & (df['data'] <= fim)]
 
         if df_filtrado.empty:
-            return {"media": None, "mensagem": "Nenhum dado encontrado para o intervalo fornecido."}
+            raise ResourceNotFoundException("Nenhum dado encontrado para o intervalo fornecido.")
 
         media = int(round(float(df_filtrado['frequenciaMedia'].mean())))
         return {"media": media}
@@ -184,9 +185,7 @@ class EstatisticaService:
         valores_validos = [v for v in valores_batimentos if isinstance(v, (int, float)) and 20 <= v <= 200]
 
         if not valores_validos:
-            return {
-                "erro": "Não há dados suficientes dentro da faixa fisiológica (20 a 200 BPM) para análise."
-            }
+            raise BadRequestException("Não há dados suficientes dentro da faixa fisiológica (20 a 200 BPM) para análise.")
 
         media = np.mean(valores_validos)
         desvio = np.std(valores_validos)
@@ -250,9 +249,7 @@ class EstatisticaService:
         valores_validos = [v for v in valores_batimentos if isinstance(v, (int, float)) and 20 <= v <= 200]
 
         if not valores_validos:
-            return {
-                "erro": "Não há dados suficientes dentro da faixa fisiológica (20 a 200 BPM) para análise."
-            }
+            raise BadRequestException("Não há dados suficientes dentro da faixa fisiológica (20 a 200 BPM) para análise.")
 
         media = np.mean(valores_validos)
         desvio = np.std(valores_validos)
@@ -336,10 +333,10 @@ class EstatisticaService:
 
     def obter_media_ultimas_5_horas_registradas(self, dados: List[dict]) -> dict:
         if not dados:
-            return {"media": None, "media_por_hora": {}, "mensagem": "Nenhum dado disponível."}
+            raise BadRequestException("Nenhum dado disponível.")
         df = pd.DataFrame(dados)
         if df.empty:
-            return {"media": None, "media_por_hora": {}, "mensagem": "Nenhum dado disponível."}
+            raise BadRequestException("Nenhum dado disponível.")
 
         # Conversão e limpeza
         df["data"] = pd.to_datetime(df["data"], errors="coerce")
@@ -360,7 +357,7 @@ class EstatisticaService:
         df_filtrado = df[df["hora"].isin(ultimas_5_horas)]
 
         if df_filtrado.empty:
-            return {"media": None, "media_por_hora": {}, "mensagem": "Nenhum dado nas últimas 5 horas registradas."}
+            raise ResourceNotFoundException("Nenhum dado nas últimas 5 horas registradas.")
 
         # Calcular média por hora
         medias_por_hora = df_filtrado.groupby("hora")["frequenciaMedia"].mean().sort_index()
@@ -438,76 +435,81 @@ class EstatisticaService:
     def batimentos_calcular_estatisticas(self, animal_id: str, token: str) -> dict:
         batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
         if not batimentos:
-            return {"error": True, "mensagem": "Nenhum batimento disponível."}
+            raise BadRequestException("Nenhum batimento disponível.")
         return self.calcular_estatisticas(batimentos)
 
     def media_batimentos_por_intervalo(self, animal_id: str, token: str, inicio: date, fim: date) -> Dict:
         batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
         if not batimentos:
-            return {"error": True, "media": None, "mensagem": "Nenhum dado disponível."}
+            raise BadRequestException("Nenhum dado disponível.")
         return self.media_por_intervalo(batimentos, inicio, fim)
 
     def probabilidade_batimento(self, animal_id: str, token: str, valor: int) -> dict:
         try:
             batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
             if not batimentos:
-                return {"error": True, "mensagem": "Nenhum dado disponível."}
+                raise BadRequestException("Nenhum dado disponível.")
 
             valores_batimentos = [batimento["frequenciaMedia"] for batimento in batimentos if isinstance(batimento.get("frequenciaMedia"), (int, float))]
             if not valores_batimentos:
-                return {"error": True, "mensagem": "Nenhum dado de batimentos disponível."}
+                raise BadRequestException("Nenhum dado de batimentos disponível.")
 
             return self.calcular_probabilidade(valor=valor, valores_batimentos=valores_batimentos)
+        except BadRequestException:
+            raise
         except Exception as e:
             logger.exception("Erro ao calcular probabilidade do batimento")
-            return {"error": True, "mensagem": "Erro ao calcular probabilidade do batimento"}
+            raise BadRequestException("Erro ao calcular probabilidade do batimento")
 
     def probabilidade_ultimo_batimento(self, animal_id: str, token: str) -> dict:
         try:
             status_code, response = self.java_api_client.get_animal_ultimo_batimento(animal_id, token)
             if status_code != 200 or not response:
-                return {"error": True, "mensagem": "Erro ao buscar último batimento do animal"}
+                raise BadRequestException("Erro ao buscar último batimento do animal")
 
             valor_ultimo_batimento = response.get("frequenciaMedia", None)
             if valor_ultimo_batimento is None:
-                return {"error": True, "mensagem": "Não foi possível obter o último batimento"}
+                raise BadRequestException("Não foi possível obter o último batimento")
 
             batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
             if not batimentos:
-                return {"error": True, "mensagem": "Nenhum dado disponível."}
+                raise BadRequestException("Nenhum dado disponível.")
 
             valores_batimentos = [batimento["frequenciaMedia"] for batimento in batimentos if isinstance(batimento.get("frequenciaMedia"), (int, float))]
             if not valores_batimentos:
-                return {"error": True, "mensagem": "Nenhum dado de batimentos disponível."}
+                raise BadRequestException("Nenhum dado de batimentos disponível.")
 
             return self.calcular_probabilidade_ultimo_batimento(valor=valor_ultimo_batimento, valores_batimentos=valores_batimentos)
+        except BadRequestException:
+            raise
         except Exception as e:
             logger.exception("Erro ao calcular probabilidade do último batimento")
-            return {"error": True, "mensagem": "Erro ao calcular probabilidade do último batimento"}
+            raise BadRequestException("Erro ao calcular probabilidade do último batimento")
 
     def media_ultimos_5_dias_validos(self, animal_id: str, token: str) -> dict:
         batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
         if not batimentos:
-            return {}
+            raise BadRequestException("Nenhum dado disponível.")
         return self.obter_media_ultimos_5_dias_validos(batimentos)
 
     def media_ultimas_5_horas_registradas(self, animal_id: str, token: str) -> dict:
         batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
         if not batimentos:
-            return {"media": None, "media_por_hora": {}, "mensagem": "Nenhum dado disponível."}
+            raise BadRequestException("Nenhum dado disponível.")
         return self.obter_media_ultimas_5_horas_registradas(batimentos)
 
     def analise_regressao_batimentos(self, animal_id: str, token: str) -> dict:
         batimentos = self._get_animal_todos_batimentos(animal_id, token, max_pages=3)
         movimentos = self._get_animal_movimentos_todos(animal_id, token, max_pages=3)
         if not batimentos or not movimentos:
-            return {"erro": "Dados insuficientes para análise."}
+            raise ResourceNotFoundException("Dados insuficientes para análise.")
         return self.executar_regressao(batimentos, movimentos)
 
     def predizer_batimento(self, animal_id: str, token: str, acelerometroX: float, acelerometroY: float, acelerometroZ: float) -> dict:
-        resultado = self.analise_regressao_batimentos(animal_id, token)
-        if "erro" in resultado:
-            return {"erro": "Dados insuficientes para gerar o modelo de regressão."}
+        try:
+            resultado = self.analise_regressao_batimentos(animal_id, token)
+        except ResourceNotFoundException:
+            raise ResourceNotFoundException("Dados insuficientes para gerar o modelo de regressão.")
 
         coef = resultado["coeficientes"]
         intercepto = resultado["coeficiente_geral"]

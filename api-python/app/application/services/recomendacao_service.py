@@ -3,6 +3,7 @@ import os
 import logging
 from typing import Dict, Any, List
 from app.infraestructure.clients.java_api_client import JavaAPIClient
+from app.infraestructure.exception.custom_exceptions import ResourceNotFoundException
 
 logger = logging.getLogger("RecomendacaoService")
 
@@ -86,7 +87,7 @@ class RecomendacaoService:
         status_code, dados_animal = self.java_api_client.get_animal(animal_id, token)
         
         if status_code != 200 or not dados_animal:
-            return {"erro": "Animal não encontrado na base PetDex", "status_code": 404}
+            raise ResourceNotFoundException("Animal não encontrado na base de dados da API Java.")
 
         # Extrai e mapeia informações necessárias do animal
         raca_nome = dados_animal.get("racaNome", "SRD (Sem Raça Definida)")

@@ -5,6 +5,7 @@ import pandas as pd
 from typing import Dict, Any, Optional
 from app.infraestructure.clients.java_api_client import JavaAPIClient
 from app.domain.utils.utils import DomainUtils
+from app.infraestructure.exception.custom_exceptions import ResourceNotFoundException
 
 logger = logging.getLogger("CheckupService")
 
@@ -58,7 +59,7 @@ class CheckupService:
         current_model = self._load_model()
         if current_model is None:
             logger.error("❌ Modelo PMML não foi carregado corretamente")
-            return {"erro": "Modelo PMML não disponível"}
+            raise Exception("Modelo PMML não disponível")
 
         try:
             df = pd.DataFrame([dados])
@@ -66,7 +67,7 @@ class CheckupService:
             return result.to_dict(orient="records")[0]
         except Exception as e:
             logger.error(f"🚨 Erro ao realizar predição: {e}")
-            return {"erro": str(e)}
+            raise Exception(str(e))
 
     def predict_with_pmml_animal(self, dados: dict) -> dict:
         """
@@ -75,7 +76,7 @@ class CheckupService:
         current_model = self._load_model()
         if current_model is None:
             logger.error("❌ Modelo PMML não foi carregado corretamente")
-            return {"erro": "Modelo PMML não disponível"}
+            raise Exception("Modelo PMML não disponível")
 
         try:
             df = pd.DataFrame([dados])
@@ -86,7 +87,7 @@ class CheckupService:
             return result.to_dict(orient="records")[0]
         except Exception as e:
             logger.error(f"🚨 Erro ao realizar predição com PMML: {e}")
-            return {"erro": str(e)}
+            raise Exception(str(e))
 
     def predict_with_pmml(self, animal_data: dict, sintomas_data: dict) -> dict:
         """
@@ -95,7 +96,7 @@ class CheckupService:
         current_model = self._load_model()
         if current_model is None:
             logger.error("❌ Modelo PMML não foi carregado corretamente")
-            return {"erro": "Modelo PMML não disponível"}
+            raise Exception("Modelo PMML não disponível")
 
         try:
             # Combina dados do animal com sintomas
@@ -127,7 +128,7 @@ class CheckupService:
 
         except Exception as e:
             logger.error(f"🚨 Erro ao realizar predição com PMML: {e}")
-            return {"erro": str(e)}
+            raise Exception(str(e))
 
     def get_animal_data(self, data: Any) -> dict:
         """
@@ -157,7 +158,7 @@ class CheckupService:
         # 1. Busca dados do animal na API Java
         status_code, response = self.java_api_client.get_animal(animal_id, token)
         if status_code != 200 or not response:
-            return {"erro": "Animal não encontrado na API Java", "status_code": 404}
+            raise ResourceNotFoundException("Animal não encontrado na base de dados da API Java.")
 
         # 2. Busca último batimento
         status_code_bat, response_bat = self.java_api_client.get_animal_ultimo_batimento(animal_id, token)
@@ -196,9 +197,6 @@ class CheckupService:
         resultado_sanitizado = {}
         classe_prevista = None
         if isinstance(resultado, dict):
-            if "erro" in resultado:
-                return resultado
-                
             for k, v in resultado.items():
                 if isinstance(v, float) and math.isnan(v):
                     resultado_sanitizado[k] = None
@@ -232,9 +230,6 @@ class CheckupService:
         classe_prevista = None
         resultado_sanitizado = {}
         if isinstance(resultado, dict):
-            if "erro" in resultado:
-                return resultado
-
             for k, v in resultado.items():
                 if isinstance(v, float) and math.isnan(v):
                     resultado_sanitizado[k] = None
