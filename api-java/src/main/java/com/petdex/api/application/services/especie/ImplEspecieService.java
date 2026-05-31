@@ -5,6 +5,7 @@ import com.petdex.api.application.contracts.dto.PageDTO;
 import com.petdex.api.application.contracts.dto.especie.EspecieReqDTO;
 import com.petdex.api.application.contracts.dto.especie.EspecieResDTO;
 import com.petdex.api.infrastructure.mongodb.EspecieRepository;
+import com.petdex.api.infrastructure.exception.ResourceNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.slf4j.Logger;
@@ -30,9 +31,9 @@ public class ImplEspecieService implements EspecieService {
     public EspecieResDTO findById(String id) {
         return especieRepository.findById(id)
                 .map(especie -> mapper.map(especie, EspecieResDTO.class))
-                .orElseGet(() -> {
+                .orElseThrow(() -> {
                     logger.error("Espécie não encontrada com ID: {}", id);
-                    return null;
+                    return new ResourceNotFoundException("Espécie", "ID", id);
                 });
     }
 
@@ -60,7 +61,7 @@ public class ImplEspecieService implements EspecieService {
 
         Especie especieUptade = especieRepository.findById(id).orElseThrow(() -> {
             logger.error("Falha ao atualizar espécie: ID {} não encontrado", id);
-            return new RuntimeException("Não existe especie com esse ID: " + id);
+            return new ResourceNotFoundException("Espécie", "ID", id);
         });
         if(especieReqDTO.getNome() != null) especieUptade.setNome(especieReqDTO.getNome());
 
@@ -70,7 +71,7 @@ public class ImplEspecieService implements EspecieService {
     @Override
     public void delete(String id) {
 
-        Especie especieDelete = especieRepository.findById(id).orElseThrow(() -> new RuntimeException("Não existe especie com esse ID: " + id));
+        Especie especieDelete = especieRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Espécie", "ID", id));
 
         especieRepository.delete(especieDelete);
     }

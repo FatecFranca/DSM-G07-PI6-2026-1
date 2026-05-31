@@ -70,9 +70,9 @@ public class ImplBatimentoService implements BatimentoService {
     public BatimentoResDTO fidById(String batimentoId) {
         return batimentoRepository.findById(batimentoId)
                 .map(batimento -> mapper.map(batimento, BatimentoResDTO.class))
-                .orElseGet(() -> {
+                .orElseThrow(() -> {
                     logger.error("Batimento não encontrado com ID: {}", batimentoId);
-                    return null;
+                    return new ResourceNotFoundException("Batimento", "ID", batimentoId);
                 });
     }
 

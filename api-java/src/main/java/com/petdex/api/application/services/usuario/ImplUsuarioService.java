@@ -7,6 +7,7 @@ import com.petdex.api.application.contracts.dto.usuario.UsuarioReqDTO;
 import com.petdex.api.application.contracts.dto.usuario.UsuarioResDTO;
 import com.petdex.api.infrastructure.exception.ConflictException;
 import com.petdex.api.infrastructure.mongodb.UsuarioRepository;
+import com.petdex.api.infrastructure.exception.ResourceNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +70,7 @@ public class ImplUsuarioService implements UsuarioService {
 
         Usuario usuarioUpdate = usuarioRepository.findById(id).orElseThrow(() -> {
             logger.error("Falha ao atualizar: Usuário não encontrado com ID: {}", id);
-            return new RuntimeException("Não foi possível contrar um usuário com este ID: " + id);
+            return new ResourceNotFoundException("Usuário", "ID", id);
         });
 
         if (usuarioReqDTO.getCpf() != null) usuarioUpdate.setCpf(usuarioReqDTO.getCpf());
@@ -85,7 +86,7 @@ public class ImplUsuarioService implements UsuarioService {
     @Override
     public void delete(String id) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário", "ID", id));
         usuarioRepository.delete(usuario);
     }
 }
