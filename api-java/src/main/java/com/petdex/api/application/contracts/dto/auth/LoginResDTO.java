@@ -8,26 +8,26 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(
         name = "Resposta Login",
         description = "Informações retornadas após autenticação bem-sucedida",
-        example = "{\"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\", \"animalId\": \"507f1f77bcf86cd799439011\", \"userId\": \"507f1f77bcf86cd799439011\", \"nome\": \"João Silva\", \"email\": \"usuario@petdex.com\", \"petName\": \"Rex\", \"animalImagemUrl\": \"/uploads/animais/123e4567-e89b-12d3-a456-426614174000_rex.jpg\"}"
+        example = "{\"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\", \"animalId\": \"68194120636f719fcd5ee5fd\", \"userId\": \"68193e7b636f719fcd5ee596\", \"nome\": \"Henrique Almeida Florentino\", \"email\": \"henriquealmeidaflorentino@gmail.com\", \"petName\": \"Uno\", \"animalImagemUrl\": \"/uploads/animais/123e4567-e89b-12d3-a456-426614174000_rex.jpg\"}"
 )
 public class LoginResDTO {
 
     @Schema(description = "Token JWT para autenticação nas próximas requisições", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
     private String token;
 
-    @Schema(description = "ID do animal associado ao usuário", example = "507f1f77bcf86cd799439011")
+    @Schema(description = "ID do animal associado ao usuário", example = "68194120636f719fcd5ee5fd")
     private String animalId;
 
-    @Schema(description = "ID do usuário autenticado", example = "507f1f77bcf86cd799439011")
+    @Schema(description = "ID do usuário autenticado", example = "68193e7b636f719fcd5ee596")
     private String userId;
 
-    @Schema(description = "Nome do usuário autenticado", example = "João Silva")
+    @Schema(description = "Nome do usuário autenticado", example = "Henrique Almeida Florentino")
     private String nome;
 
-    @Schema(description = "Email do usuário autenticado", example = "usuario@petdex.com")
+    @Schema(description = "Email do usuário autenticado", example = "henriquealmeidaflorentino@gmail.com")
     private String email;
 
-    @Schema(description = "Nome do animal associado ao usuário", example = "Rex")
+    @Schema(description = "Nome do animal associado ao usuário", example = "Uno")
     private String petName;
 
     @Schema(description = "URL da imagem do animal associado ao usuário", example = "/uploads/animais/123e4567-e89b-12d3-a456-426614174000_rex.jpg")

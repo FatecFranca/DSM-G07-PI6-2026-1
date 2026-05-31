@@ -2,10 +2,8 @@
 
 import { useEffect, useState } from "react";
 import MapView from "@/components/screens/MapScreen/MapView";
-import {
-  getUltimaLocalizacaoAnimal,
-  getEnderecoFromCoordinates,
-} from "@/services/locationService";
+import { getUltimaLocalizacaoAnimal } from "@/services/locationService";
+import { getEnderecoAtualDoAnimal } from "@/services/mapService";
 
 interface Props {
   animalId: string;
@@ -38,7 +36,7 @@ export default function AnimalLocationCard({
       setLat(location.latitude);
       setLng(location.longitude);
 
-      const addr = await getEnderecoFromCoordinates(
+      const addr = await getEnderecoAtualDoAnimal(
         location.latitude,
         location.longitude
       );

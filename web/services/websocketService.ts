@@ -1,7 +1,7 @@
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 
-const WEBSOCKET_URL = process.env.NEXT_PUBLIC_WEBSOCKET_URL!;
+const WEBSOCKET_URL = process.env.NEXT_PUBLIC_WEBSOCKET_URL?.trim() || "";
 
 let client: Client;
 

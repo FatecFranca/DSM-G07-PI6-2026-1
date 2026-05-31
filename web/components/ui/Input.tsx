@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 type InputSize = "small" | "medium" | "large";
 
@@ -14,6 +15,7 @@ interface InputProps {
   value?: string;
   centerText?: boolean;
   suffixText?: string;
+  textColor?: string;
 }
 
 export default function Input({
@@ -26,25 +28,30 @@ export default function Input({
   value,
   centerText = false,
   suffixText,
+  textColor,
 }: InputProps) {
   const [isFocused, setIsFocused] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const isPasswordType = type === "password";
+  const inputType = isPasswordType ? (showPassword ? "text" : "password") : type;
 
   const sizeStyles = {
     small: {
       label: "text-xs",
-      input: "text-xs",
+      input: "text-xs w-full",
       icon: "text-[18px]",
       paddingY: "py-3",
     },
     medium: {
       label: "text-sm",
-      input: "text-sm",
+      input: "text-sm w-full",
       icon: "text-[20px]",
       paddingY: "py-3.5",
     },
     large: {
       label: "text-base",
-      input: "text-base",
+      input: "text-base w-full",
       icon: "text-[22px]",
       paddingY: "py-2.5",
     },
@@ -54,7 +61,7 @@ export default function Input({
 
   return (
     <div
-      className={`flex flex-col ${
+      className={`w-full flex flex-col ${
         centerText ? "items-center text-center" : "items-start"
       }`}
     >
@@ -91,6 +98,7 @@ export default function Input({
 
       <div
         className={`
+          w-full
           flex items-center
           rounded-full
           border
@@ -104,7 +112,7 @@ export default function Input({
         `}
       >
         <input
-          type={type}
+          type={inputType}
           value={value}
           onChange={(e) => onChange?.(e.target.value)}
           onFocus={() => setIsFocused(true)}
@@ -115,8 +123,8 @@ export default function Input({
             outline-none
             ${currentSize.input}
             ${currentSize.paddingY}
-            text-[var(--color-foreground)]
-            placeholder:text-zinc-400
+            ${textColor || "text-[var(--color-foreground)]"}
+            ${textColor ? "placeholder:text-[var(--color-brown)] placeholder:opacity-60" : "placeholder:text-zinc-400"}
             ${
               centerText
                 ? "text-center"
@@ -125,8 +133,18 @@ export default function Input({
           `}
         />
 
+        {isPasswordType && (
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="ml-2 text-[var(--color-primary)] hover:text-[var(--color-primary-active)] transition-colors focus:outline-none cursor-pointer"
+          >
+            {showPassword ? <FaEyeSlash className="text-lg" /> : <FaEye className="text-lg" />}
+          </button>
+        )}
+
         {suffixText && (
-          <span className={`ml-2 ${currentSize.input}`}>
+          <span className={`ml-2 ${currentSize.input} ${textColor || "text-[var(--color-foreground)]"}`}>
             {suffixText}
           </span>
         )}

@@ -77,9 +77,9 @@ public class ImplAreaSeguraService implements AreaSeguraService {
     @Override
     public AreaSeguraResDTO findById(String id) {
         Optional<AreaSegura> areaSegura = areaSeguraRepository.findById(id);
-        return areaSegura.map(area -> mapper.map(area, AreaSeguraResDTO.class)).orElseGet(() -> {
+        return areaSegura.map(area -> mapper.map(area, AreaSeguraResDTO.class)).orElseThrow(() -> {
             logger.error("Área segura não encontrada com ID: {}", id);
-            return null;
+            return new ResourceNotFoundException("Área Segura", "ID", id);
         });
     }
 

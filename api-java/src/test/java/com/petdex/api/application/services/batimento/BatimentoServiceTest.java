@@ -70,6 +70,7 @@ public class BatimentoServiceTest {
         Batimento batimento = new Batimento();
         batimento.setFrequenciaMedia(90);
 
+        Mockito.when(validation.existAnimal(Mockito.anyString())).thenReturn(true);
         Mockito.when(repository.findFirstByAnimalOrderByDataDesc(animalId)).thenReturn(Optional.of(batimento));
 
         // ação

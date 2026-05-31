@@ -1,0 +1,120 @@
+<USER_REQUEST>
+só uma coisinha, na statusbar, colocar uma sombrina bem de leve para separar dos fundos, bem suave ein, igual no flutter import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '/models/animal.dart';
+import '/models/heartbeat_data.dart';
+import '/models/latest_heartbeat.dart';
+import '/models/websocket_message.dart'; // HeartrateUpdate
+import '/services/animal_service.dart';
+import '/services/websocket_service.dart';
+import '/services/animal_stats_service.dart'; // <- nova
+import '/theme/app_theme.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:PetDex/components/ui/heart_line_chart.dart';
+
+class StatusBar extends StatefulWidget {
+  final String animalId;
+  final bool isConnected;
+
+  const StatusBar({
+    super.key,
+    required this.animalId,
+    required this.isConnected,
+  });
+
+  @override
+  State<StatusBar> createState() => _StatusBarState();
+}
+
+class _StatusBarState extends State<StatusBar>
+    with SingleTickerProviderStateMixin {
+  bool _isExpanded = false;
+  bool _isClosing = false; // indica que está em processo de fechamento
+  bool _showExpandedContent =
+      false; // mantém conteúdo visível até o fim da animação de fechamento
+  bool _showArrowDown = false; // controla quando a seta muda de direção
+  late final AnimationController _animationController;
+  late Animation<double> _heightAnimation;
+
+  final AnimalService _animalService = AnimalService();
+  final WebSocketService _webSocketService = WebSocketService();
+  final AnimalStatsService _statsService =
+      AnimalStatsService(); // <- para API Python
+
+  Animal? _animalInfo;
+  LatestHeartbeat? _latestHeartbeat;
+  List<HeartbeatData>? _heartbeatHistory; // <- dados reais da API
+  bool _isLoading = true;
+  int _retryCount = 0;
+  Timer? _retryTimer;
+  StreamSubscription<HeartrateUpdate>? _heartrateSubscription;
+
+  static const double _collapsedHeight = 160.0;
+
+  @override
+  
+<truncated 11747 bytes>
+     ),
+                  ),
+                  const SizedBox(width: 4),
+                  const FaIcon(
+                    FontAwesomeIcons.heartPulse,
+                    color: AppColors.orange,
+                    size: 24,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    'BPM',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.brown,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 0.0),
+              child: Row(
+                children: [
+                  Transform.rotate(
+                    angle: -1.57,
+                    child: const FaIcon(
+                      batteryIcon,
+                      color: Colors.green,
+                      size: 18,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '$batteryLevel%',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: AppColors.brown,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-05-19T19:41:50-03:00.
+
+The user's current state is as follows:
+Active Document: c:\Users\luizf\OneDrive\Documentos\Projetos\petdex\web\components\ui\AnimalLocationCard.tsx (LANGUAGE_TSX)
+Cursor is on line: 1
+Other open documents:
+- c:\Users\luizf\OneDrive\Documentos\Projetos\petdex\web\components\ui\AnimalLocationCard.tsx (LANGUAGE_TSX)
+Running terminal commands:
+- npm run dev (in c:\Users\luizf\OneDrive\Documentos\Projetos\petdex\web, running for 16m16s)
+</ADDITIONAL_METADATA>

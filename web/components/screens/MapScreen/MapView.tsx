@@ -38,7 +38,7 @@ export default function MapView({
   const circleRef = useRef<google.maps.Circle | null>(null);
 
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY?.trim() || "",
     libraries,
   });
 

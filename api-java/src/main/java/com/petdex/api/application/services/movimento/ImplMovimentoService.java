@@ -16,6 +16,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Date;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 @Service
 public class ImplMovimentoService implements MovimentoService {
@@ -56,9 +59,25 @@ public class ImplMovimentoService implements MovimentoService {
     }
 
     @Override
-    public Page<MovimentoResDTO> findAllByAnimalId(String animalId, PageDTO pageDTO) {
+    public Page<MovimentoResDTO> findAllByAnimalId(String animalId, LocalDate dataInicio, LocalDate dataFim, PageDTO pageDTO) {
+        if (!validation.existAnimal(animalId)) {
+            throw new ResourceNotFoundException("Animal", "ID", animalId);
+        }
         pageDTO.sortByNewest();
-        Page<Movimento> batimentosPage = movimentoRepository.findAllByAnimal(animalId, pageDTO.mapPage());
+        Page<Movimento> batimentosPage;
+        
+        if (dataInicio != null) {
+            Date start = Date.from(dataInicio.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            Date end;
+            if (dataFim != null) {
+                end = Date.from(dataFim.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant());
+            } else {
+                end = Date.from(dataInicio.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant());
+            }
+            batimentosPage = movimentoRepository.findAllByAnimalAndDataBetween(animalId, start, end, pageDTO.mapPage());
+        } else {
+            batimentosPage = movimentoRepository.findAllByAnimal(animalId, pageDTO.mapPage());
+        }
 
         List<MovimentoResDTO> dtoList = batimentosPage.getContent().stream()
                 .map(b -> mapper.map(b, MovimentoResDTO.class))
@@ -68,9 +87,25 @@ public class ImplMovimentoService implements MovimentoService {
     }
 
     @Override
-    public Page<MovimentoResDTO> findAllByColeiraId(String coleiraId, PageDTO pageDTO) {
+    public Page<MovimentoResDTO> findAllByColeiraId(String coleiraId, LocalDate dataInicio, LocalDate dataFim, PageDTO pageDTO) {
+        if (!validation.existColeira(coleiraId)) {
+            throw new ResourceNotFoundException("Coleira", "ID", coleiraId);
+        }
         pageDTO.sortByNewest();
-        Page<Movimento> batimentosPage = movimentoRepository.findAllByColeira(coleiraId, pageDTO.mapPage());
+        Page<Movimento> batimentosPage;
+        
+        if (dataInicio != null) {
+            Date start = Date.from(dataInicio.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            Date end;
+            if (dataFim != null) {
+                end = Date.from(dataFim.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant());
+            } else {
+                end = Date.from(dataInicio.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant());
+            }
+            batimentosPage = movimentoRepository.findAllByColeiraAndDataBetween(coleiraId, start, end, pageDTO.mapPage());
+        } else {
+            batimentosPage = movimentoRepository.findAllByColeira(coleiraId, pageDTO.mapPage());
+        }
 
         List<MovimentoResDTO> dtoList = batimentosPage.getContent().stream()
                 .map(b -> mapper.map(b, MovimentoResDTO.class))

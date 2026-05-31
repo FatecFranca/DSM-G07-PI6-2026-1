@@ -6,10 +6,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;
+import java.util.Date;
 
 public interface LocalizacaoRepository extends MongoRepository<Localizacao, String> {
     Page<Localizacao> findAllByAnimal(String animal, Pageable pageable);
+    Page<Localizacao> findAllByAnimalAndDataBetween(String animal, Date dataInicio, Date dataFim, Pageable pageable);
     Page<Localizacao> findAllByColeira(String coleira, Pageable pageable);
+    Page<Localizacao> findAllByColeiraAndDataBetween(String coleira, Date dataInicio, Date dataFim, Pageable pageable);
 
     /**
      * Busca a última localização registrada de um animal (ordenada por data decrescente)

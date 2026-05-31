@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.springframework.security.authentication.BadCredentialsException;
 import java.util.Optional;
 
 @Service
@@ -37,13 +38,13 @@ public class ImplAuthService implements AuthService {
         Usuario usuario = usuarioRepository.findByEmail(loginReqDTO.getEmail())
                 .orElseThrow(() -> {
                     logger.error("Falha no login: Usuário não encontrado com e-mail {}", loginReqDTO.getEmail());
-                    return new RuntimeException("Credenciais inválidas");
+                    return new BadCredentialsException("Credenciais inválidas");
                 });
 
 
         if (!encryptionService.validatePassword(loginReqDTO.getSenha(), usuario.getSenha())) {
             logger.error("Falha no login: Senha incorreta para o usuário {}", loginReqDTO.getEmail());
-            throw new RuntimeException("Credenciais inválidas");
+            throw new BadCredentialsException("Credenciais inválidas");
         }
 
         String token = tokenService.generateToken(usuario.getId(), usuario.getEmail());

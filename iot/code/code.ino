@@ -359,7 +359,7 @@ void enviarBatimento(int media, String timestamp) {
   String endpoint = String(serverName) + "/telemetria/batimento";
   HTTPClient http;
   String jsonData = "{";
-  jsondata += "\"type\": \"heart_rate\", ";
+  jsonData += "\"type\": \"heart_rate\", ";
   jsonData += "\"frequenciaMedia\": \"" + String(media) + "\", ";
   jsonData += "\"coleira\": \"" + coleiraId + "\", ";
   jsonData += "\"animal\": \"" + animalId + "\", ";
@@ -392,7 +392,7 @@ void enviarLocalizacao(double latitude, double longitude, String timestamp) {
   String endpoint = String(serverName) + "/telemetria/localizacao";
   HTTPClient http;
   String jsonData = "{";
-  jsondata += "\"type\": \"location\", ";
+  jsonData += "\"type\": \"location\", ";
   jsonData += "\"latitude\": \"" + String(latitude, 6) + "\", ";
   jsonData += "\"longitude\": \"" + String(longitude, 6) + "\", ";
   jsonData += "\"coleira\": \"" + coleiraId + "\", ";
@@ -426,7 +426,7 @@ void enviarMovimento(double accX, double accY, double accZ, double angleX, doubl
   String endpoint = String(serverName) + "/telemetria/movimento";
   HTTPClient http;
   String jsonData = "{";
-  jsondata += "\"type\": \"movement\", ";
+  jsonData += "\"type\": \"movement\", ";
   jsonData += "\"acelerometroX\": \"" + String(accX) + "\", ";
   jsonData += "\"acelerometroY\": \"" + String(accY) + "\", ";
   jsonData += "\"acelerometroZ\": \"" + String(accZ) + "\", ";

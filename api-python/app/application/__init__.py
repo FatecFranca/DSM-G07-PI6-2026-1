@@ -1,0 +1,3 @@
+from app.application.services.checkup_service import CheckupService
+from app.application.services.estatistica_service import EstatisticaService
+from app.application.services.recomendacao_service import RecomendacaoService

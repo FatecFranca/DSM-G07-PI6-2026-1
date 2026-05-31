@@ -6,7 +6,6 @@
 
 Bem-vindo à API de Análise de Dados da PetDex! Desenvolvida com **Python** e **FastAPI**, esta API é o coração analítico do nosso ecossistema. Ela é responsável por **transformar os dados brutos coletados pela coleira em insights acionáveis** e executar o **modelo de Inteligência Artificial** que identifica a espécie do animal, capacitando os donos a cuidarem melhor da saúde de seus pets.
 
----
 
 ## ⚙️ Tecnologias Utilizadas
 
@@ -22,6 +21,36 @@ Bem-vindo à API de Análise de Dados da PetDex! Desenvolvida com **Python** e *
 * **Google Cloud** (Plataforma de hospedagem da API)
 
 ---
+
+# 📡 Hospedagem da API
+
+A API está hospedada em um servidor **Google Cloud** e pode ser acessada através do link:
+
+🔗 **API Base:** [http://34.24.9.134:8083](http://34.24.9.134:8083)
+
+📘 **Documentação Interativa (Swagger):** [http://34.24.9.134:8083/docs](http://34.24.9.134:8083/docs)
+
+### 🔐 Autenticação JWT
+
+Todos os endpoints (exceto `/health`) requerem autenticação via **JWT (JSON Web Tokens)**.
+
+**Fluxo de Autenticação:**
+
+1. O aplicativo mobile faz login na **API Java** (endpoint `POST /auth/login`)
+2. A API Java retorna um **token JWT**
+3. O aplicativo envia esse token no header `Authorization: Bearer <token>` para a **API Python**
+4. A API Python valida o token usando a mesma chave secreta (`JWT_SECRET`) configurada na API Java
+
+### **🔑 Credenciais de Teste**
+
+Para testar a API, utilize as seguintes credenciais na API Java:
+
+```json
+{
+  "email": "henriquealmeidaflorentino@gmail.com",
+  "senha": "senha123"
+}
+```
 
 ## 🧠 Objetivo da API
 
@@ -114,6 +143,21 @@ Este documento contém:
 
 ---
 
+## 🏛️ Arquitetura do Projeto (DDD)
+
+A API Python foi estruturada seguindo os princípios do **Domain-Driven Design (DDD)** e da Arquitetura Limpa (Clean Architecture). Essa abordagem organiza o código em camadas, separando as responsabilidades e garantindo que as regras de negócio fiquem isoladas de tecnologias externas.
+
+A estrutura do diretório `app/` está dividida nas seguintes camadas principais:
+
+- 📁 **`domain/` (Domínio):** O núcleo da aplicação. Contém as entidades, objetos de valor e as regras de negócio puras do sistema. Não possui dependências com frameworks externos.
+- 📁 **`application/` (Aplicação):** Contém os casos de uso (Use Cases) e serviços da aplicação. Coordena o fluxo de dados entre o domínio e a infraestrutura, orquestrando as operações de análise e IA.
+- 📁 **`infraestructure/` (Infraestrutura):** Lida com os detalhes técnicos e integrações externas. Inclui a comunicação com a API Java via HTTP, configuração do modelo de IA (PMML) e outras dependências de baixo nível.
+- 📁 **`view/` (Apresentação/Rotas):** É a porta de entrada da API. Contém os endpoints (routers) do FastAPI, responsáveis por receber as requisições HTTP, encaminhá-las para a camada de aplicação e retornar as respostas adequadas.
+
+Essa separação arquitetural traz inúmeros benefícios, como **alta testabilidade**, facilidade de **manutenção** e uma melhor **escalabilidade** para o crescimento do projeto.
+
+---
+
 ## 🔬 Conectando a Ciência de Dados à Saúde do Seu Pet
 
 O verdadeiro poder desta API está em como suas funcionalidades se traduzem em recursos visuais e práticos para o usuário. Cada cálculo tem um propósito: dar ao dono do pet a tranquilidade e as informações necessárias para tomar decisões importantes.
@@ -151,35 +195,6 @@ Ao identificar um batimento com baixa probabilidade de ocorrência, o tutor é a
 
 ---
 
-## 📡 Endpoints da API
-
-A API está hospedada em um servidor **Google Cloud** e pode ser acessada através do link:
-
-🔗 **API Base:** [http://34.24.9.134:8083](http://34.24.9.134:8083)
-
-📘 **Documentação Interativa (Swagger):** [http://34.24.9.134:8083/docs](http://34.24.9.134:8083/docs)
-
-### 🔐 Autenticação JWT
-
-Todos os endpoints (exceto `/health`) requerem autenticação via **JWT (JSON Web Tokens)**.
-
-**Fluxo de Autenticação:**
-
-1. O aplicativo mobile faz login na **API Java** (endpoint `POST /auth/login`)
-2. A API Java retorna um **token JWT**
-3. O aplicativo envia esse token no header `Authorization: Bearer <token>` para a **API Python**
-4. A API Python valida o token usando a mesma chave secreta (`JWT_SECRET`) configurada na API Java
-
-### **🔑 Credenciais de Teste**
-
-Para testar a API, utilize as seguintes credenciais na API Java:
-
-```json
-{
-  "email": "henriquealmeidaflorentino@gmail.com",
-  "senha": "senha123"
-}
-```
 
 ### **📋 Rotas Disponíveis**
 

@@ -3,6 +3,7 @@ package com.petdex.api.view;
 import com.petdex.api.application.services.areasegura.AreaSeguraService;
 import com.petdex.api.application.contracts.dto.areasegura.AreaSeguraReqDTO;
 import com.petdex.api.application.contracts.dto.areasegura.AreaSeguraResDTO;
+import com.petdex.api.infrastructure.exception.ResourceNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -87,7 +88,7 @@ public class AreaSeguraController {
     public ResponseEntity<AreaSeguraResDTO> findById(@PathVariable String id) {
         AreaSeguraResDTO areaSegura = areaSeguraService.findById(id);
         if (areaSegura == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new ResourceNotFoundException("Área Segura", "ID", id);
         }
         return new ResponseEntity<>(areaSegura, HttpStatus.OK);
     }
@@ -120,7 +121,7 @@ public class AreaSeguraController {
         Optional<AreaSeguraResDTO> areaSegura = areaSeguraService.findByAnimalId(animalId);
         return areaSegura
                 .map(area -> new ResponseEntity<>(area, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException("Área Segura", "Animal ID", animalId));
     }
 
     @Operation(

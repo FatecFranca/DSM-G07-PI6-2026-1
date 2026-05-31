@@ -4,7 +4,7 @@
 
 # 🧠 API em Java — Coleira Inteligente
 
-Esta é a API RESTful desenvolvida com **Java** e **Spring Boot**, responsável por receber os dados enviados pela coleira inteligente, realizar o cadastro de usuários e animais no banco de dados, e transmitir atualizações em tempo real via **WebSocket** para o aplicativo mobile.
+Esta é a API RESTful desenvolvida com **Java** e **Spring Boot**, responsável por receber os dados de telemetria enviados pela coleira inteligente, realizar o cadastro de usuários e animais no banco de dados, gerenciar áreas seguras e disparar notificações em tempo real via **WebSocket** para as interfaces frontend (Mobile e Web).
 
 ---
 
@@ -12,35 +12,30 @@ Esta é a API RESTful desenvolvida com **Java** e **Spring Boot**, responsável 
 
 - **Java 21**
 - **Spring Boot**
-- **MongoDB** (Banco de dados NoSQL)
-- **JWT (JSON Web Tokens)** (Autenticação e Segurança)
-- **WebSocket + STOMP** (Comunicação em Tempo Real)
-- **SockJS** (Fallback para navegadores sem suporte WebSocket)
-- **Swagger/OpenAPI** (Documentação)
-- **Google Cloud** (Hospedagem da API)
-- **Testes**
+- **Google Cloud Pub/Sub** (Mensageria assíncrona para alta vazão de telemetria)
+- **MongoDB** (Banco de dados NoSQL de alta performance para armazenamento de telemetria)
+- **JWT (JSON Web Tokens)** (Autenticação distribuída e Segurança)
+- **WebSocket + STOMP** (Comunicação bidirecional e eventos em tempo real)
+- **SockJS** (Fallback para navegadores/clientes sem suporte WebSocket nativo)
+- **Swagger/OpenAPI 3.0** (Documentação interativa de endpoints)
+- **Google Cloud Platform** (Infraestrutura de hospedagem)
+- **Lombok** (Produtividade no código Java)
+- **JUnit & Mockito** (Testes unitários e de integração)
 
 ---
 
-## 📐 Arquitetura
+## 🚀 Infraestrutura de Hospedagem
 
-A API foi desenvolvida seguindo o padrão **DDD (Domain-Driven Design)**, escolhido pela facilidade de organizar as regras de negócio e manter o código desacoplado e escalável.
 
-A estrutura do projeto é composta por:
+A API está hospedada em um servidor **Google Cloud** com as seguintes especificações:
 
-- **Entidades (Domain):** Representam os modelos principais do sistema.
-- **DTOs (Data Transfer Objects):** Utilizados para garantir a segurança do sistema, evitando o acesso direto às entidades e controlando os dados expostos pela API.
-- **Controllers:** Responsáveis por receber as requisições HTTP e direcioná-las para os serviços.
-- **Services:** Contêm as regras de negócio e a lógica de processamento dos dados.
-- **Repositories:** Camada responsável pela persistência e acesso ao banco de dados (MongoDB).
-- **WebSocket Services:** Gerenciam a comunicação em tempo real, enviando notificações instantâneas para os clientes conectados.
-- **Security Interceptors:** Validam autenticação JWT tanto em requisições HTTP quanto em conexões WebSocket.
+- **Sistema Operacional:** Ubuntu
+- **Tipo de Máquina:** Standard B1ms
+- **IP Público:** 34.24.9.134
+- **Porta:** 8080
 
----
+Esta infraestrutura garante alta disponibilidade e performance para o processamento dos dados da coleira inteligente em tempo real.
 
-## 📡 Endpoints
-
-A API está hospedada em um servidor **Google Cloud** (Ubuntu) e pode ser acessada através do link:
 
 🔗 **API Base:** [http://34.24.9.134:8080](http://34.24.9.134:8080)
 
@@ -70,29 +65,177 @@ Para testar os endpoints protegidos, utilize as seguintes credenciais:
 
 ---
 
+## 📣 Arquitetura de Mensageria Pub/Sub (Google Cloud Pub/Sub)
+
+Para garantir que a **Coleira Inteligente** consiga transmitir dados de sensores com alta frequência sem sofrer atrasos ou bloqueios causados por operações de persistência no banco de dados, a API utiliza uma arquitetura baseada em eventos com o **Google Cloud Pub/Sub**.
+
+### 🔄 Fluxo de Processamento de Telemetria
+
+```mermaid
+sequenceDiagram
+    participant Coleira as Coleira Inteligente
+    participant API as API Java (Publisher)
+    participant PubSub as GCP Pub/Sub (petdex-telemetry)
+    participant Worker as Subscritor Assíncrono (Java)
+    participant DB as MongoDB
+    participant WS as WebSocket Broker
+    participant Clientes as Frontends (Web / Mobile)
+
+    Coleira->>API: POST /telemetria/{tipo} (Dados do sensor)
+    Note over Coleira,API: Envio imediato para não bloquear sensores
+    API->>PubSub: Publica mensagem no tópico
+    API-->>Coleira: HTTP 200 OK (Retorno rápido)
+    
+    Note over PubSub,Worker: Escuta assíncrona da subscrição
+    PubSub->>Worker: Envia mensagem (petdex-telemetry-sub)
+    Worker->>DB: Salva os dados (Batimento/Localização/Movimento)
+    
+    alt Se for Batimento ou Localização
+        Worker->>WS: Envia evento atualizado
+        WS->>Clientes: Transmite via WebSocket (/topic/animal/{id})
+    end
+    Worker-->>PubSub: Acknowledge (ACK)
+```
+
+1. **Ingestão Ultrarrápida (Publishing)**: A coleira inteligente faz uma requisição HTTP `POST` para os endpoints de `/telemetria/*`. A API converte o payload em JSON e o publica imediatamente no tópico `petdex-telemetry` da GCP, retornando `HTTP 200 OK` de forma instantânea. Isso libera a CPU do dispositivo embarcado da coleira para realizar novas leituras de sensores sem aguardar a gravação em disco.
+2. **Processamento em Segundo Plano (Subscribing)**: A classe `TelemetrySubscriberAsyncPubSub` roda continuamente em segundo plano consumindo mensagens da subscrição `petdex-telemetry-sub` na GCP de forma desacoplada.
+3. **Roteamento & Validação**: O `TelemetrySubscriberService` interpreta a mensagem JSON, identifica o tipo de telemetria (`heart_rate`, `location` ou `movement`) utilizando a enum `TelemetryTypeEnum` e delega aos serviços de negócio específicos.
+4. **Persistência & Atualização Real-Time**: Os serviços salvam os dados no MongoDB. Ao persistir dados de **localização** e **batimentos cardíacos**, a API invoca o `NotificationService` para transmitir esses novos dados via **WebSocket** em tempo real para os aplicativos mobile e web conectados.
+
+### 📋 Schemas de Mensagens JSON (Pub/Sub)
+
+Ao publicar no tópico `petdex-telemetry`, as mensagens devem seguir a estrutura definida pelas DTOs correspondentes ao campo `type`:
+
+#### 1. Batimento Cardíaco (`heart_rate`)
+Utiliza a classe `BatimentoPublisherDTO`:
+```json
+{
+  "type": "heart_rate",
+  "data": "2026-05-30T14:30:00.000+00:00",
+  "frequenciaMedia": 75,
+  "animal": "507f1f77bcf86cd799439011",
+  "coleira": "507f1f77bcf86cd799439011"
+}
+```
+
+#### 2. Localização (`location`)
+Utiliza a classe `LocalizacaoPublisherDTO`:
+```json
+{
+  "type": "location",
+  "data": "2026-05-30T14:30:00.000+00:00",
+  "latitude": -23.550520,
+  "longitude": -46.633308,
+  "animal": "507f1f77bcf86cd799439011",
+  "coleira": "507f1f77bcf86cd799439011"
+}
+```
+
+#### 3. Movimento (`movement`)
+Utiliza a classe `MovimentoPublisherDTO`:
+```json
+{
+  "type": "movement",
+  "data": "2026-05-30T14:30:00.000+00:00",
+  "acelerometroX": 0.5,
+  "acelerometroY": 0.3,
+  "acelerometroZ": 9.8,
+  "giroscopioX": 0.1,
+  "giroscopioY": 0.2,
+  "giroscopioZ": 0.05,
+  "animal": "507f1f77bcf86cd799439011",
+  "coleira": "507f1f77bcf86cd799439011"
+}
+```
+
+---
+
+
+## 🔌 Comunicação em Tempo Real via WebSocket
+
+Para manter as telas do **Frontend Web (Next.js)** e do **Aplicativo Mobile (Flutter)** atualizadas instantaneamente assim que a telemetria é processada pelo Pub/Sub, a API Java implementa **WebSockets com o protocolo STOMP**.
+
+### 🔄 Fluxo de Notificação
+
+1. Quando o subscritor do Pub/Sub recebe e valida uma mensagem de telemetria, ela é salva no MongoDB.
+2. Imediatamente após salvar, o `WebSocketNotificationAdapter` transmite o dado para o broker de mensagens do Spring.
+3. O broker direciona a mensagem para o canal correspondente ao ID do animal monitorado.
+4. Qualquer cliente autenticado (Web ou Mobile) que esteja escutando o canal recebe instantaneamente o payload JSON.
+
+### 🔗 Endpoint e Protocolos
+
+* **Endpoint de Conexão**: `ws://localhost:8080/ws-petdex` (ou `ws://34.24.9.134:8080/ws-petdex` em produção)
+* **Autenticação**: O token JWT deve ser fornecido via cabeçalho HTTP de handshake (`Authorization: Bearer <token>`) ou como query parameter `?token=<token>`.
+* **Protocolos**: STOMP por cima do WebSocket, com suporte a **SockJS** para conexões legadas.
+
+### 📣 Tópicos de Assinatura (Subscription Channels)
+
+Os clientes (Web/Mobile) devem se inscrever em tópicos específicos para monitoramento em tempo real:
+
+| Tópico | Descrição | Dados Transmitidos |
+|:-------|:----------|:-------------------|
+| `/topic/animal/{animalId}` | Escuta as telemetrias em tempo real de um pet específico | Localização (latitude/longitude) e Batimentos Cardíacos (BPM) |
+
+---
+
+
+## 📐 Arquitetura DDD (Domain-Driven Design)
+
+A API foi desenvolvida seguindo os princípios de **Domain-Driven Design (DDD)**, visando manter o domínio de negócios limpo, desacoplado de dependências tecnológicas e facilmente testável.
+
+A estrutura de pacotes do projeto é organizada em quatro camadas principais:
+
+```
+src/main/java/com/petdex/api/
+├── domain/                  # Camada de Domínio (Core do Negócio)
+│   └── collections/         # Entidades de domínio (Mapeadas para o MongoDB)
+├── application/             # Camada de Aplicação (Orquestração e Casos de Uso)
+│   ├── contracts/           # DTOs, Enums e Interfaces de Notificação
+│   └── services/            # Serviços de aplicação contendo regras de negócio
+├── infrastructure/          # Camada de Infraestrutura (Detalhes de Tecnologia)
+│   ├── config/              # Configurações do Spring e WebSocket
+│   ├── mongodb/             # Repositórios do Spring Data MongoDB (Persistência)
+│   ├── messaging/           # Implementação concreta dos Adaptadores Pub/Sub GCP
+│   ├── security/            # Filtros JWT e configurações de criptografia
+│   └── websocket/           # Emissor físico das mensagens WebSocket
+└── view/                    # Camada de Apresentação (Interface Externa)
+    └── *Controllers.java   # Controladores REST HTTP expostos aos clientes
+```
+
+### 🧱 Detalhe das Camadas
+
+* **Domínio (`domain`)**: Contém as entidades ricas do sistema como `Animal`, `AreaSegura`, `Usuario`, `Coleira`, `Batimento`, `Localizacao` e `Movimento`. Elas encapsulam o estado e o comportamento principal do modelo de dados.
+* **Aplicação (`application`)**:
+  * **Contracts**: Define DTOs separadas para entrada (`ReqDTO`), saída (`ResDTO`) e filas (`PublisherDTO`), enums como `TelemetryTypeEnum` e interfaces como `NotificationService`.
+  * **Services**: Implementa o fluxo de controle de cadastros, atualizações e validações. Não conhece os endpoints HTTP e interage com persistência e mensageria apenas por interfaces abstratas.
+* **Infraestrutura (`infrastructure`)**: Contém adaptadores tecnológicos que dão suporte à aplicação, incluindo bibliotecas da Google Cloud para o Pub/Sub, segurança com JWT e a integração com o banco MongoDB.
+* **Visão (`view`)**: Controladores REST. Lida com protocolos de comunicação externa, validações básicas do payload (`@Valid`), cabeçalhos de resposta HTTP e anotações OpenAPI (Swagger).
+
+---
+
 ## 🔐 Sistema de Autenticação JWT
 
 A API implementa autenticação baseada em **JWT (JSON Web Tokens)** para garantir a segurança das comunicações.
 
 ### **Como Funciona**
 
-1. **Login:** O usuário envia suas credenciais (email e senha) para o endpoint de autenticação
-2. **Geração do Token:** A API valida as credenciais no banco de dados e gera um token JWT assinado
-3. **Uso do Token:** O token deve ser incluído no header `Authorization: Bearer <token>` em todas as requisições protegidas
-4. **Validação:** A API valida o token em cada requisição, verificando sua assinatura e expiração
+1. **Login:** O usuário envia suas credenciais (email e senha) para o endpoint `/auth/login`.
+2. **Geração do Token:** A API valida as credenciais no banco de dados e gera um token JWT assinado.
+3. **Uso do Token:** O token deve ser incluído no header `Authorization: Bearer <token>` em todas as requisições protegidas.
+4. **Validação:** A API valida o token em cada requisição, verificando sua assinatura e expiração.
 
 ### **Fluxo de Tokens**
 
 A arquitetura da PetDex implementa um fluxo de autenticação em cascata:
 
 ```
-Cliente (Mobile) → API Python → API Java
+Cliente (Mobile/Web) → API Python → API Java
 ```
 
-- O aplicativo mobile obtém o token JWT através do login na API Java
-- Quando o mobile faz requisições para a API Python, envia o token JWT
-- A API Python valida e propaga o token para a API Java
-- A API Java valida o token e processa a requisição
+- O aplicativo mobile e o portal web obtêm o token JWT através do login na API Java.
+- Quando o frontend faz requisições para a API Python, envia o token JWT.
+- A API Python valida e propaga o token para a API Java.
+- A API Java valida o token e processa a requisição.
 
 Isso garante que a autenticação seja mantida em toda a cadeia de comunicação, sem necessidade de múltiplos logins.
 
@@ -122,149 +265,90 @@ O `JWT_SECRET` é usado para assinar e validar os tokens JWT. Como a arquitetura
 
 ---
 
-## 🔌 Comunicação em Tempo Real via WebSocket
-
-A API implementa **WebSocket com protocolo STOMP** para permitir comunicação bidirecional em tempo real entre a coleira inteligente, o servidor e o aplicativo mobile.
-
-### **Como Funciona**
-
-O WebSocket permite que o aplicativo mobile receba atualizações instantâneas sem precisar fazer polling (requisições repetidas). Quando a coleira envia novos dados para a API, estes são automaticamente transmitidos para todos os clientes conectados.
-
-### **Endpoint de Conexão**
-
-🔗 **WebSocket Endpoint:** `ws://34.24.9.134:8080/ws-petdex`
-
-**Para desenvolvimento local:** `ws://localhost:8080/ws-petdex`
-
-### **Autenticação WebSocket**
-
-A conexão WebSocket também requer autenticação JWT. O token pode ser enviado de duas formas:
-
-1. **Via Header Authorization:**
-   ```
-   Authorization: Bearer <seu_token_jwt>
-   ```
-
-2. **Via Query Parameter:**
-   ```
-   ws://34.24.9.134:8080/ws-petdex?token=<seu_token_jwt>
-   ```
-
-### **Tópicos de Inscrição**
-
-Após conectar, o cliente deve se inscrever em tópicos específicos para receber atualizações:
-
-| Tópico | Descrição | Dados Transmitidos |
-|:-------|:----------|:-------------------|
-| `/topic/animal/{animalId}` | Recebe todas as atualizações de um animal específico | Localização e batimentos cardíacos |
-
-**Exemplo de inscrição:**
-```javascript
-stompClient.subscribe('/topic/animal/68194120636f719fcd5ee5fd', function(message) {
-    const data = JSON.parse(message.body);
-    console.log('Atualização recebida:', data);
-});
-```
-
-### **Tipos de Mensagens**
-
-A API envia dois tipos de mensagens via WebSocket:
-
-#### **1. Atualização de Localização (`location_update`)**
-
-```json
-{
-  "messageType": "location_update",
-  "animalId": "68194120636f719fcd5ee5fd",
-  "coleiraId": "coleira-001",
-  "latitude": -23.5505,
-  "longitude": -46.6333,
-  "timestamp": "2025-01-18T14:30:00Z",
-  "isOutsideSafeZone": false,
-  "distanciaDoPerimetro": 15.5
-}
-```
-
-**Campos:**
-- `messageType`: Tipo da mensagem (sempre `location_update`)
-- `animalId`: ID do animal
-- `coleiraId`: ID da coleira
-- `latitude`: Latitude da localização atual
-- `longitude`: Longitude da localização atual
-- `timestamp`: Data e hora da medição
-- `isOutsideSafeZone`: Indica se o pet está fora da área segura
-- `distanciaDoPerimetro`: Distância em metros do perímetro da área segura
-
-#### **2. Atualização de Batimento Cardíaco (`heartrate_update`)**
-
-```json
-{
-  "messageType": "heartrate_update",
-  "animalId": "68194120636f719fcd5ee5fd",
-  "coleiraId": "coleira-001",
-  "frequenciaMedia": 85,
-  "timestamp": "2025-01-18T14:30:00Z"
-}
-```
-
-**Campos:**
-- `messageType`: Tipo da mensagem (sempre `heartrate_update`)
-- `animalId`: ID do animal
-- `coleiraId`: ID da coleira
-- `frequenciaMedia`: Frequência cardíaca média em BPM (batimentos por minuto)
-- `timestamp`: Data e hora da medição
-
-### **Tecnologias Utilizadas**
-
-- **STOMP (Simple Text Oriented Messaging Protocol):** Protocolo de mensagens sobre WebSocket
-- **SockJS:** Biblioteca de fallback para navegadores que não suportam WebSocket nativo
-- **Spring WebSocket:** Implementação do Spring Framework para WebSocket
-- **Message Broker em Memória:** Gerenciamento de mensagens e tópicos
-
-### **Cliente de Teste**
-
-A API inclui um **cliente HTML de teste** localizado em `cliente-teste-websocket.html` na raiz do projeto. Este cliente permite:
-
-- Conectar ao WebSocket
-- Inscrever-se em tópicos de animais específicos
-- Visualizar mensagens em tempo real
-- Testar a conexão e autenticação
-
-**Como usar:**
-
-1. Abra o arquivo `cliente-teste-websocket.html` em um navegador
-2. Configure a URL do servidor (padrão: `http://localhost:8080/ws-petdex`)
-3. Insira o ID do animal que deseja monitorar
-4. Clique em "Conectar"
-5. Observe as atualizações em tempo real
-
-### **Integração com o Aplicativo Mobile**
-
-O aplicativo Flutter se conecta automaticamente ao WebSocket quando o usuário faz login e:
-
-- Recebe atualizações de localização em tempo real no mapa
-- Atualiza os batimentos cardíacos instantaneamente
-- Envia notificações quando o pet sai da área segura
-- Mantém os dados sincronizados sem necessidade de refresh manual
-
----
-
 ## 🧩 Banco de Dados
 
 Utilizamos o **MongoDB** como banco de dados pela sua alta disponibilidade, flexibilidade na estrutura de dados e facilidade de escalabilidade. Como se trata de um projeto com dados variáveis (ex.: batimentos cardíacos, localização, movimentação), um banco NoSQL foi a melhor escolha.
 
 ---
 
-## 🚀 Infraestrutura de Hospedagem
+## 📡 Recursos e Endpoints da API
 
-A API está hospedada em um servidor **Google Cloud** com as seguintes especificações:
+A API oferece uma gama completa de recursos para gerenciar o ecossistema da coleira inteligente PetDex. Todos os endpoints abaixo (exceto `/auth/login` e `/health`) exigem autenticação JWT no cabeçalho: `Authorization: Bearer <seu_token_jwt>`.
 
-- **Sistema Operacional:** Ubuntu
-- **Tipo de Máquina:** Standard B1ms
-- **IP Público:** 34.24.9.134
-- **Porta:** 8080
+### 1. Autenticação e Segurança (`/auth`)
+* `POST /auth/login`: Autentica o usuário no sistema e retorna o token JWT assinado.
 
-Esta infraestrutura garante alta disponibilidade e performance para o processamento dos dados da coleira inteligente em tempo real.
+### 2. Gestão de Usuários (`/usuario`)
+* `GET /usuario`: Lista todos os usuários cadastrados.
+* `GET /usuario/{id}`: Busca um usuário pelo ID único.
+* `POST /usuario`: Cadastra um novo usuário no sistema.
+* `PUT /usuario/{id}`: Atualiza os dados de um usuário existente.
+* `DELETE /usuario/{id}`: Exclui um usuário do sistema.
+
+### 3. Gestão de Animais (`/animal`)
+* `GET /animal`: Lista todos os pets cadastrados.
+* `GET /animal/{id}`: Detalha informações de um animal por ID.
+* `GET /animal/usuario/{usuarioId}`: Lista todos os animais que pertencem a um tutor específico.
+* `POST /animal`: Cadastra um animal (vinculando raça, espécie e tutor).
+* `PUT /animal/{id}`: Atualiza informações cadastrais do animal.
+* `DELETE /animal/{id}`: Remove o animal.
+
+### 4. Áreas Seguras e Cerca Virtual (`/areas-seguras`)
+* `POST /areas-seguras`: Cria ou atualiza a cerca virtual do pet (Latitude, Longitude e Raio em metros).
+* `GET /areas-seguras/{id}`: Consulta uma área segura pelo seu ID.
+* `GET /areas-seguras/animal/{animalId}`: Retorna a cerca virtual configurada para um animal específico.
+* `DELETE /areas-seguras/animal/{animalId}`: Remove a cerca virtual configurada do animal.
+
+### 5. Coleiras Inteligentes (`/coleira`)
+* `GET /coleira`: Lista todas as coleiras registradas no sistema.
+* `GET /coleira/{id}`: Detalha uma coleira por ID.
+* `POST /coleira`: Cadastra uma nova coleira inteligente.
+* `PUT /coleira/{id}`: Atualiza o status/dados da coleira.
+* `DELETE /coleira/{id}`: Remove o dispositivo do sistema.
+
+### 6. Catálogo de Espécies (`/especie`)
+* `GET /especie`: Lista as espécies registradas (ex: Cão, Gato).
+* `GET /especie/{id}`: Detalha uma espécie específica.
+* `POST /especie`: Cadastra uma nova espécie.
+* `PUT /especie/{id}`: Atualiza dados da espécie.
+* `DELETE /especie/{id}`: Remove uma espécie.
+
+### 7. Catálogo de Raças (`/raca`)
+* `GET /raca`: Lista todas as raças de animais disponíveis.
+* `GET /raca/{id}`: Detalha uma raça específica.
+* `GET /raca/especie/{idEspecie}`: Filtra raças pertencentes a uma espécie específica.
+* `POST /raca`: Cadastra uma nova raça.
+* `PUT /raca/{id}`: Atualiza dados da raça.
+* `DELETE /raca/{id}`: Exclui uma raça do catálogo.
+
+### 8. Históricos de Telemetria (Dashboards e Relatórios)
+Esses endpoints retornam os dados consolidados e persistidos no banco de dados para a montagem de históricos e gráficos nas interfaces web e mobile:
+* **Batimentos Cardíacos (`/batimento`)**:
+  * `GET /batimento/{idBatimento}`: Detalha um registro específico de batimento.
+  * `GET /batimento/animal/{idAnimal}`: Lista o histórico de batimentos cardíacos de um animal.
+  * `GET /batimento/coleira/{idColeira}`: Lista batimentos capturados por uma coleira específica.
+  * `GET /batimento/animal/{idAnimal}/ultimo`: Obtém o último batimento registrado do pet.
+  * `POST /batimento`: Insere manualmente um dado de batimento.
+* **Localização (`/localizacao`)**:
+  * `GET /localizacao/{idLocalizacao}`: Detalha um registro de coordenada.
+  * `GET /localizacao/animal/{idAnimal}`: Histórico de posições geográficas do animal.
+  * `GET /localizacao/coleira/{idColeira}`: Coordenadas capturadas por uma coleira específica.
+  * `GET /localizacao/animal/{idAnimal}/ultima`: Obtém a última coordenada geográfica conhecida do pet.
+  * `POST /localizacao`: Insere manualmente um ponto de coordenada.
+* **Movimentação do Sensor (`/movimento`)**:
+  * `GET /movimento/{idMovimento}`: Detalha leituras de movimento específicas.
+  * `GET /movimento/animal/{idAnimal}`: Histórico de leituras do acelerômetro e giroscópio do animal.
+  * `GET /movimento/coleira/{idColeira}`: Leituras capturadas por uma coleira.
+  * `POST /movimento`: Insere manualmente leituras de aceleração e rotação.
+
+### 9. Interface de Telemetria da Coleira Inteligente (`/telemetria`)
+Estes são os endpoints de alto desempenho expostos para a ingestão rápida de dados em tempo de execução pela coleira:
+* `POST /telemetria/batimento`: Envia dados de frequência cardíaca diretamente ao Pub/Sub.
+* `POST /telemetria/localizacao`: Envia dados de coordenadas (latitude/longitude) diretamente ao Pub/Sub.
+* `POST /telemetria/movimento`: Envia dados de aceleração e giroscópio diretamente ao Pub/Sub.
+
+### 10. Status da API (`/health`)
+* `GET /health` ou `GET /`: Retorna o status de integridade do servidor.
 
 ---
 
@@ -293,7 +377,14 @@ git clone https://github.com/FatecFranca/DSM-P4-G07-2025-1.git
 cd DSM-P4-G07-2025-1/api-java
 ```
 
-**2. Configure as variáveis de ambiente:**
+**2. Configure as credenciais da Google Cloud (Pub/Sub):**
+
+A API necessita de acesso a uma conta de serviço GCP com permissões para interagir com o GCP Pub/Sub.
+
+1. Baixe o arquivo JSON com a chave da conta de serviço da GCP.
+2. Salve este arquivo na raiz do projeto `api-java` com o nome `google-cloud-key.json`.
+
+**3. Configure as variáveis de ambiente:**
 
 Crie um arquivo `.env` na raiz do projeto (copie do `.env.example`):
 
@@ -308,14 +399,17 @@ Edite o arquivo `.env` e configure as seguintes variáveis:
 JWT_SECRET=sua_chave_secreta_aqui_deve_ser_longa_e_complexa
 
 # Configuração do MongoDB
-MONGODB_URI=mongodb://localhost:27017/petdex
+DATABASE_URI=mongodb://localhost:27017/petdex
 MONGODB_DATABASE=petdex
+
+# Configurações de Mensageria GCP Pub/Sub
+GCP_CREDENTIALS=file:./google-cloud-key.json
 
 # Porta da aplicação (padrão: 8080)
 SERVER_PORT=8080
 ```
 
-**3. Instale as dependências:**
+**4. Instale as dependências:**
 
 ```bash
 # Usando Maven Wrapper (recomendado)
@@ -325,7 +419,7 @@ SERVER_PORT=8080
 mvn clean install
 ```
 
-**4. Execute a aplicação:**
+**5. Execute a aplicação:**
 
 ```bash
 # Usando Maven Wrapper
@@ -335,7 +429,7 @@ mvn clean install
 mvn spring-boot:run
 ```
 
-**5. Acesse a aplicação:**
+**6. Acesse a aplicação:**
 
 - **API Base:** `http://localhost:8080`
 - **Documentação Swagger:** `http://localhost:8080/swagger`
@@ -368,16 +462,6 @@ docker build -t petdex-api-java .
 # Executar o container
 docker run -p 8080:8080 --env-file .env petdex-api-java
 ```
-
-### **⚙️ Configurações Adicionais**
-
-**Porta da Aplicação:**
-- A API roda por padrão na porta **8080**
-- Para alterar, modifique a variável `SERVER_PORT` no arquivo `.env`
-
-**Banco de Dados:**
-- Certifique-se de que o MongoDB está rodando antes de iniciar a API
-- A string de conexão pode ser configurada via `MONGODB_URI` no `.env`
 
 ---
 

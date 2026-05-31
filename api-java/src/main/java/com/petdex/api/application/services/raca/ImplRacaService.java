@@ -7,6 +7,7 @@ import com.petdex.api.application.contracts.dto.raca.RacaReqDTO;
 import com.petdex.api.application.contracts.dto.raca.RacaResDTO;
 import com.petdex.api.infrastructure.mongodb.EspecieRepository;
 import com.petdex.api.infrastructure.mongodb.RacaRepository;
+import com.petdex.api.infrastructure.exception.ResourceNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -49,18 +50,18 @@ public class ImplRacaService implements RacaService {
     @Override
     public RacaResDTO create(RacaReqDTO racaReqDTO) {
 
-        Especie especie = especieRepository.findById(racaReqDTO.getEspecie()).orElseThrow(() -> new RuntimeException("Especie com o ID não encontrada: " + racaReqDTO.getEspecie()));
+        Especie especie = especieRepository.findById(racaReqDTO.getEspecie()).orElseThrow(() -> new ResourceNotFoundException("Espécie", "ID", racaReqDTO.getEspecie()));
         return mapper.map(racaRepository.save(mapper.map(racaReqDTO, Raca.class)), RacaResDTO.class);
     }
 
     @Override
     public RacaResDTO update(String id, RacaReqDTO racaReqDTO) {
 
-        Raca racaUptade = racaRepository.findById(id).orElseThrow(()->new RuntimeException("Não foi possível encontrar uma raça com o ID: "+ id));
+        Raca racaUptade = racaRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Raça", "ID", id));
 
         if(racaReqDTO.getNome() != null) racaUptade.setNome(racaReqDTO.getNome());
         if(racaReqDTO.getEspecie()!=null) {
-            Especie especie = especieRepository.findById(racaReqDTO.getEspecie()).orElseThrow(() -> new RuntimeException("Especie com o ID não encontrada: " + racaReqDTO.getEspecie()));
+            Especie especie = especieRepository.findById(racaReqDTO.getEspecie()).orElseThrow(() -> new ResourceNotFoundException("Espécie", "ID", racaReqDTO.getEspecie()));
             racaUptade.setEspecie(racaReqDTO.getEspecie());
         }
 
@@ -106,7 +107,7 @@ public class ImplRacaService implements RacaService {
     @Override
     public void delete(String id) {
        Raca racaDelete =  racaRepository.findById(id)
-               .orElseThrow(() -> new RuntimeException("Não foi possível encontrar uma raça com o ID: " + id));
+               .orElseThrow(() -> new ResourceNotFoundException("Raça", "ID", id));
        racaRepository.delete(racaDelete);
     }
 }

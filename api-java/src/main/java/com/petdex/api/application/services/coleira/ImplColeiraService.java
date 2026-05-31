@@ -15,8 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.petdex.api.infrastructure.exception.ResourceNotFoundException;
 import org.springframework.web.client.HttpServerErrorException;
-
 import java.util.List;
 
 @Service
@@ -38,7 +38,7 @@ public class ImplColeiraService implements ColeiraService {
         return mapper.map(coleiraRepository.findById(id)
                         .orElseThrow(() -> {
                             logger.error("Coleira não encontrada com ID: {}", id);
-                            return new HttpServerErrorException(HttpStatus.NOT_FOUND, "Não existe coleira com o ID: " + id);
+                            return new ResourceNotFoundException("Coleira", "ID", id);
                         }),
                 ColeiraResDTO.class);
     }
@@ -67,7 +67,7 @@ public class ImplColeiraService implements ColeiraService {
         Animal animal = animalRepository.findById(coleiraReqDTO.getAnimal())
                 .orElseThrow(() -> {
                     logger.error("Falha ao criar coleira: Animal ID {} não encontrado", coleiraReqDTO.getAnimal());
-                    return new HttpServerErrorException(HttpStatus.NOT_FOUND, "Não existe animal com o ID: " + coleiraReqDTO.getAnimal());
+                    return new ResourceNotFoundException("Animal", "ID", coleiraReqDTO.getAnimal());
                 });
 
         ColeiraResDTO res = mapper.map(coleiraRepository.save(mapper.map(coleiraReqDTO, Coleira.class)), ColeiraResDTO.class);
@@ -78,12 +78,12 @@ public class ImplColeiraService implements ColeiraService {
     @Override
     public ColeiraResDTO update(String id, ColeiraReqDTO coleiraReqDTO) {
         Coleira coleiraUpdate = coleiraRepository.findById(id).orElseThrow(() ->
-                new HttpServerErrorException(HttpStatus.NOT_FOUND, "Não existe coleira com o ID: " + id));
+                new ResourceNotFoundException("Coleira", "ID", id));
 
         if (coleiraReqDTO.getDescricao() != null) coleiraUpdate.setDescricao(coleiraReqDTO.getDescricao());
         if (coleiraReqDTO.getAnimal() != null) {
             Animal animal = animalRepository.findById(coleiraReqDTO.getAnimal())
-                    .orElseThrow(() -> new HttpServerErrorException(HttpStatus.NOT_FOUND, "Não existe aniaml com o ID: " + coleiraReqDTO.getAnimal()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Animal", "ID", coleiraReqDTO.getAnimal()));
 
             coleiraUpdate.setAnimal(coleiraReqDTO.getAnimal());
         }
@@ -93,7 +93,7 @@ public class ImplColeiraService implements ColeiraService {
     @Override
     public void delete(String id) {
         Coleira coleiraDelete = coleiraRepository.findById(id).orElseThrow(() ->
-                new HttpServerErrorException(HttpStatus.NOT_FOUND, "Não existe coleira com o ID: " + id));
+                new ResourceNotFoundException("Coleira", "ID", id));
 
         coleiraRepository.delete(coleiraDelete);
     }
