@@ -53,28 +53,6 @@ def custom_openapi():
         routes=app.routes,
     )
 
-    # Adiciona a definição de segurança Bearer (preservando os schemas existentes)
-    if "components" not in openapi_schema:
-        openapi_schema["components"] = {}
-
-    if "securitySchemes" not in openapi_schema["components"]:
-        openapi_schema["components"]["securitySchemes"] = {}
-
-    openapi_schema["components"]["securitySchemes"]["Bearer"] = {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT",
-        "description": "Token JWT obtido da API Java. Formato: Bearer <token>"
-    }
-
-    # Aplica a segurança Bearer a todos os endpoints (exceto /health)
-    for path, path_item in openapi_schema["paths"].items():
-        if path != "/health":
-            for method in path_item:
-                if method in ["get", "post", "put", "delete", "patch"]:
-                    if "security" not in path_item[method]:
-                        path_item[method]["security"] = [{"Bearer": []}]
-
     # ------------------ Injeta respostas de erro globais ------------------
     if "schemas" not in openapi_schema["components"]:
         openapi_schema["components"]["schemas"] = {}
