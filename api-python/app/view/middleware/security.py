@@ -8,7 +8,11 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import Tuple
 from app.application.services.jwt_service import jwt_service
 
-oauth2_scheme = HTTPBearer()
+oauth2_scheme = HTTPBearer(
+    scheme_name="Bearer", 
+    description="Token JWT obtido da API Java. Formato: Bearer <token>",
+    bearerFormat="JWT"
+)
 
 async def verify_jwt_token(auth: HTTPAuthorizationCredentials = Depends(oauth2_scheme)) -> Tuple[str, str]:
     """
