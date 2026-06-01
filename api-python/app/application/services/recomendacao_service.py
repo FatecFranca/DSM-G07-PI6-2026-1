@@ -15,7 +15,7 @@ class RecomendacaoService:
         self.java_api_client = JavaAPIClient()
         
         # Caminho absoluto para os artefatos de ML
-        PASTA_MODELOS = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'modelos_ia'))
+        PASTA_MODELOS = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'models', 'recomendation'))
         try:
             self.modelo_marca = joblib.load(os.path.join(PASTA_MODELOS, 'modelo_knn_racao.pkl'))
             self.scaler_marca = joblib.load(os.path.join(PASTA_MODELOS, 'scaler_knn_brand.pkl'))
