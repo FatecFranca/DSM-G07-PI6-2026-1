@@ -5,11 +5,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(
         name = "Resposta Coleira",
         description = "Informações detalhadas de uma coleira retornadas pela API",
-        example = "{\"id\": \"507f1f77bcf86cd799439011\", \"descricao\": \"Coleira GPS Azul\", \"animal\": \"507f1f77bcf86cd799439011\"}"
+        example = "{\"id\": \"6819475baa479949daccea94\", \"descricao\": \"Coleira GPS Azul\", \"animal\": \"68194120636f719fcd5ee5fd\"}"
 )
 public class ColeiraResDTO {
 
-    @Schema(description = "Código único identificador da coleira", example = "507f1f77bcf86cd799439011")
+    @Schema(description = "Código único identificador da coleira", example = "6819475baa479949daccea94")
     private String id;
 
     @Schema(description = "Descrição ou identificação da coleira", example = "Coleira GPS Azul")

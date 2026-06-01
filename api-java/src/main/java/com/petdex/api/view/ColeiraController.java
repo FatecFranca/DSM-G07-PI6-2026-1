@@ -32,7 +32,7 @@ public class ColeiraController {
             description = "Consulta os detalhes de uma coleira específica através do seu identificador único",
             tags = {"Coleira"},
             parameters = {
-                    @Parameter(name = "id", description = "Código identificador da coleira que será consultada", required = true, example = "507f1f77bcf86cd799439011")
+                    @Parameter(name = "id", description = "Código identificador da coleira que será consultada", required = true, example = "6819475baa479949daccea94")
             },
             responses = {
                     @ApiResponse(
@@ -136,7 +136,7 @@ public class ColeiraController {
                          "É possível atualizar a descrição e/ou o animal associado à coleira.",
             tags = {"Coleira"},
             parameters = {
-                    @Parameter(name = "id", description = "Código identificador da coleira que será atualizada", required = true, example = "507f1f77bcf86cd799439011")
+                    @Parameter(name = "id", description = "Código identificador da coleira que será atualizada", required = true, example = "6819475baa479949daccea94")
             },
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Dados atualizados da coleira",
@@ -170,7 +170,7 @@ public class ColeiraController {
             description = "Remove uma coleira do sistema através do seu identificador único",
             tags = {"Coleira"},
             parameters = {
-                    @Parameter(name = "id", description = "Código identificador da coleira que será deletada", required = true, example = "507f1f77bcf86cd799439011")
+                    @Parameter(name = "id", description = "Código identificador da coleira que será deletada", required = true, example = "6819475baa479949daccea94")
             },
             responses = {
                     @ApiResponse(

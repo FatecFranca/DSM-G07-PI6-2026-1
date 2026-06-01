@@ -10,14 +10,14 @@ import java.util.Date;
 @Schema(
         name = "Resposta Área Segura",
         description = "Informações detalhadas de uma área segura retornadas pela API",
-        example = "{\"id\": \"507f1f77bcf86cd799439011\", \"animal\": \"507f1f77bcf86cd799439011\", \"latitude\": -23.550520, \"longitude\": -46.633308, \"raio\": 500.0, \"dataCriacao\": \"2024-01-15T10:30:00.000+00:00\", \"dataAtualizacao\": \"2024-01-20T14:45:00.000+00:00\"}"
+        example = "{\"id\": \"507f1f77bcf86cd799439011\", \"animal\": \"68194120636f719fcd5ee5fd\", \"latitude\": -23.550520, \"longitude\": -46.633308, \"raio\": 500.0, \"dataCriacao\": \"2024-01-15T10:30:00.000+00:00\", \"dataAtualizacao\": \"2024-01-20T14:45:00.000+00:00\"}"
 )
 public class AreaSeguraResDTO {
 
     @Schema(description = "Código único identificador da área segura", example = "507f1f77bcf86cd799439011")
     private String id;
 
-    @Schema(description = "ID do animal associado à área segura", example = "507f1f77bcf86cd799439011")
+    @Schema(description = "ID do animal associado à área segura", example = "68194120636f719fcd5ee5fd")
     private String animal;
 
     @Schema(description = "Latitude do ponto central da área segura", example = "-23.550520")

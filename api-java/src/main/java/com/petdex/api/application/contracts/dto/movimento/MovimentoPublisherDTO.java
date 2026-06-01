@@ -38,7 +38,7 @@ public class MovimentoPublisherDTO {
     @Schema(description = "Valor da rotação do giroscópio no eixo Z no momento da coleta em graus/s", example = "0.05", requiredMode = Schema.RequiredMode.REQUIRED)
     private Double giroscopioZ;
 
-    @Schema(description = "ID do animal que teve o movimento coletado", example = "507f1f77bcf86cd799439011", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "ID do animal que teve o movimento coletado", example = "68194120636f719fcd5ee5fd", requiredMode = Schema.RequiredMode.REQUIRED)
     private String animal;
 
     @Schema(description = "ID da coleira que realizou a coleta do movimento do animal", example = "507f1f77bcf86cd799439011", requiredMode = Schema.RequiredMode.REQUIRED)

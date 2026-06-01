@@ -11,7 +11,7 @@ import java.util.List;
 )
 public class ExemploRespostaPageColeira {
 
-    @Schema(description = "Lista de coleiras retornadas na página atual", example = "[{\"id\": \"507f1f77bcf86cd799439011\", \"descricao\": \"Coleira GPS Azul\", \"animal\": \"507f1f77bcf86cd799439011\"}]")
+    @Schema(description = "Lista de coleiras retornadas na página atual", example = "[{\"id\": \"6819475baa479949daccea94\", \"descricao\": \"Coleira GPS Azul\", \"animal\": \"68194120636f719fcd5ee5fd\"}]")
     private List<ColeiraResDTO> content;
 
     @Schema(description = "Número da página atual (começa em 0)", example = "0")

@@ -38,7 +38,7 @@ public class AnimalController {
             summary = "Buscar animal por ID",
             description = "Retorna os detalhes de um animal específico através do seu identificador único",
             parameters = {
-                    @Parameter(name = "id", description = "ID do animal que se deseja consultar", required = true, example = "507f1f77bcf86cd799439011")
+                    @Parameter(name = "id", description = "ID do animal que se deseja consultar", required = true, example = "68194120636f719fcd5ee5fd")
             }
     )
     @ApiResponses(value = {
@@ -74,7 +74,7 @@ public class AnimalController {
             summary = "Buscar animal pelo ID do usuário",
             description = "Retorna o animal associado a um usuário específico através do ID do usuário",
             parameters = {
-                    @Parameter(name = "usuarioId", description = "ID do usuário que se deseja consultar o animal", required = true, example = "507f1f77bcf86cd799439011")
+                    @Parameter(name = "usuarioId", description = "ID do usuário que se deseja consultar o animal", required = true, example = "68194120636f719fcd5ee5fd")
             }
     )
     @ApiResponses(value = {
@@ -111,7 +111,7 @@ public class AnimalController {
             summary = "Atualizar o cadastro de um animal",
             description = "Atualiza as informações de um animal existente no sistema através do seu ID",
             parameters = {
-                    @Parameter(name = "id", description = "ID do animal que se deseja atualizar", required = true, example = "507f1f77bcf86cd799439011")
+                    @Parameter(name = "id", description = "ID do animal que se deseja atualizar", required = true, example = "68194120636f719fcd5ee5fd")
             }
     )
     @ApiResponses(value = {
@@ -181,7 +181,7 @@ public class AnimalController {
             summary = "Deletar um animal",
             description = "Remove um animal do sistema através do seu ID",
             parameters = {
-                    @Parameter(name = "id", description = "ID do animal que se deseja deletar", required = true, example = "507f1f77bcf86cd799439011")
+                    @Parameter(name = "id", description = "ID do animal que se deseja deletar", required = true, example = "68194120636f719fcd5ee5fd")
             }
     )
     @ApiResponses(value = {

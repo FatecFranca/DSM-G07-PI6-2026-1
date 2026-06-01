@@ -62,7 +62,7 @@ public class BatimentoController {
                          "Os resultados são ordenados por data de coleta (mais recentes primeiro) por padrão.",
             tags = {"Batimentos"},
             parameters = {
-                    @Parameter(name = "idAnimal", description = "Código identificador do animal que terá os batimentos consultados", required = true, example = "507f1f77bcf86cd799439011"),
+                    @Parameter(name = "idAnimal", description = "Código identificador do animal que terá os batimentos consultados", required = true, example = "68194120636f719fcd5ee5fd"),
                     @Parameter(name = "page", description = "Número da página que será feita a requisição", example = "0", schema = @Schema(implementation = Integer.class)),
                     @Parameter(name = "size", description = "Quantidade máxima de elementos por página", example = "10", schema = @Schema(implementation = Integer.class)),
                     @Parameter(
@@ -124,7 +124,7 @@ public class BatimentoController {
                          "Os resultados são ordenados por data de coleta (mais recentes primeiro) por padrão.",
             tags = {"Batimentos"},
             parameters = {
-                    @Parameter(name = "idColeira", description = "Código identificador da coleira que terá os batimentos consultados", required = true, example = "507f1f77bcf86cd799439011"),
+                    @Parameter(name = "idColeira", description = "Código identificador da coleira que terá os batimentos consultados", required = true, example = "6819475baa479949daccea94"),
                     @Parameter(name = "page", description = "Número da página que será feita a requisição", example = "0", schema = @Schema(implementation = Integer.class)),
                     @Parameter(name = "size", description = "Quantidade máxima de elementos por página", example = "10", schema = @Schema(implementation = Integer.class)),
                     @Parameter(
@@ -186,7 +186,7 @@ public class BatimentoController {
             description = "Consulta o batimento cardíaco mais recente registrado de um animal específico, ordenado por data de coleta",
             tags = {"Batimentos"},
             parameters = {
-                    @Parameter(name = "idAnimal", description = "Código identificador do animal que terá o último batimento consultado", required = true, example = "507f1f77bcf86cd799439011")
+                    @Parameter(name = "idAnimal", description = "Código identificador do animal que terá o último batimento consultado", required = true, example = "68194120636f719fcd5ee5fd")
             },
             responses = {
                     @ApiResponse(

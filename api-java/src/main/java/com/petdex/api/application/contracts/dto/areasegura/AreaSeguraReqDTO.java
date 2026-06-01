@@ -11,11 +11,11 @@ import jakarta.validation.constraints.Positive;
 @Schema(
         name = "Requisição Área Segura",
         description = "Dados necessários para criar ou atualizar uma área segura de um animal",
-        example = "{\"animal\": \"507f1f77bcf86cd799439011\", \"latitude\": -23.550520, \"longitude\": -46.633308, \"raio\": 500.0}"
+        example = "{\"animal\": \"68194120636f719fcd5ee5fd\", \"latitude\": -23.550520, \"longitude\": -46.633308, \"raio\": 500.0}"
 )
 public class AreaSeguraReqDTO {
 
-    @Schema(description = "ID do animal que terá a área segura configurada", example = "507f1f77bcf86cd799439011", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "ID do animal que terá a área segura configurada", example = "68194120636f719fcd5ee5fd", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "ID do animal não pode ser nulo ou vazio")
     private String animal;
 

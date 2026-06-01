@@ -7,7 +7,7 @@ import java.util.Date;
 @Schema(
         name = "Resposta Batimento",
         description = "Informações detalhadas de um batimento cardíaco retornadas pela API",
-        example = "{\"id\": \"507f1f77bcf86cd799439011\", \"data\": \"2024-01-20T14:30:00.000+00:00\", \"frequenciaMedia\": 75, \"animal\": \"507f1f77bcf86cd799439011\", \"coleira\": \"507f1f77bcf86cd799439011\"}"
+        example = "{\"id\": \"507f1f77bcf86cd799439011\", \"data\": \"2024-01-20T14:30:00.000+00:00\", \"frequenciaMedia\": 75, \"animal\": \"68194120636f719fcd5ee5fd\", \"coleira\": \"6819475baa479949daccea94\"}"
 )
 public class BatimentoResDTO {
 
@@ -20,10 +20,10 @@ public class BatimentoResDTO {
     @Schema(description = "Frequência cardíaca média coletada do animal em batimentos por minuto (BPM)", example = "75")
     private Integer frequenciaMedia;
 
-    @Schema(description = "ID do animal que teve o batimento cardíaco coletado", example = "507f1f77bcf86cd799439011")
+    @Schema(description = "ID do animal que teve o batimento cardíaco coletado", example = "68194120636f719fcd5ee5fd")
     private String animal;
 
-    @Schema(description = "ID da coleira que realizou a coleta do batimento cardíaco", example = "507f1f77bcf86cd799439011")
+    @Schema(description = "ID da coleira que realizou a coleta do batimento cardíaco", example = "6819475baa479949daccea94")
     private String coleira;
 
     public BatimentoResDTO() {
