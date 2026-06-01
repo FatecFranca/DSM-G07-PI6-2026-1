@@ -157,27 +157,15 @@ class RespostaCheckupTesteDTO(BaseModel):
         }
 
 
-class RecomendacaoEstiloVidaDTO(BaseModel):
-    """
-    Metas de estilo de vida saudável recomendadas pela IA.
-    """
-    caminhada_diaria_km_meta: float = Field(..., description="Meta recomendada de caminhada diária em km", example=3.5)
-    nivel_atividade_meta: str = Field(..., description="Nível de atividade física ideal recomendado", example="Moderado")
-    tempo_brincadeira_horas_meta: float = Field(..., description="Meta recomendada de horas de brincadeira diária", example=1.5)
-    tipo_dieta_meta: str = Field(..., description="Tipo de dieta alimentar recomendado", example="Ração Seca")
-    justificativa: str = Field(..., description="Explicação detalhada e diagnóstico clínico-nutricional em português", example="O pet está saudável...")
-
-
 class RecomendacaoIADTO(BaseModel):
     """
-    Recomendação nutricional e de estilo de vida gerada pela IA.
+    Recomendação nutricional gerada pela IA.
     """
     animalId: str = Field(..., example="68194120636f719fcd5ee5fd")
     nome: str = Field(..., example="Rex")
     diagnostico: str = Field(..., example="Sobrepeso")
     peso_ideal_esperado: float = Field(..., example=20.0)
     sugestoes_racao: list[str] = Field(..., example=["Ração Light Plus", "Ração Weight Control"])
-    recomendacoes_estilo_vida: RecomendacaoEstiloVidaDTO = Field(..., description="Metas recomendadas de estilo de vida saudável")
 
     class Config:
         schema_extra = {
@@ -186,13 +174,6 @@ class RecomendacaoIADTO(BaseModel):
                 "nome": "Rex",
                 "diagnostico": "Sobrepeso",
                 "peso_ideal_esperado": 20.0,
-                "sugestoes_racao": ["Ração Light Plus", "Ração Weight Control"],
-                "recomendacoes_estilo_vida": {
-                    "caminhada_diaria_km_meta": 3.5,
-                    "nivel_atividade_meta": "Moderado",
-                    "tempo_brincadeira_horas_meta": 1.5,
-                    "tipo_dieta_meta": "Ração Seca",
-                    "justificativa": "O pet está saudável..."
-                }
+                "sugestoes_racao": ["Ração Light Plus", "Ração Weight Control"]
             }
         }

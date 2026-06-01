@@ -33,8 +33,7 @@ class TestRecomendacaoServiceDDD(unittest.TestCase):
         self.assertEqual(res["diagnostico"], "Sobrepeso")
         self.assertEqual(res["peso_ideal_esperado"], 23.26)
         self.assertTrue(len(res["sugestoes_racao"]) > 0)
-        self.assertEqual(res["recomendacoes_estilo_vida"]["nivel_atividade_meta"], "Muito Ativo")
-        self.assertEqual(res["recomendacoes_estilo_vida"]["tipo_dieta_meta"], "Úmida")
+        self.assertNotIn("recomendacoes_estilo_vida", res)
         print("[TESTE OK] Cão em Sobrepeso (Labrador) validado com sucesso!")
 
     def test_recomendacao_abaixo_peso(self):
@@ -51,7 +50,8 @@ class TestRecomendacaoServiceDDD(unittest.TestCase):
         
         self.assertEqual(res["diagnostico"], "Abaixo do Peso")
         self.assertEqual(res["peso_ideal_esperado"], 21.7)
-        self.assertEqual(res["recomendacoes_estilo_vida"]["tipo_dieta_meta"], "Ração Seca")
+        self.assertTrue(len(res["sugestoes_racao"]) > 0)
+        self.assertNotIn("recomendacoes_estilo_vida", res)
         print("[TESTE OK] Cão Abaixo do Peso (Golden) validado com sucesso!")
 
     def test_recomendacao_peso_ideal(self):
@@ -68,6 +68,8 @@ class TestRecomendacaoServiceDDD(unittest.TestCase):
         
         self.assertEqual(res["diagnostico"], "Peso Ideal")
         self.assertEqual(res["peso_ideal_esperado"], 23.38)
+        self.assertTrue(len(res["sugestoes_racao"]) > 0)
+        self.assertNotIn("recomendacoes_estilo_vida", res)
         print("[TESTE OK] Cão em Peso Ideal (Beagle) validado com sucesso!")
 
     def test_srd_porte_calculado_e_caminhada_opcional(self):
@@ -84,8 +86,8 @@ class TestRecomendacaoServiceDDD(unittest.TestCase):
         
         self.assertEqual(res["diagnostico"], "Sobrepeso") # 12.0 > 7.0 * 1.15
         self.assertEqual(res["peso_ideal_esperado"], 7.0)
-        # O porte deve ter sido calculado como Médio pois peso atual é 12.0 kg
-        # E a caminhada diária foi processada corretamente sem dar erro
+        self.assertTrue(len(res["sugestoes_racao"]) > 0)
+        self.assertNotIn("recomendacoes_estilo_vida", res)
         print("[TESTE OK] Cão SRD com porte calculado e caminhada opcional validado com sucesso!")
 
     def test_validacoes_erros(self):
