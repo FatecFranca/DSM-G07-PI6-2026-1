@@ -14,7 +14,6 @@ class RecomendacaoService:
     def __init__(self):
         self.java_api_client = JavaAPIClient()
         
-        # Caminho absoluto para os artefatos de ML
         PASTA_MODELOS = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'models', 'recomendation'))
         try:
             self.modelo_marca = joblib.load(os.path.join(PASTA_MODELOS, 'modelo_knn_racao.pkl'))
@@ -39,8 +38,6 @@ class RecomendacaoService:
         if self.modelo_marca is None or self.scaler_marca is None or self.encoders is None:
             raise ValueError("Os modelos de recomendação da IA não foram carregados corretamente no servidor.")
 
-        # 1. VALIDAÇÃO E EXTRAÇÃO DOS INPUTS OBRIGATÓRIOS
-        # Peso Atual
         peso_val = dados_animal.get("peso")
         if peso_val is None:
             raise ValueError("O peso do animal é obrigatório para gerar a recomendação.")
@@ -51,7 +48,6 @@ class RecomendacaoService:
         except ValueError:
             raise ValueError("Peso do animal inválido. Deve ser um número maior que zero.")
 
-        # Idade
         data_nasc = dados_animal.get("dataNascimento")
         if not data_nasc:
             raise ValueError("A data de nascimento do animal é obrigatória.")
@@ -59,7 +55,6 @@ class RecomendacaoService:
         if idade is None:
             raise ValueError("Idade do animal inválida ou não pôde ser calculada a partir da data de nascimento.")
 
-        # Caminhada Diária Atual (KM) - Opcional, com fallback para 0.0
         caminhada_val = dados_animal.get("caminhada_diaria_km") or dados_animal.get("caminhadaDiariaKm") or dados_animal.get("caminhada_diaria") or dados_animal.get("caminhadaDiaria")
         if caminhada_val is not None:
             try:
@@ -71,22 +66,17 @@ class RecomendacaoService:
         else:
             caminhada_diaria_km = 0.0
 
-        # 2. FLUXO DE INFERÊNCIA
         try:
-            # A. Peso Ideal recebido como parâmetro
             peso_ideal = round(float(peso_ideal), 2)
 
-            # B. Cálculo de Calorias RER com base no Peso Ideal
             calorias_diarias_RER = round(70 * (peso_ideal ** 0.75), 2)
 
-            # C. Predição da Marca de Ração Ideal (KNN) usando os dados reais e RER calculado
             X_brand = pd.DataFrame([{
                 'Age': idade,
                 'Weight (kg)': peso_ideal,
                 'caminhada_diaria_km': caminhada_diaria_km,
                 'calorias_diarias_RER': calorias_diarias_RER
             }])
-            # Normalizar os dados usando o scaler treinado antes da predição KNN
             X_brand_scaled = self.scaler_marca.transform(X_brand)
             predicao_brand_num = self.modelo_marca.predict(X_brand_scaled)[0]
             marca_prevista_nome = self.encoders['Marca_Racao'].inverse_transform([predicao_brand_num])[0]
@@ -94,7 +84,6 @@ class RecomendacaoService:
         except Exception as e:
             raise ValueError(f"Não foi possível obter a recomendação da IA devido a uma falha nos modelos: {str(e)}")
 
-        # 3. DIAGNÓSTICO CORPORAL COMPARATIVO
         if peso_kg > (peso_ideal * 1.15):
             status_corpo = 'Sobrepeso'
         elif peso_kg < (peso_ideal * 0.85):
@@ -102,8 +91,6 @@ class RecomendacaoService:
         else:
             status_corpo = 'Peso Ideal'
 
-        # 4. FILTRAR CATÁLOGO DE PRODUTOS
-        # O porte é calculado dinamicamente com base no peso real do animal
         if peso_kg <= 10:
             porte_pet_original = 'Pequeno'
         elif peso_kg <= 25:
@@ -119,7 +106,6 @@ class RecomendacaoService:
             match_marca = (produto.get('brand') == marca_prevista_nome)
             match_porte = (produto.get('animalSize') == "All" or produto.get('animalSize') == porte_busca)
             
-            # Filtro de nutrição baseada no status corporal
             match_nutricao = False
             if status_corpo == 'Sobrepeso':
                 match_nutricao = produto.get('condition') in ['Overweight', 'Weight Management', 'Weight Care', 'Active/Weight Management']
@@ -131,7 +117,6 @@ class RecomendacaoService:
             if match_marca and match_porte and match_nutricao:
                 sugestoes.append(produto['name'])
 
-        # Fallbacks de relaxamento de filtros se nenhum for encontrado
         if not sugestoes:
             for produto in self.catalogo:
                 if produto.get('brand') == marca_prevista_nome and (produto.get('animalSize') == "All" or produto.get('animalSize') == porte_busca):
@@ -158,7 +143,6 @@ class RecomendacaoService:
         if status_code != 200 or not dados_animal:
             raise ResourceNotFoundException("Animal não encontrado na base de dados da API Java.")
 
-        # Realiza a predição chamando a lógica do modelo de IA com o peso_ideal
         resultado = self.gerar_sugestao_nutricional(dados_animal, peso_ideal)
         
         return {
