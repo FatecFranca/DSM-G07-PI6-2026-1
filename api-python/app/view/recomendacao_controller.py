@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Path, HTTPException
+from fastapi import APIRouter, Depends, Path, HTTPException, Query
 from typing import Tuple
 from app.view.middleware.security import get_current_user
 from app.application import RecomendacaoService
@@ -12,7 +12,7 @@ recomendacao_service = RecomendacaoService()
     "/animal/{animalId}/ia-recomendacao",
     response_model=RecomendacaoIADTO,
     summary="Obter recomendação da IA",
-    description="Rota que integra a inteligência de peso ideal com os dados reais do animal para fornecer sugestões nutricionais.\n\n**Requer autenticação JWT.**",
+    description="Rota que integra a inteligência de recomendação com os dados reais do animal e o peso ideal.\n\n**Requer autenticação JWT.**",
     responses={
         200: {
             "description": "Recomendação gerada com sucesso"
@@ -22,12 +22,13 @@ recomendacao_service = RecomendacaoService()
 )
 async def obter_recomendacao_ia(
     animalId: str = Path(..., description="Identificador único do animal", example="68194120636f719fcd5ee5fd"), 
+    pesoIdeal: float = Query(..., description="Peso ideal recomendado para o animal em kg", example=25.0),
     credentials: Tuple[str, str] = Depends(get_current_user)
 ):
     """
-    Rota que integra a inteligência de peso ideal com os dados reais do animal.
+    Rota que integra a inteligência de recomendação com os dados reais do animal e o peso ideal.
 
     **Requer autenticação JWT.**
     """
     _, token = credentials
-    return recomendacao_service.obter_recomendacao_ia_animal(animalId, token)
+    return recomendacao_service.obter_recomendacao_ia_animal(animalId, pesoIdeal, token)

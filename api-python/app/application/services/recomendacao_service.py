@@ -1,86 +1,140 @@
 import json
 import os
 import logging
+import joblib
+import pandas as pd
 from typing import Dict, Any, List
 from app.infraestructure.clients.java_api_client import JavaAPIClient
 from app.infraestructure.exception.custom_exceptions import ResourceNotFoundException
+from app.domain.utils.utils import DomainUtils
 
 logger = logging.getLogger("RecomendacaoService")
-
-PESO_IDEAL_RACA = {
-    'Australian Shepherd': 23.0, 'Golden Retriever': 30.0, 'Labrador Retriever': 32.0,
-    'Poodle': 20.0, 'Siberian Husky': 22.0, 'Dachshund': 10.0, 'Chihuahua': 3.0,
-    'Boxer': 28.0, 'Bulldog': 20.0, 'German Shepherd': 35.0, 'Rottweiler': 45.0,
-    'Beagle': 12.0, 'Yorkshire Terrier': 4.0
-}
 
 class RecomendacaoService:
     def __init__(self):
         self.java_api_client = JavaAPIClient()
-
-    def _carregar_catalogo(self) -> List[Dict[str, Any]]:
-        path_food = os.path.join('pet-food-advice-api-main', 'db-food.json')
-        if os.path.exists(path_food):
-            try:
-                with open(path_food, 'r', encoding='utf-8') as f:
-                    return json.load(f)
-            except Exception as e:
-                logger.error(f"Erro ao carregar catalogo de ração: {e}")
-        else:
-            logger.warning(f"Catalogo de ração não encontrado no caminho: {path_food}")
-        return []
-
-    def gerar_sugestao_nutricional(self, dados_animal: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Recebe os dados do animal vindos da API Java e retorna a recomendação da IA.
-        """
-        raca = dados_animal.get("raca", "SRD (Sem Raça Definida)")
-        peso_atual = dados_animal.get("peso", 0)
-        # Tenta pegar o porte do JSON, se não tiver, calcula pelo peso
-        porte_pet_original = dados_animal.get("porte", "Médio") 
         
-        # 1. Definir Peso Ideal (Lógica SRD por Porte)
-        if raca == 'SRD (Sem Raça Definida)':
-            if porte_pet_original == 'Pequeno': peso_ref = 7.0
-            elif porte_pet_original == 'Médio': peso_ref = 15.0
-            else: peso_ref = 30.0
-        else:
-            peso_ref = PESO_IDEAL_RACA.get(raca, 20.0)
+        PASTA_MODELOS = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'models', 'recomendation'))
+        try:
+            self.modelo_marca = joblib.load(os.path.join(PASTA_MODELOS, 'modelo_knn_racao.pkl'))
+            self.scaler_marca = joblib.load(os.path.join(PASTA_MODELOS, 'scaler_knn_brand.pkl'))
+            self.encoders = joblib.load(os.path.join(PASTA_MODELOS, 'label_encoders.pkl'))
+            
+            with open(os.path.join(PASTA_MODELOS, 'db-food.json'), 'r', encoding='utf-8') as f:
+                self.catalogo = json.load(f)
+            logger.info("Todos os modelos de IA carregados com sucesso no RecomendacaoService.")
+        except Exception as e:
+            logger.error(f"Erro ao carregar arquivos da IA no RecomendacaoService: {e}")
+            self.modelo_marca = None
+            self.scaler_marca = None
+            self.encoders = None
+            self.catalogo = []
 
-        # 2. Diagnóstico Corporal
-        if peso_atual > (peso_ref * 1.15):
+    def gerar_sugestao_nutricional(self, dados_animal: Dict[str, Any], peso_ideal: float) -> Dict[str, Any]:
+        """
+        Recebe os dados do animal vindos da API Java e gera a recomendação utilizando
+        o classificador KNN com base no peso ideal recebido.
+        """
+        if self.modelo_marca is None or self.scaler_marca is None or self.encoders is None:
+            raise ValueError("Os modelos de recomendação da IA não foram carregados corretamente no servidor.")
+
+        peso_val = dados_animal.get("peso")
+        if peso_val is None:
+            raise ValueError("O peso do animal é obrigatório para gerar a recomendação.")
+        try:
+            peso_kg = float(peso_val)
+            if peso_kg <= 0:
+                raise ValueError
+        except ValueError:
+            raise ValueError("Peso do animal inválido. Deve ser um número maior que zero.")
+
+        data_nasc = dados_animal.get("dataNascimento")
+        if not data_nasc:
+            raise ValueError("A data de nascimento do animal é obrigatória.")
+        idade = DomainUtils.calcular_idade(data_nasc)
+        if idade is None:
+            raise ValueError("Idade do animal inválida ou não pôde ser calculada a partir da data de nascimento.")
+
+        caminhada_val = dados_animal.get("caminhada_diaria_km") or dados_animal.get("caminhadaDiariaKm") or dados_animal.get("caminhada_diaria") or dados_animal.get("caminhadaDiaria")
+        if caminhada_val is not None:
+            try:
+                caminhada_diaria_km = float(caminhada_val)
+                if caminhada_diaria_km < 0:
+                    caminhada_diaria_km = 0.0
+            except ValueError:
+                caminhada_diaria_km = 0.0
+        else:
+            caminhada_diaria_km = 0.0
+
+        try:
+            peso_ideal = round(float(peso_ideal), 2)
+
+            calorias_diarias_RER = round(70 * (peso_ideal ** 0.75), 2)
+
+            X_brand = pd.DataFrame([{
+                'Age': idade,
+                'Weight (kg)': peso_ideal,
+                'caminhada_diaria_km': caminhada_diaria_km,
+                'calorias_diarias_RER': calorias_diarias_RER
+            }])
+            X_brand_scaled = self.scaler_marca.transform(X_brand)
+            predicao_brand_num = self.modelo_marca.predict(X_brand_scaled)[0]
+            marca_prevista_nome = self.encoders['Marca_Racao'].inverse_transform([predicao_brand_num])[0]
+
+        except Exception as e:
+            raise ValueError(f"Não foi possível obter a recomendação da IA devido a uma falha nos modelos: {str(e)}")
+
+        if peso_kg > (peso_ideal * 1.15):
             status_corpo = 'Sobrepeso'
-        elif peso_atual < (peso_ref * 0.85):
+        elif peso_kg < (peso_ideal * 0.85):
             status_corpo = 'Abaixo do Peso'
         else:
             status_corpo = 'Peso Ideal'
 
-        # 3. Match com o Catálogo
-        catalogo = self._carregar_catalogo()
-        sugestoes = []
+        if peso_kg <= 10:
+            porte_pet_original = 'Pequeno'
+        elif peso_kg <= 25:
+            porte_pet_original = 'Médio'
+        else:
+            porte_pet_original = 'Grande'
+
         mapa_porte = {'Pequeno': 'Small', 'Médio': 'Medium', 'Grande': 'Large'}
         porte_busca = mapa_porte.get(porte_pet_original, 'All')
 
-        for produto in catalogo:
-            match_porte = produto['animalSize'] == "All" or produto['animalSize'] == porte_busca
+        sugestoes = []
+        for produto in self.catalogo:
+            match_marca = (produto.get('brand') == marca_prevista_nome)
+            match_porte = (produto.get('animalSize') == "All" or produto.get('animalSize') == porte_busca)
             
+            match_nutricao = False
             if status_corpo == 'Sobrepeso':
-                match_nutricao = produto['condition'] in ['Overweight', 'Weight Management']
+                match_nutricao = produto.get('condition') in ['Overweight', 'Weight Management', 'Weight Care', 'Active/Weight Management']
             elif status_corpo == 'Abaixo do Peso':
-                match_nutricao = produto['condition'] is None or "Puppy" in produto['name']
+                match_nutricao = produto.get('condition') is None or "Puppy" in produto.get('name', '')
             else:
-                match_nutricao = produto['condition'] in [None, 'Everyday Health']
+                match_nutricao = produto.get('condition') in [None, 'Everyday Health']
 
-            if match_porte and match_nutricao:
+            if match_marca and match_porte and match_nutricao:
                 sugestoes.append(produto['name'])
+
+        if not sugestoes:
+            for produto in self.catalogo:
+                if produto.get('brand') == marca_prevista_nome and (produto.get('animalSize') == "All" or produto.get('animalSize') == porte_busca):
+                    sugestoes.append(produto['name'])
+        if not sugestoes:
+            for produto in self.catalogo:
+                if produto.get('brand') == marca_prevista_nome:
+                    sugestoes.append(produto['name'])
+        if not sugestoes:
+            sugestoes = [f"Ração recomendada da marca {marca_prevista_nome}"]
 
         return {
             "status_corporal": status_corpo,
-            "peso_referencia": peso_ref,
-            "recomendacoes": sugestoes[:2] # Retorna as 2 melhores
+            "peso_referencia": peso_ideal,
+            "recomendacoes": sugestoes[:2]
         }
 
-    def obter_recomendacao_ia_animal(self, animal_id: str, token: str) -> Dict[str, Any]:
+    def obter_recomendacao_ia_animal(self, animal_id: str, peso_ideal: float, token: str) -> Dict[str, Any]:
         """
         Orquestra a busca dos dados do animal na API Java e gera a recomendação nutricional.
         """
@@ -89,23 +143,11 @@ class RecomendacaoService:
         if status_code != 200 or not dados_animal:
             raise ResourceNotFoundException("Animal não encontrado na base de dados da API Java.")
 
-        # Extrai e mapeia informações necessárias do animal
-        raca_nome = dados_animal.get("racaNome", "SRD (Sem Raça Definida)")
-        peso = dados_animal.get("peso", 0.0)
-        porte = dados_animal.get("porte", "Médio")
-        nome = dados_animal.get("nome", "Animal")
-
-        input_dados = {
-            "raca": raca_nome,
-            "peso": peso,
-            "porte": porte
-        }
-
-        resultado = self.gerar_sugestao_nutricional(input_dados)
+        resultado = self.gerar_sugestao_nutricional(dados_animal, peso_ideal)
         
         return {
             "animalId": animal_id,
-            "nome": nome,
+            "nome": dados_animal.get("nome", "Animal"),
             "diagnostico": resultado["status_corporal"],
             "peso_ideal_esperado": resultado["peso_referencia"],
             "sugestoes_racao": resultado["recomendacoes"]

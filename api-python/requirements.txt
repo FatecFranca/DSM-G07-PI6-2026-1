@@ -12,3 +12,6 @@ python-dotenv
 pypmml
 PyJWT
 requests
+xgboost
+joblib
+mlxtend
