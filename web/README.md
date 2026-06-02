@@ -195,7 +195,7 @@ Aqui estão as capturas de tela da versão Web do PetDex:
 
 ---
 
-### **2. Tela inicial com Mapa e barra de status)**
+### **2. Tela inicial com Mapa e barra de status**
 <p align="center">
   <img src="public/images/tela-inicial.png" alt="Dashboard & Mapa PetDex Web" width="90%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
 </p>
