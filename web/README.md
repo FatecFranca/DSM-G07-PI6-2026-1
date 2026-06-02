@@ -156,12 +156,12 @@ Para testar todas as funcionalidades integradas com dados simulados e reais de t
 
 O painel Web oferece uma visualização expandida e gerencial das informações do Pet, dividida em módulos especializados:
 
-### **🔑 Tela de Login Premium**
+### **🔑 Tela de Login**
 * Tela com design responsivo (split-screen em telas grandes, com ilustração integrada no fundo).
 * Campo de senha interativo com ícone de visualização ("olhinho") para ocultar ou exibir o texto digitado.
 * Atalho para login rápido com o usuário de teste, livre de sublinhados, garantindo uma interface polida.
 
-### **🗺️ Dashboard & Mapa Principal**
+### **🗺️ Tela inicial com Mapa e barra de status**
 * **Localização em Tempo Real:** Mapa interativo carregado com a API oficial do Google Maps, mostrando a posição exata do Pet selecionado.
 * **WebSocket Stomp Integration:** Conectado diretamente à fila do servidor de mensagens para receber coordenadas GPS atualizadas instantaneamente sem necessidade de refresh.
 * **Barra Lateral de Status:** Permite alternar rapidamente entre diferentes animais de estimação do usuário e exibe dados essenciais da coleira (bateria, conectividade).
@@ -178,7 +178,7 @@ O painel Web oferece uma visualização expandida e gerencial das informações 
 * **Previsão de Enfermidades:** Interface conectada à inteligência artificial do PetDex que estima a probabilidade de condições com base nos sintomas.
 * **Direcionamento Preventivo:** Recomendações imediatas de cuidados e alertas para procurar atendimento veterinário profissional.
 
-### **📍 Cerca Virtual (Área Segura)**
+### **📍Área Segura**
 * Interface integrada para visualização do perímetro de segurança configurado para cada pet.
 * Cartões dinâmicos de status informando se o pet está seguro em casa ou fora dos limites delimitados.
 
@@ -188,14 +188,14 @@ O painel Web oferece uma visualização expandida e gerencial das informações 
 
 Aqui estão as capturas de tela da versão Web do PetDex:
 
-### **1. Tela de Login (Premium Split-Screen)**
+### **1. Tela de Login**
 <p align="center">
   <img src="public/images/tela-login.png" alt="Tela de Login PetDex Web" width="90%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
 </p>
 
 ---
 
-### **2. Dashboard & Mapa (Rastreamento em Tempo Real)**
+### **2. Tela inicial com Mapa e barra de status)**
 <p align="center">
   <img src="public/images/tela-inicial.png" alt="Dashboard & Mapa PetDex Web" width="90%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
 </p>
@@ -216,7 +216,7 @@ Aqui estão as capturas de tela da versão Web do PetDex:
 
 ---
 
-### **5. Cerca Virtual (Área Segura no Mapa)**
+### **5. Tela de Localização (Área Segura no Mapa)**
 <p align="center">
   <img src="public/images/tela-localizacao.png" alt="Cerca Virtual PetDex Web" width="90%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
 </p>
