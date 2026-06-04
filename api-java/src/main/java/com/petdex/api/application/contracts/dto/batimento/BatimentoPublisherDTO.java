@@ -22,10 +22,10 @@ public class BatimentoPublisherDTO {
     @Schema(description = "Frequência cardíaca média coletada do animal em batimentos por minuto (BPM)", example = "75", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer frequenciaMedia;
 
-    @Schema(description = "ID do animal que teve o batimento cardíaco coletado", example = "507f1f77bcf86cd799439011", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "ID do animal que teve o batimento cardíaco coletado", example = "68194120636f719fcd5ee5fd", requiredMode = Schema.RequiredMode.REQUIRED)
     private String animal;
 
-    @Schema(description = "ID da coleira que realizou a coleta do batimento cardíaco", example = "507f1f77bcf86cd799439011", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "ID da coleira que realizou a coleta do batimento cardíaco", example = "6819475baa479949daccea94", requiredMode = Schema.RequiredMode.REQUIRED)
     private String coleira;
 
 }

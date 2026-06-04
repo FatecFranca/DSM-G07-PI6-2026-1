@@ -8,11 +8,11 @@ import java.util.Date;
 @Schema(
         name = "Resposta Animal",
         description = "Informações detalhadas de um animal retornadas pela API",
-        example = "{\"id\": \"507f1f77bcf86cd799439011\", \"nome\": \"Rex\", \"dataNascimento\": \"2020-01-15\", \"sexo\": \"Macho\", \"peso\": 25.5, \"castrado\": true, \"usuario\": \"507f1f77bcf86cd799439011\", \"racaNome\": \"Labrador\", \"especieNome\": \"Cachorro\", \"caminhadaDiariaKm\": 2.5, \"porte\": \"medio\"}"
+        example = "{\"id\": \"68194120636f719fcd5ee5fd\", \"nome\": \"Rex\", \"dataNascimento\": \"2020-01-15\", \"sexo\": \"Macho\", \"peso\": 25.5, \"castrado\": true, \"usuario\": \"507f1f77bcf86cd799439011\", \"racaNome\": \"Labrador\", \"especieNome\": \"Cachorro\", \"caminhadaDiariaKm\": 2.5, \"porte\": \"medio\"}"
 )
 public class AnimalResDTO {
 
-    @Schema(description = "Código único identificador do animal", example = "507f1f77bcf86cd799439011")
+    @Schema(description = "Código único identificador do animal", example = "68194120636f719fcd5ee5fd")
     private String id;
 
     @Schema(description = "Nome do animal", example = "Rex")
@@ -30,7 +30,7 @@ public class AnimalResDTO {
     @Schema(description = "Indica se o animal é castrado", example = "true")
     private Boolean castrado;
 
-    @Schema(description = "ID do usuário responsável pelo animal", example = "507f1f77bcf86cd799439011")
+    @Schema(description = "ID do usuário responsável pelo animal", example = "68194120636f719fcd5ee5fd")
     private String usuario;
 
     @Schema(description = "Nome da raça do animal", example = "Labrador")

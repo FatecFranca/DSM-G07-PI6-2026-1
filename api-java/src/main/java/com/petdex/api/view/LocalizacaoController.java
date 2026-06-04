@@ -60,7 +60,7 @@ public class LocalizacaoController {
             description = "Consulta uma lista paginada de todas as localizações registradas para um animal específico",
             tags = {"Localizacao"},
             parameters = {
-                    @Parameter(name = "idAnimal", description = "Código identificador do animal que terá as localizações consultadas", required = true, example = "507f1f77bcf86cd799439011"),
+                    @Parameter(name = "idAnimal", description = "Código identificador do animal que terá as localizações consultadas", required = true, example = "68194120636f719fcd5ee5fd"),
                     @Parameter(name = "page", description = "Número da página que será feita a requisição", example = "0", schema = @Schema(implementation = Integer.class)),
                     @Parameter(name = "size", description = "Quantidade máxima de elementos por página", example = "10", schema = @Schema(implementation = Integer.class)),
                     @Parameter(
@@ -124,7 +124,7 @@ public class LocalizacaoController {
             description = "Consulta uma lista paginada de todas as localizações registradas por uma coleira específica",
             tags = {"Localizacao"},
             parameters = {
-                    @Parameter(name = "idColeira", description = "Código identificador da coleira que terá as localizações consultadas", required = true, example = "507f1f77bcf86cd799439011"),
+                    @Parameter(name = "idColeira", description = "Código identificador da coleira que terá as localizações consultadas", required = true, example = "6819475baa479949daccea94"),
                     @Parameter(name = "page", description = "Número da página que será feita a requisição", example = "0", schema = @Schema(implementation = Integer.class)),
                     @Parameter(name = "size", description = "Quantidade máxima de elementos por página", example = "10", schema = @Schema(implementation = Integer.class)),
                     @Parameter(
@@ -188,7 +188,7 @@ public class LocalizacaoController {
             description = "Consulta a localização mais recente registrada de um animal específico",
             tags = {"Localizacao"},
             parameters = {
-                    @Parameter(name = "idAnimal", description = "Código identificador do animal que terá a última localização consultada", required = true, example = "507f1f77bcf86cd799439011")
+                    @Parameter(name = "idAnimal", description = "Código identificador do animal que terá a última localização consultada", required = true, example = "68194120636f719fcd5ee5fd")
             },
             responses = {
                     @ApiResponse(

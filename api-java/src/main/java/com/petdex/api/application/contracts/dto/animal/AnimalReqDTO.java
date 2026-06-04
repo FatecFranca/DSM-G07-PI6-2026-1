@@ -28,10 +28,10 @@ public class AnimalReqDTO {
     @Schema(description = "Indica se o animal é castrado", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
     private Boolean castrado;
 
-    @Schema(description = "ID do usuário responsável pelo animal", example = "507f1f77bcf86cd799439011", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "ID do usuário responsável pelo animal", example = "68194120636f719fcd5ee5fd", requiredMode = Schema.RequiredMode.REQUIRED)
     private String usuario;
 
-    @Schema(description = "ID da raça do animal", example = "507f1f77bcf86cd799439011", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "ID da raça do animal", example = "68194120636f719fcd5ee5fd", requiredMode = Schema.RequiredMode.REQUIRED)
     private String raca;
 
     @Schema(description = "Quantidade de KM diários que o animal caminha", example = "2.5", requiredMode = Schema.RequiredMode.NOT_REQUIRED)

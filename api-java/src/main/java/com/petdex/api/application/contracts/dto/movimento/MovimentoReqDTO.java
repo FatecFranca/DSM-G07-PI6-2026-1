@@ -7,7 +7,7 @@ import java.util.Date;
 @Schema(
         name = "Requisição Movimento",
         description = "Dados necessários para registrar um novo movimento no sistema",
-        example = "{\"data\": \"2024-01-20T14:30:00.000+00:00\", \"acelerometroX\": 0.5, \"acelerometroY\": 0.3, \"acelerometroZ\": 9.8, \"giroscopioX\": 0.1, \"giroscopioY\": 0.2, \"giroscopioZ\": 0.05, \"animal\": \"507f1f77bcf86cd799439011\", \"coleira\": \"507f1f77bcf86cd799439011\"}"
+        example = "{\"data\": \"2024-01-20T14:30:00.000+00:00\", \"acelerometroX\": 0.5, \"acelerometroY\": 0.3, \"acelerometroZ\": 9.8, \"giroscopioX\": 0.1, \"giroscopioY\": 0.2, \"giroscopioZ\": 0.05, \"animal\": \"68194120636f719fcd5ee5fd\", \"coleira\": \"6819475baa479949daccea94\"}"
 )
 public class MovimentoReqDTO {
 
@@ -32,7 +32,7 @@ public class MovimentoReqDTO {
     @Schema(description = "Valor da rotação do giroscópio no eixo Z no momento da coleta em graus/s", example = "0.05", requiredMode = Schema.RequiredMode.REQUIRED)
     private Double giroscopioZ;
 
-    @Schema(description = "ID do animal que teve o movimento coletado", example = "507f1f77bcf86cd799439011", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "ID do animal que teve o movimento coletado", example = "68194120636f719fcd5ee5fd", requiredMode = Schema.RequiredMode.REQUIRED)
     private String animal;
 
     @Schema(description = "ID da coleira que realizou a coleta do movimento do animal", example = "507f1f77bcf86cd799439011", requiredMode = Schema.RequiredMode.REQUIRED)

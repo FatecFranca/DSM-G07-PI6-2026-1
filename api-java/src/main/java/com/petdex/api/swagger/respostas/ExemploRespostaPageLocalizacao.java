@@ -11,7 +11,7 @@ import java.util.List;
 )
 public class ExemploRespostaPageLocalizacao {
 
-    @Schema(description = "Lista de localizações retornadas na página atual", example = "[{\"id\": \"507f1f77bcf86cd799439011\", \"data\": \"2024-01-20T14:30:00.000+00:00\", \"latitude\": -23.550520, \"longitude\": -46.633308, \"animal\": \"507f1f77bcf86cd799439011\", \"coleira\": \"507f1f77bcf86cd799439011\", \"isOutsideSafeZone\": false, \"distanciaDoPerimetro\": -50.0}]")
+    @Schema(description = "Lista de localizações retornadas na página atual", example = "[{\"id\": \"507f1f77bcf86cd799439011\", \"data\": \"2024-01-20T14:30:00.000+00:00\", \"latitude\": -23.550520, \"longitude\": -46.633308, \"animal\": \"68194120636f719fcd5ee5fd\", \"coleira\": \"6819475baa479949daccea94\", \"isOutsideSafeZone\": false, \"distanciaDoPerimetro\": -50.0}]")
     private List<LocalizacaoResDTO> content;
 
     @Schema(description = "Número da página atual (começa em 0)", example = "0")

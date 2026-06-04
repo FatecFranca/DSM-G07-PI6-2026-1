@@ -7,7 +7,7 @@ import java.util.Date;
 @Schema(
         name = "Requisição Localização",
         description = "Dados necessários para registrar uma nova localização no sistema",
-        example = "{\"data\": \"2024-01-20T14:30:00.000+00:00\", \"latitude\": -23.550520, \"longitude\": -46.633308, \"animal\": \"507f1f77bcf86cd799439011\", \"coleira\": \"507f1f77bcf86cd799439011\"}"
+        example = "{\"data\": \"2024-01-20T14:30:00.000+00:00\", \"latitude\": -23.550520, \"longitude\": -46.633308, \"animal\": \"68194120636f719fcd5ee5fd\", \"coleira\": \"6819475baa479949daccea94\"}"
 )
 public class LocalizacaoReqDTO {
 
@@ -20,7 +20,7 @@ public class LocalizacaoReqDTO {
     @Schema(description = "Longitude da posição geográfica onde o animal se encontra no momento da coleta", example = "-46.633308", requiredMode = Schema.RequiredMode.REQUIRED)
     private Double longitude;
 
-    @Schema(description = "ID do animal que teve a localização coletada", example = "507f1f77bcf86cd799439011", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "ID do animal que teve a localização coletada", example = "68194120636f719fcd5ee5fd", requiredMode = Schema.RequiredMode.REQUIRED)
     private String animal;
 
     @Schema(description = "ID da coleira que realizou a coleta da localização do animal", example = "507f1f77bcf86cd799439011", requiredMode = Schema.RequiredMode.REQUIRED)

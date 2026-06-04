@@ -11,7 +11,7 @@ import java.util.List;
 )
 public class ExemploRespostaPageBatimento {
 
-    @Schema(description = "Lista de batimentos cardíacos retornados na página atual", example = "[{\"id\": \"507f1f77bcf86cd799439011\", \"data\": \"2024-01-20T14:30:00.000+00:00\", \"frequenciaMedia\": 75, \"animal\": \"507f1f77bcf86cd799439011\", \"coleira\": \"507f1f77bcf86cd799439011\"}]")
+    @Schema(description = "Lista de batimentos cardíacos retornados na página atual", example = "[{\"id\": \"507f1f77bcf86cd799439011\", \"data\": \"2024-01-20T14:30:00.000+00:00\", \"frequenciaMedia\": 75, \"animal\": \"68194120636f719fcd5ee5fd\", \"coleira\": \"6819475baa479949daccea94\"}]")
     private List<BatimentoResDTO> content;
 
     @Schema(description = "Número da página atual (começa em 0)", example = "0")

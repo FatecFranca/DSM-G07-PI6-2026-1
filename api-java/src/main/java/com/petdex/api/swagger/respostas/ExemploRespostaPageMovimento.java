@@ -11,7 +11,7 @@ import java.util.List;
 )
 public class ExemploRespostaPageMovimento {
 
-    @Schema(description = "Lista de movimentos retornados na página atual", example = "[{\"id\": \"507f1f77bcf86cd799439011\", \"data\": \"2024-01-20T14:30:00.000+00:00\", \"acelerometroX\": 0.5, \"acelerometroY\": 0.3, \"acelerometroZ\": 9.8, \"giroscopioX\": 0.1, \"giroscopioY\": 0.2, \"giroscopioZ\": 0.05, \"animal\": \"507f1f77bcf86cd799439011\", \"coleira\": \"507f1f77bcf86cd799439011\"}]")
+    @Schema(description = "Lista de movimentos retornados na página atual", example = "[{\"id\": \"507f1f77bcf86cd799439011\", \"data\": \"2024-01-20T14:30:00.000+00:00\", \"acelerometroX\": 0.5, \"acelerometroY\": 0.3, \"acelerometroZ\": 9.8, \"giroscopioX\": 0.1, \"giroscopioY\": 0.2, \"giroscopioZ\": 0.05, \"animal\": \"68194120636f719fcd5ee5fd\", \"coleira\": \"6819475baa479949daccea94\"}]")
     private List<MovimentoResDTO> content;
 
     @Schema(description = "Número da página atual", example = "0")
