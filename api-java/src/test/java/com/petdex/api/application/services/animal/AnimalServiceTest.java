@@ -3,6 +3,7 @@ package com.petdex.api.application.services.animal;
 import com.petdex.api.domain.collections.Animal;
 import com.petdex.api.domain.collections.Especie;
 import com.petdex.api.domain.collections.Raca;
+import com.petdex.api.domain.collections.PorteEnum;
 import com.petdex.api.application.contracts.dto.animal.AnimalReqDTO;
 import com.petdex.api.application.contracts.dto.animal.AnimalResDTO;
 import com.petdex.api.infrastructure.exception.ResourceNotFoundException;
@@ -92,10 +93,14 @@ public class AnimalServiceTest {
         req.setNome("Rex");
         req.setUsuario("usuario123");
         req.setRaca("raca123");
+        req.setCaminhadaDiariaKm(3.5);
+        req.setPorte(PorteEnum.grande);
         
         Animal animalSalvo = new Animal();
         animalSalvo.setId("123");
         animalSalvo.setNome("Rex");
+        animalSalvo.setCaminhadaDiariaKm(3.5);
+        animalSalvo.setPorte(PorteEnum.grande);
 
         Mockito.when(animalRepository.save(Mockito.any(Animal.class))).thenReturn(animalSalvo);
         Mockito.when(usuarioRepository.existsById(Mockito.anyString())).thenReturn(true);
@@ -107,6 +112,8 @@ public class AnimalServiceTest {
         // verificação
         Assertions.assertThat(result).isNotNull();
         Assertions.assertThat(result.getNome()).isEqualTo("Rex");
+        Assertions.assertThat(result.getCaminhadaDiariaKm()).isEqualTo(3.5);
+        Assertions.assertThat(result.getPorte()).isEqualTo(PorteEnum.grande);
         Mockito.verify(animalRepository, Mockito.times(1)).save(Mockito.any());
     }
 

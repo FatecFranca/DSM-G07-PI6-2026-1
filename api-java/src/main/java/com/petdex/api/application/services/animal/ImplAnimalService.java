@@ -148,6 +148,8 @@ public class ImplAnimalService implements AnimalService {
             }
             animalUpdate.setUsuario(animalDTO.getUsuario());
         }
+        if(animalDTO.getCaminhadaDiariaKm() != null) animalUpdate.setCaminhadaDiariaKm(animalDTO.getCaminhadaDiariaKm());
+        if(animalDTO.getPorte() != null) animalUpdate.setPorte(animalDTO.getPorte());
 
         return mapper.map(animalRepository.save(animalUpdate), AnimalResDTO.class);
     }
