@@ -1,5 +1,6 @@
 package com.petdex.api.application.contracts.dto.animal;
 
+import com.petdex.api.domain.collections.PorteEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Date;
@@ -7,7 +8,7 @@ import java.util.Date;
 @Schema(
         name = "Resposta Animal",
         description = "Informações detalhadas de um animal retornadas pela API",
-        example = "{\"id\": \"507f1f77bcf86cd799439011\", \"nome\": \"Rex\", \"dataNascimento\": \"2020-01-15\", \"sexo\": \"Macho\", \"peso\": 25.5, \"castrado\": true, \"usuario\": \"507f1f77bcf86cd799439011\", \"racaNome\": \"Labrador\", \"especieNome\": \"Cachorro\"}"
+        example = "{\"id\": \"507f1f77bcf86cd799439011\", \"nome\": \"Rex\", \"dataNascimento\": \"2020-01-15\", \"sexo\": \"Macho\", \"peso\": 25.5, \"castrado\": true, \"usuario\": \"507f1f77bcf86cd799439011\", \"racaNome\": \"Labrador\", \"especieNome\": \"Cachorro\", \"caminhadaDiariaKm\": 2.5, \"porte\": \"medio\"}"
 )
 public class AnimalResDTO {
 
@@ -40,6 +41,12 @@ public class AnimalResDTO {
 
     @Schema(description = "Url da imagem do pet", example = "/uploads/animal/imagem-do-pet.png")
     private String urlImagem;
+
+    @Schema(description = "Quantidade de KM diários que o animal caminha", example = "2.5")
+    private Double caminhadaDiariaKm;
+
+    @Schema(description = "Porte do animal (pequeno, medio, grande)", example = "medio")
+    private PorteEnum porte;
 
     public AnimalResDTO() {
     }
@@ -155,5 +162,21 @@ public class AnimalResDTO {
 
     public void setUrlImagem(String urlImagem) {
         this.urlImagem = urlImagem;
+    }
+
+    public Double getCaminhadaDiariaKm() {
+        return caminhadaDiariaKm;
+    }
+
+    public void setCaminhadaDiariaKm(Double caminhadaDiariaKm) {
+        this.caminhadaDiariaKm = caminhadaDiariaKm;
+    }
+
+    public PorteEnum getPorte() {
+        return porte;
+    }
+
+    public void setPorte(PorteEnum porte) {
+        this.porte = porte;
     }
 }

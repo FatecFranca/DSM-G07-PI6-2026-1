@@ -1,5 +1,6 @@
 package com.petdex.api.application.contracts.dto.animal;
 
+import com.petdex.api.domain.collections.PorteEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -8,7 +9,7 @@ import java.util.Date;
 @Schema(
         name = "Requisição Animal",
         description = "Dados necessários para criar ou atualizar um animal no sistema",
-        example = "{\"nome\": \"Rex\", \"dataNascimento\": \"2020-01-15\", \"sexo\": \"Macho\", \"peso\": 25.5, \"castrado\": true, \"usuario\": \"507f1f77bcf86cd799439011\", \"raca\": \"507f1f77bcf86cd799439011\"}"
+        example = "{\"nome\": \"Rex\", \"dataNascimento\": \"2020-01-15\", \"sexo\": \"Macho\", \"peso\": 25.5, \"castrado\": true, \"usuario\": \"507f1f77bcf86cd799439011\", \"raca\": \"507f1f77bcf86cd799439011\", \"caminhadaDiariaKm\": 2.5, \"porte\": \"medio\"}"
 )
 public class AnimalReqDTO {
 
@@ -32,6 +33,12 @@ public class AnimalReqDTO {
 
     @Schema(description = "ID da raça do animal", example = "507f1f77bcf86cd799439011", requiredMode = Schema.RequiredMode.REQUIRED)
     private String raca;
+
+    @Schema(description = "Quantidade de KM diários que o animal caminha", example = "2.5", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private Double caminhadaDiariaKm;
+
+    @Schema(description = "Porte do animal (pequeno, medio, grande)", example = "medio", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private PorteEnum porte;
 
     public AnimalReqDTO() {
     }
@@ -100,5 +107,21 @@ public class AnimalReqDTO {
 
     public void setRaca(String string) {
         this.raca = string;
+    }
+
+    public Double getCaminhadaDiariaKm() {
+        return caminhadaDiariaKm;
+    }
+
+    public void setCaminhadaDiariaKm(Double caminhadaDiariaKm) {
+        this.caminhadaDiariaKm = caminhadaDiariaKm;
+    }
+
+    public PorteEnum getPorte() {
+        return porte;
+    }
+
+    public void setPorte(PorteEnum porte) {
+        this.porte = porte;
     }
 }

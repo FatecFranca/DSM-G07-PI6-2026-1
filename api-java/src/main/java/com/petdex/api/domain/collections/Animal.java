@@ -3,6 +3,7 @@ package com.petdex.api.domain.collections;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -33,6 +34,10 @@ public class Animal {
     private String raca;
 
     private String urlImagem;
+
+    @PositiveOrZero(message = "caminhadaDiariaKm deve ser maior ou igual a zero")
+    private Double caminhadaDiariaKm;
+    private PorteEnum porte;
 
 
     public Animal() {
@@ -154,5 +159,21 @@ public class Animal {
 
     public void setUrlImagem(String urlImagem) {
         this.urlImagem = urlImagem;
+    }
+
+    public Double getCaminhadaDiariaKm() {
+        return caminhadaDiariaKm;
+    }
+
+    public void setCaminhadaDiariaKm(Double caminhadaDiariaKm) {
+        this.caminhadaDiariaKm = caminhadaDiariaKm;
+    }
+
+    public PorteEnum getPorte() {
+        return porte;
+    }
+
+    public void setPorte(PorteEnum porte) {
+        this.porte = porte;
     }
 }

@@ -1,6 +1,7 @@
 package com.petdex.api.infrastructure.mongodb;
 
 import com.petdex.api.domain.collections.Animal;
+import com.petdex.api.domain.collections.PorteEnum;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,8 @@ public class AnimalRepositoryTest {
         // verificação
         Assertions.assertThat(animalSalvo.getId()).isNotNull();
         Assertions.assertThat(animalSalvo.getNome()).isEqualTo("Rex");
+        Assertions.assertThat(animalSalvo.getCaminhadaDiariaKm()).isEqualTo(2.5);
+        Assertions.assertThat(animalSalvo.getPorte()).isEqualTo(PorteEnum.medio);
     }
 
     @Test
@@ -66,7 +69,7 @@ public class AnimalRepositoryTest {
     }
 
     public static Animal criarAnimal() {
-        return new Animal(
+        Animal animal = new Animal(
                 "Rex",
                 new Date(),
                 "M",
@@ -75,5 +78,8 @@ public class AnimalRepositoryTest {
                 "usuario123",
                 "raca123"
         );
+        animal.setCaminhadaDiariaKm(2.5);
+        animal.setPorte(PorteEnum.medio);
+        return animal;
     }
 }
