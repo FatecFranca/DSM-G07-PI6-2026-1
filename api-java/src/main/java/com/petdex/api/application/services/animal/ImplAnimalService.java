@@ -115,7 +115,21 @@ public class ImplAnimalService implements AnimalService {
 
         try {
             Animal animal = mapper.map(animalDTO, Animal.class);
-            AnimalResDTO res = mapper.map(animalRepository.save(animal), AnimalResDTO.class);
+            Animal savedAnimal = animalRepository.save(animal);
+
+            Raca raca = racaRepository.findById(savedAnimal.getRaca()).orElseThrow(() -> {
+                logger.error("Raça {} não encontrada para o animal {}", savedAnimal.getRaca(), savedAnimal.getId());
+                return new ResourceNotFoundException("Raça", "ID", savedAnimal.getRaca());
+            });
+            Especie especie = especieRepository.findById(raca.getEspecie()).orElseThrow(()-> {
+                logger.error("Espécie {} não encontrada para a raça {}", raca.getEspecie(), raca.getId());
+                return new ResourceNotFoundException("Espécie", "ID", raca.getEspecie());
+            });
+
+            AnimalResDTO res = mapper.map(savedAnimal, AnimalResDTO.class);
+            res.setRacaNome(raca.getNome());
+            res.setEspecieNome(especie.getNome());
+
             logger.info("Animal cadastrado com sucesso: {} (ID: {})", res.getNome(), res.getId());
             return res;
         } catch (Exception e) {
@@ -151,7 +165,22 @@ public class ImplAnimalService implements AnimalService {
         if(animalDTO.getCaminhadaDiariaKm() != null) animalUpdate.setCaminhadaDiariaKm(animalDTO.getCaminhadaDiariaKm());
         if(animalDTO.getPorte() != null) animalUpdate.setPorte(animalDTO.getPorte());
 
-        return mapper.map(animalRepository.save(animalUpdate), AnimalResDTO.class);
+        Animal savedAnimal = animalRepository.save(animalUpdate);
+
+        Raca raca = racaRepository.findById(savedAnimal.getRaca()).orElseThrow(() -> {
+            logger.error("Raça {} não encontrada para o animal {}", savedAnimal.getRaca(), savedAnimal.getId());
+            return new ResourceNotFoundException("Raça", "ID", savedAnimal.getRaca());
+        });
+        Especie especie = especieRepository.findById(raca.getEspecie()).orElseThrow(()-> {
+            logger.error("Espécie {} não encontrada para a raça {}", raca.getEspecie(), raca.getId());
+            return new ResourceNotFoundException("Espécie", "ID", raca.getEspecie());
+        });
+
+        AnimalResDTO res = mapper.map(savedAnimal, AnimalResDTO.class);
+        res.setRacaNome(raca.getNome());
+        res.setEspecieNome(especie.getNome());
+
+        return res;
     }
 
     @Override

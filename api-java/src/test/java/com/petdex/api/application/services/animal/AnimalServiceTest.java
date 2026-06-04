@@ -99,12 +99,24 @@ public class AnimalServiceTest {
         Animal animalSalvo = new Animal();
         animalSalvo.setId("123");
         animalSalvo.setNome("Rex");
+        animalSalvo.setRaca("raca123");
         animalSalvo.setCaminhadaDiariaKm(3.5);
         animalSalvo.setPorte(PorteEnum.grande);
+
+        Raca raca = new Raca();
+        raca.setId("raca123");
+        raca.setNome("Poodle");
+        raca.setEspecie("especie123");
+
+        Especie especie = new Especie();
+        especie.setId("especie123");
+        especie.setNome("Cachorro");
 
         Mockito.when(animalRepository.save(Mockito.any(Animal.class))).thenReturn(animalSalvo);
         Mockito.when(usuarioRepository.existsById(Mockito.anyString())).thenReturn(true);
         Mockito.when(racaRepository.existsById(Mockito.anyString())).thenReturn(true);
+        Mockito.when(racaRepository.findById("raca123")).thenReturn(Optional.of(raca));
+        Mockito.when(especieRepository.findById("especie123")).thenReturn(Optional.of(especie));
 
         // ação
         AnimalResDTO result = service.create(req);
@@ -114,7 +126,60 @@ public class AnimalServiceTest {
         Assertions.assertThat(result.getNome()).isEqualTo("Rex");
         Assertions.assertThat(result.getCaminhadaDiariaKm()).isEqualTo(3.5);
         Assertions.assertThat(result.getPorte()).isEqualTo(PorteEnum.grande);
+        Assertions.assertThat(result.getRacaNome()).isEqualTo("Poodle");
+        Assertions.assertThat(result.getEspecieNome()).isEqualTo("Cachorro");
         Mockito.verify(animalRepository, Mockito.times(1)).save(Mockito.any());
+    }
+
+    @Test
+    public void deveAtualizarAnimalComSucesso() throws IOException {
+        // cenário
+        String id = "123";
+        AnimalReqDTO req = new AnimalReqDTO();
+        req.setNome("Rex Novo");
+        req.setUsuario("usuario123");
+        req.setRaca("raca123");
+        req.setCaminhadaDiariaKm(4.0);
+        req.setPorte(PorteEnum.grande);
+
+        Animal animalOriginal = new Animal();
+        animalOriginal.setId(id);
+        animalOriginal.setNome("Rex");
+        animalOriginal.setRaca("racaOriginal");
+        animalOriginal.setUsuario("usuario123");
+
+        Animal animalSalvo = new Animal();
+        animalSalvo.setId(id);
+        animalSalvo.setNome("Rex Novo");
+        animalSalvo.setRaca("raca123");
+        animalSalvo.setUsuario("usuario123");
+        animalSalvo.setCaminhadaDiariaKm(4.0);
+        animalSalvo.setPorte(PorteEnum.grande);
+
+        Raca raca = new Raca();
+        raca.setId("raca123");
+        raca.setNome("Poodle");
+        raca.setEspecie("especie123");
+
+        Especie especie = new Especie();
+        especie.setId("especie123");
+        especie.setNome("Cachorro");
+
+        Mockito.when(animalRepository.findById(id)).thenReturn(Optional.of(animalOriginal));
+        Mockito.when(animalRepository.save(Mockito.any(Animal.class))).thenReturn(animalSalvo);
+        Mockito.when(usuarioRepository.existsById("usuario123")).thenReturn(true);
+        Mockito.when(racaRepository.existsById("raca123")).thenReturn(true);
+        Mockito.when(racaRepository.findById("raca123")).thenReturn(Optional.of(raca));
+        Mockito.when(especieRepository.findById("especie123")).thenReturn(Optional.of(especie));
+
+        // ação
+        AnimalResDTO result = service.update(id, req);
+
+        // verificação
+        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result.getNome()).isEqualTo("Rex Novo");
+        Assertions.assertThat(result.getRacaNome()).isEqualTo("Poodle");
+        Assertions.assertThat(result.getEspecieNome()).isEqualTo("Cachorro");
     }
 
     @Test
