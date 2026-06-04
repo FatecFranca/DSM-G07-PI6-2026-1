@@ -6,12 +6,14 @@ import com.petdex.api.domain.collections.Raca;
 import com.petdex.api.domain.collections.PorteEnum;
 import com.petdex.api.application.contracts.dto.animal.AnimalReqDTO;
 import com.petdex.api.application.contracts.dto.animal.AnimalResDTO;
+import com.petdex.api.infrastructure.exception.BadRequestException;
 import com.petdex.api.infrastructure.exception.ResourceNotFoundException;
 import com.petdex.api.infrastructure.mongodb.AnimalRepository;
 import com.petdex.api.infrastructure.mongodb.EspecieRepository;
 import com.petdex.api.infrastructure.mongodb.RacaRepository;
 import com.petdex.api.infrastructure.mongodb.UsuarioRepository;
 import org.assertj.core.api.Assertions;
+import org.springframework.web.multipart.MultipartFile;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -192,5 +194,37 @@ public class AnimalServiceTest {
 
         // verificação
         Mockito.verify(animalRepository, Mockito.times(1)).deleteById(id);
+    }
+
+    @Test
+    public void deveLancarErroAoSalvarImagemComArquivoNulo() {
+        // cenário
+        String id = "123";
+        Animal animal = new Animal();
+        animal.setId(id);
+
+        Mockito.when(animalRepository.findById(id)).thenReturn(Optional.of(animal));
+
+        // ação e verificação
+        Assertions.assertThatThrownBy(() -> service.saveImage(id, null))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("O arquivo de imagem não pode ser nulo ou vazio");
+    }
+
+    @Test
+    public void deveLancarErroAoSalvarImagemComArquivoVazio() {
+        // cenário
+        String id = "123";
+        Animal animal = new Animal();
+        animal.setId(id);
+
+        MultipartFile file = Mockito.mock(MultipartFile.class);
+        Mockito.when(file.isEmpty()).thenReturn(true);
+        Mockito.when(animalRepository.findById(id)).thenReturn(Optional.of(animal));
+
+        // ação e verificação
+        Assertions.assertThatThrownBy(() -> service.saveImage(id, file))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("O arquivo de imagem não pode ser nulo ou vazio");
     }
 }

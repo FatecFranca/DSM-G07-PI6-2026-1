@@ -6,6 +6,7 @@ import com.petdex.api.domain.collections.Raca;
 import com.petdex.api.application.contracts.dto.PageDTO;
 import com.petdex.api.application.contracts.dto.animal.AnimalReqDTO;
 import com.petdex.api.application.contracts.dto.animal.AnimalResDTO;
+import com.petdex.api.infrastructure.exception.BadRequestException;
 import com.petdex.api.infrastructure.exception.ResourceNotFoundException;
 import com.petdex.api.infrastructure.mongodb.AnimalRepository;
 import com.petdex.api.infrastructure.mongodb.EspecieRepository;
@@ -210,16 +211,23 @@ public class ImplAnimalService implements AnimalService {
 
     @Override
     public String saveImage (String id, MultipartFile file) throws IOException {
+        logger.info("Iniciando processo de salvamento de imagem para o animal ID: {}", id);
 
         Animal animal = animalRepository.findById(id).orElseThrow(() -> {
             logger.error("Falha ao salvar imagem: Animal não encontrado com ID: {}", id);
             return new ResourceNotFoundException("Animal", "ID", id);
         });
 
+        if (file == null || file.isEmpty()) {
+            logger.error("Falha ao salvar imagem para o animal ID {}: o arquivo enviado é nulo ou vazio", id);
+            throw new BadRequestException("O arquivo de imagem não pode ser nulo ou vazio");
+        }
+
         try {
             // Verifica se existe uma imagem antiga e a exclui
             String oldImageUrl = animal.getUrlImagem();
             if (oldImageUrl != null && !oldImageUrl.isEmpty()) {
+                logger.info("Animal ID {} já possui uma imagem: {}. Removendo imagem anterior...", id, oldImageUrl);
                 // Extrai o nome do arquivo da URL antiga
                 String oldFileName = oldImageUrl.substring(oldImageUrl.lastIndexOf("/") + 1);
                 Path oldFilePath = Paths.get("/uploads/animais/").resolve(oldFileName);
@@ -227,26 +235,31 @@ public class ImplAnimalService implements AnimalService {
                 // Exclui o arquivo antigo se ele existir
                 if (Files.exists(oldFilePath)) {
                     Files.delete(oldFilePath);
-                    logger.info("Imagem antiga removida: {}", oldFileName);
+                    logger.info("Imagem antiga removida com sucesso: {}", oldFileName);
+                } else {
+                    logger.warn("Imagem antiga {} não encontrada no sistema de arquivos para remoção", oldFileName);
                 }
             }
 
-            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            String originalFilename = file.getOriginalFilename();
+            String fileName = UUID.randomUUID() + "_" + originalFilename;
             Path uploadPath = Paths.get("/uploads/animais/");
             if (!Files.exists(uploadPath)) {
+                logger.info("Diretório de upload não existe. Criando diretório: {}", uploadPath);
                 Files.createDirectories(uploadPath);
             }
             Path filePath = uploadPath.resolve(fileName);
+            logger.info("Salvando novo arquivo de imagem '{}' para o animal ID {} no caminho: {}", originalFilename, id, filePath);
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
             String imageUrl = "/uploads/animais/" + fileName;
 
             animal.setUrlImagem(imageUrl);
             animalRepository.save(animal);
 
-            logger.info("Nova imagem salva para o animal {}: {}", id, imageUrl);
+            logger.info("Nova imagem salva com sucesso para o animal ID {}. URL: {}", id, imageUrl);
             return imageUrl;
         } catch (IOException e) {
-            logger.error("Erro ao processar upload de imagem para o animal {}: {}", id, e.getMessage());
+            logger.error("Erro de I/O ao processar upload de imagem para o animal ID {}: {}", id, e.getMessage(), e);
             throw e;
         }
     }
