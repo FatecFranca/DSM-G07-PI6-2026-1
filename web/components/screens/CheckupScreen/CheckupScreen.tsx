@@ -525,29 +525,49 @@ export default function CheckupScreen({ animalId, animalName }: Props) {
                   const imageUrl = getRacaoImage(firstRacao);
 
                   return (
-                    <div className="flex items-center gap-4">
+                    <div className="flex gap-4 items-start w-full">
                       {/* Imagem da Ração mapeada */}
                       <img 
                         src={imageUrl} 
                         alt={altText} 
-                        className="w-[100px] h-[100px] object-contain shrink-0 drop-shadow-md"
+                        className="w-[90px] h-[90px] object-contain shrink-0 drop-shadow-md bg-white rounded-xl p-1 border border-[var(--color-brown)]/10"
                       />
-                      {/* Nome da Ração */}
-                      <div className="flex flex-col gap-1">
+                      {/* Detalhes da Ração */}
+                      <div className="flex flex-col gap-1.5 min-w-0 flex-1">
                         <span className="text-[10px] text-[var(--color-orange-900)] font-black uppercase tracking-wider">
                           Recomendada ({recData.diagnostico})
                         </span>
-                        <h4 className="font-bold text-[14px] text-[var(--color-brown)] leading-snug">
-                          {firstRacaoName}
-                        </h4>
-                        {alternativeRacaoName && (
-                          <span className="text-[11px] text-[var(--color-brown)] opacity-75 mt-1">
-                            Alternativa: {alternativeRacaoName}
-                          </span>
+
+                        {typeof firstRacao === "object" && firstRacao !== null ? (
+                          <>
+                            {firstRacao.marca && (
+                              <div className="text-[12px] text-[var(--color-brown)]">
+                                <span className="font-extrabold text-[var(--color-orange-900)]">Marca: </span>
+                                <span className="font-semibold">{firstRacao.marca}</span>
+                              </div>
+                            )}
+                            {firstRacao.nome && (
+                              <div className="text-[12px] text-[var(--color-brown)] leading-snug">
+                                <span className="font-extrabold text-[var(--color-orange-900)]">Nome: </span>
+                                <span className="font-semibold">{firstRacao.nome}</span>
+                              </div>
+                            )}
+                            {firstRacao.motivo && (
+                              <div className="text-[11px] text-[var(--color-brown)] opacity-90 leading-relaxed border-t border-[var(--color-brown)]/10 pt-1.5 mt-1">
+                                <span className="font-extrabold text-[var(--color-orange-900)]">Motivo: </span>
+                                <span className="font-medium italic">{firstRacao.motivo}</span>
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <h4 className="font-bold text-[13px] text-[var(--color-brown)] leading-snug">
+                            {firstRacaoName}
+                          </h4>
                         )}
-                        {typeof firstRacao === "object" && firstRacao !== null && firstRacao.motivo && (
-                          <span className="text-[11px] text-[var(--color-orange-900)] font-semibold italic mt-0.5">
-                            Motivo: {firstRacao.motivo}
+
+                        {alternativeRacaoName && (
+                          <span className="text-[11px] text-[var(--color-brown)] opacity-75 mt-1 border-t border-[var(--color-brown)]/5 pt-1">
+                            Alternativa: {alternativeRacaoName}
                           </span>
                         )}
                       </div>
