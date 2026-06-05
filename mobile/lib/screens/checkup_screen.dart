@@ -8,6 +8,7 @@ import 'package:PetDex/components/ui/input.dart';
 import 'package:PetDex/components/ui/button.dart';
 import 'package:PetDex/services/animal_service.dart';
 import 'package:PetDex/main.dart';
+import 'package:PetDex/models/animal.dart';
 
 class CheckupScreen extends StatefulWidget {
   const CheckupScreen({super.key});
@@ -27,6 +28,108 @@ class _CheckupScreenState extends State<CheckupScreen> {
   String? _resultadoRotulo; // Texto apresentado no DiseasePrediction\
   String? _description;
 
+  bool _exibindoCheckupGeral = true;
+  Animal? _animal;
+  Map<String, dynamic>? _recomendacao;
+  bool _carregandoAnimal = true;
+  bool _carregandoRecomendacao = true;
+  String? _erroCarregamento;
+
+  double calcularPesoIdeal(double peso) {
+    return peso * 0.91;
+  }
+
+  double calcularPesoMinimo(double pesoIdeal) {
+    return pesoIdeal * 0.85;
+  }
+
+  double calcularPesoMaximo(double pesoIdeal) {
+    return pesoIdeal * 1.15;
+  }
+
+  Future<void> _carregarDados() async {
+    setState(() {
+      _carregandoAnimal = true;
+      _carregandoRecomendacao = true;
+      _erroCarregamento = null;
+    });
+
+    final animalId = authService.getAnimalId();
+    if (animalId == null || animalId.isEmpty) {
+      setState(() {
+        _erroCarregamento = 'ID do pet não encontrado.';
+        _carregandoAnimal = false;
+        _carregandoRecomendacao = false;
+      });
+      return;
+    }
+
+    try {
+      final animal = await _animalService.getAnimalInfo(animalId);
+      final pesoIdeal = calcularPesoIdeal(animal.peso);
+      
+      setState(() {
+        _animal = animal;
+        _carregandoAnimal = false;
+      });
+
+      // Carrega recomendação em segundo plano
+      final rec = await _animalService.getIaRecomendacao(animalId, pesoIdeal);
+      setState(() {
+        _recomendacao = rec;
+        _carregandoRecomendacao = false;
+      });
+    } catch (e) {
+      print('Erro ao carregar dados do checkup: $e');
+      setState(() {
+        _erroCarregamento = 'Erro de conexão com a API.';
+        _carregandoAnimal = false;
+        _carregandoRecomendacao = false;
+      });
+    }
+  }
+
+  String getRacaoAssetPath(String brand) {
+    final clean = brand.toLowerCase();
+    if (clean.contains('royal canin')) {
+      return 'assets/images/racao-royal-canin.png';
+    }
+    if (clean.contains('blue buffalo')) {
+      return 'assets/images/racao-blue-buffalo.png';
+    }
+    if (clean.contains('purina')) {
+      return 'assets/images/racao-purina.png';
+    }
+    if (clean.contains('pedigree')) {
+      return 'assets/images/racao-pedigree.png';
+    }
+    if (clean.contains('hill') || clean.contains('science diet')) {
+      return 'assets/images/racao-hills.png';
+    }
+    if (clean.contains('nutrience')) {
+      return 'assets/images/racao-nutrience.png';
+    }
+    if (clean.contains('authority')) {
+      return 'assets/images/racao-authority.png';
+    }
+    if (clean.contains('iams')) {
+      return 'assets/images/racao-iams.png';
+    }
+    if (clean.contains('nutro')) {
+      return 'assets/images/racao-nutro.png';
+    }
+    if (clean.contains('special')) {
+      return 'assets/images/racao-special.png';
+    }
+    if (clean.contains('wellness')) {
+      return 'assets/images/racao-wellness.png';
+    }
+    if (clean.contains('natural balance')) {
+      return 'assets/images/racao-natural-balance.png';
+    }
+    return 'assets/images/racao-generica.png';
+  }
+
   final TextEditingController _duracaoController = TextEditingController(
     text: '0',
   );
@@ -41,6 +144,7 @@ class _CheckupScreenState extends State<CheckupScreen> {
   void initState() {
     super.initState();
     _resetarFluxo();
+    _carregarDados();
 
     // Listener para rolar a tela quando o input de duração receber foco
     _duracaoFocusNode.addListener(() {
@@ -147,6 +251,7 @@ class _CheckupScreenState extends State<CheckupScreen> {
     _enviando = false;
     _mostrouResultado = false;
     _resultadoRotulo = null;
+    _exibindoCheckupGeral = true;
   }
 
   // Mapeia os códigos de resultado da API para rótulos amigáveis
@@ -362,6 +467,22 @@ class _CheckupScreenState extends State<CheckupScreen> {
             });
           },
         ),
+        const SizedBox(height: 12),
+        TextButton(
+          onPressed: () {
+            setState(() {
+              _exibindoCheckupGeral = true;
+            });
+          },
+          child: Text(
+            'Voltar ao Dashboard',
+            style: GoogleFonts.poppins(
+              color: AppColors.orange900,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
         const SizedBox(height: 16),
         // Disclaimer
         Padding(
@@ -412,6 +533,9 @@ class _CheckupScreenState extends State<CheckupScreen> {
   }
 
   Widget _tituloTopo() {
+    if (_exibindoCheckupGeral) {
+      return const SizedBox.shrink();
+    }
     // Não mostra título na tela de introdução
     if (!_mostrouIntroducao) {
       return const SizedBox.shrink();
@@ -791,6 +915,9 @@ class _CheckupScreenState extends State<CheckupScreen> {
   }
 
   Widget _conteudoPorEtapa() {
+    if (_exibindoCheckupGeral) {
+      return _buildCheckupGeral();
+    }
     // Mostra a tela de introdução se ainda não foi exibida
     if (!_mostrouIntroducao) {
       return _telaIntroducao();
@@ -921,7 +1048,9 @@ class _CheckupScreenState extends State<CheckupScreen> {
             26,
             12,
             26,
-            bottomInset > 0 ? bottomInset + 40 : 280,
+            bottomInset > 0
+                ? bottomInset + 40
+                : 280.0,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -976,6 +1105,386 @@ class _CheckupScreenState extends State<CheckupScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildCheckupGeral() {
+    if (_carregandoAnimal) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 60.0),
+          child: CircularProgressIndicator(color: AppColors.orange900),
+        ),
+      );
+    }
+
+    if (_erroCarregamento != null || _animal == null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            children: [
+              Text(
+                _erroCarregamento ?? 'Erro ao carregar dados do pet.',
+                style: GoogleFonts.poppins(color: Colors.red, fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _carregarDados,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.orange900,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: const Text('Tentar Novamente', style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final animal = _animal!;
+    final pesoIdeal = calcularPesoIdeal(animal.peso);
+    final pesoMinimo = calcularPesoMinimo(pesoIdeal);
+    final pesoMaximo = calcularPesoMaximo(pesoIdeal);
+    final currentW = animal.peso;
+
+    // Calcula a posição proporcional
+    double range = pesoMaximo - pesoMinimo;
+    double pct = range > 0 ? (currentW - pesoMinimo) / range : 0.5;
+    pct = pct.clamp(0.02, 0.98); // safe limits between 2% and 98%
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: 12),
+        // Título Principal
+        Text(
+          'Checkup Gerais',
+          textAlign: TextAlign.center,
+          style: GoogleFonts.poppins(
+            color: AppColors.orange,
+            fontSize: 28,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 4),
+        // Subtítulo
+        Text(
+          'Peso ideal para seu pet é de ${pesoIdeal.toStringAsFixed(2)}kg',
+          textAlign: TextAlign.center,
+          style: GoogleFonts.poppins(
+            color: AppColors.brown,
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 32),
+
+        // Termômetro de Peso
+        Column(
+          children: [
+            // Barra de Gradiente de Peso
+            Container(
+              height: 26,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(13),
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFFD32F2F), // Red
+                    Color(0xFFF39200), // Orange
+                    Color(0xFF388E3C), // Green
+                    Color(0xFF388E3C), // Green
+                    Color(0xFFF39200), // Orange
+                    Color(0xFFD32F2F), // Red
+                  ],
+                  stops: [0.0, 0.15, 0.35, 0.65, 0.85, 1.0],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  )
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16.0),
+                    child: Text(
+                      '${pesoMinimo.toStringAsFixed(2)}kg',
+                      style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Text(
+                    '${pesoIdeal.toStringAsFixed(2)}kg',
+                    style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 16.0),
+                    child: Text(
+                      '${pesoMaximo.toStringAsFixed(2)}kg',
+                      style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 6),
+            Container(
+              width: double.infinity,
+              height: 40,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final width = constraints.maxWidth;
+                  const containerWidth = 120.0;
+                  final leftOffset = pct * width - (containerWidth / 2);
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Positioned(
+                        left: leftOffset.clamp(0.0, width - containerWidth),
+                        top: 0,
+                        child: Container(
+                          width: containerWidth,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Linha indicadora vertical
+                              Container(
+                                width: 3,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: AppColors.orange900,
+                                  borderRadius: BorderRadius.circular(1.5),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              // Texto de Peso Atual
+                              Text(
+                                'Seu pet pesa ${currentW.toInt() == currentW ? currentW.toInt() : currentW}kg',
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.poppins(
+                                  color: AppColors.orange900,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+
+        // Título Ração
+        Text(
+          'Conheça a ração ideal para uma refeição balanceada',
+          textAlign: TextAlign.center,
+          style: GoogleFonts.poppins(
+            color: AppColors.orange900,
+            fontSize: 15,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // Card Amarelo da Ração
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppColors.sand,
+            borderRadius: BorderRadius.circular(24.0),
+          ),
+          child: _carregandoRecomendacao
+              ? const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20.0),
+                    child: CircularProgressIndicator(color: AppColors.orange900),
+                  ),
+                )
+              : _buildRecomendacaoCard(),
+        ),
+        const SizedBox(height: 32),
+
+        // Botão Checar Saúde
+        Button(
+          text: 'Checar saúde',
+          onPressed: () {
+            setState(() {
+              _exibindoCheckupGeral = false;
+            });
+          },
+        ),
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Text(
+            'Responda algumas perguntas rápidas sobre os sintomas observados e deixe a inteligência da PetDex analisar os dados para identificar possíveis problemas de saúde.',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              height: 1.5,
+              color: AppColors.brown.withOpacity(0.7),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRecomendacaoCard() {
+    if (_recomendacao == null) {
+      return Text(
+        'Não foi possível gerar a recomendação no momento.',
+        style: GoogleFonts.poppins(color: AppColors.brown, fontSize: 14),
+      );
+    }
+
+    final sugeridos = _recomendacao!['sugestoes_racao'] as List<dynamic>?;
+    if (sugeridos == null || sugeridos.isEmpty) {
+      return Text(
+        'Nenhuma ração recomendada encontrada.',
+        style: GoogleFonts.poppins(color: AppColors.brown, fontSize: 14),
+      );
+    }
+
+    final firstRacao = sugeridos[0];
+    final hasAlt = sugeridos.length > 1;
+    final altRacao = hasAlt ? sugeridos[1] : null;
+
+    String firstRacaoName = "";
+    String firstRacaoMarca = "";
+    String firstRacaoMotivo = "";
+
+    if (firstRacao is Map) {
+      firstRacaoName = firstRacao['nome'] ?? '';
+      firstRacaoMarca = firstRacao['marca'] ?? '';
+      firstRacaoMotivo = firstRacao['motivo'] ?? '';
+    } else {
+      firstRacaoName = firstRacao.toString();
+    }
+
+    String altRacaoName = "";
+    if (altRacao != null) {
+      if (altRacao is Map) {
+        altRacaoName = altRacao['nome'] ?? altRacao['marca'] ?? '';
+      } else {
+        altRacaoName = altRacao.toString();
+      }
+    }
+
+    final assetPath = getRacaoAssetPath(firstRacaoName.isNotEmpty ? firstRacaoName : firstRacaoMarca);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Imagem da ração
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            width: 115,
+            height: 115,
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.brown.withOpacity(0.1)),
+            ),
+            child: Image.asset(
+              assetPath,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        // Detalhes da recomendação
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (firstRacaoMarca.isNotEmpty)
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      const TextSpan(
+                        text: 'Marca: ',
+                        style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.orange900),
+                      ),
+                      TextSpan(
+                        text: firstRacaoMarca,
+                        style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.brown),
+                      ),
+                    ],
+                  ),
+                  style: GoogleFonts.poppins(fontSize: 14),
+                ),
+              if (firstRacaoName.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      const TextSpan(
+                        text: 'Nome: ',
+                        style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.orange900),
+                      ),
+                      TextSpan(
+                        text: firstRacaoName,
+                        style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.brown),
+                      ),
+                    ],
+                  ),
+                  style: GoogleFonts.poppins(fontSize: 14),
+                ),
+              ],
+              if (firstRacaoMotivo.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Divider(color: AppColors.brown.withOpacity(0.1), height: 1),
+                const SizedBox(height: 6),
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      const TextSpan(
+                        text: 'Motivo: ',
+                        style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.orange900),
+                      ),
+                      TextSpan(
+                        text: firstRacaoMotivo,
+                        style: const TextStyle(fontStyle: FontStyle.italic, color: AppColors.brown),
+                      ),
+                    ],
+                  ),
+                  style: GoogleFonts.poppins(fontSize: 12),
+                ),
+              ],
+              if (altRacaoName.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  'Alternativa: $altRacaoName',
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.brown.withOpacity(0.75),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

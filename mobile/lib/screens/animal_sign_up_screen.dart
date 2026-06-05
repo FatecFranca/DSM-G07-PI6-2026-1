@@ -25,8 +25,10 @@ class _AnimalSignUpScreenState extends State<AnimalSignUpScreen> {
   final TextEditingController _nomeController = TextEditingController();
   final TextEditingController _dataController = TextEditingController();
   final TextEditingController _pesoController = TextEditingController();
+  final TextEditingController _caminhadaController = TextEditingController();
 
   String? _sexoSelecionado;
+  String? _porteSelecionado;
   bool _castrado = false;
 
   String? _especieSelecionada;
@@ -57,6 +59,7 @@ class _AnimalSignUpScreenState extends State<AnimalSignUpScreen> {
     _nomeController.dispose();
     _dataController.dispose();
     _pesoController.dispose();
+    _caminhadaController.dispose();
     super.dispose();
   }
 
@@ -154,6 +157,8 @@ class _AnimalSignUpScreenState extends State<AnimalSignUpScreen> {
           "usuario": widget.usuarioId,
           "especie": _especieSelecionada,
           "raca": _racaSelecionada,
+          "caminhadaDiariaKm": double.tryParse(_caminhadaController.text.trim().replaceAll(',', '.')) ?? 0.0,
+          "porte": _porteSelecionado,
         }),
         headers: {
           "Content-Type": "application/json"
@@ -369,6 +374,32 @@ class _AnimalSignUpScreenState extends State<AnimalSignUpScreen> {
                 hint: "Ex: 12.5",
                 controller: _pesoController,
                 keyboard: TextInputType.number,
+              ),
+
+              const SizedBox(height: 16),
+
+              _label("Caminhada Diária (km)", Icons.directions_walk),
+              const SizedBox(height: 8),
+              _input(
+                hint: "Ex: 1.5",
+                controller: _caminhadaController,
+                keyboard: TextInputType.number,
+              ),
+
+              const SizedBox(height: 16),
+
+              _label("Porte do Animal", Icons.straighten),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                value: _porteSelecionado,
+                decoration: _selectDecoration(),
+                items: const [
+                  DropdownMenuItem(value: "pequeno", child: Text("Pequeno")),
+                  DropdownMenuItem(value: "medio", child: Text("Médio")),
+                  DropdownMenuItem(value: "grande", child: Text("Grande")),
+                ],
+                onChanged: (value) =>
+                    setState(() => _porteSelecionado = value),
               ),
 
               const SizedBox(height: 16),

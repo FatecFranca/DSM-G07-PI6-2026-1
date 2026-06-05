@@ -12,6 +12,8 @@ class Animal {
   final bool castrado;
   final String raca;
   final SpeciesEnum especie;
+  final double? caminhadaDiariaKm;
+  final String? porte;
 
   Animal({
     required this.id,
@@ -22,6 +24,8 @@ class Animal {
     required this.castrado,
     required this.raca,
     required this.especie,
+    this.caminhadaDiariaKm,
+    this.porte,
   });
 
   factory Animal.fromJson(Map<String, dynamic> json) {
@@ -32,10 +36,12 @@ class Animal {
       sexo: json['sexo'],
       peso: (json['peso'] as num).toDouble(),
       castrado: json['castrado'],
-      raca: json['racaNome'],
-      especie: json['especieNome'].toLowerCase() == 'gato'
+      raca: json['racaNome'] ?? json['raca'] ?? '',
+      especie: (json['especieNome'] ?? json['especie'] ?? '').toString().toLowerCase() == 'gato'
           ? SpeciesEnum.cat
           : SpeciesEnum.dog,
+      caminhadaDiariaKm: json['caminhadaDiariaKm'] != null ? (json['caminhadaDiariaKm'] as num).toDouble() : null,
+      porte: json['porte'],
     );
   }
 }
