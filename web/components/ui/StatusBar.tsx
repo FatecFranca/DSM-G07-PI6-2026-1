@@ -12,6 +12,7 @@ import {
 } from "react-icons/fa";
 import HeartLineChart from "@/components/screens/HealthScreen/HeartLineChart";
 import { animalStatsService, HeartbeatData } from "@/services/animalStatsService";
+import { fetchAuthenticatedImage } from "@/services/imageService";
 
 interface StatusBarProps {
   isConnected: boolean;
@@ -20,6 +21,7 @@ interface StatusBarProps {
   lastBpm?: number;
   battery?: number;
   animalId?: string;
+  animalImagemUrl?: string;
 }
 
 export default function StatusBar({
@@ -29,10 +31,48 @@ export default function StatusBar({
   lastBpm,
   battery = 96,
   animalId,
+  animalImagemUrl,
 }: StatusBarProps) {
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [chartData, setChartData] = useState<HeartbeatData[]>([]);
+  const [imgSrc, setImgSrc] = useState<string>("/images/cao-dex.png");
+
+  // 🖼️ Effect to fetch authenticated image with fallback
+  useEffect(() => {
+    if (!animalImagemUrl) {
+      setImgSrc("/images/cao-dex.png");
+      return;
+    }
+
+    const imageUrl: string = animalImagemUrl;
+    let active = true;
+    let objectUrl = "";
+
+    async function loadImage() {
+      try {
+        const url = await fetchAuthenticatedImage(imageUrl);
+        if (active) {
+          setImgSrc(url);
+          objectUrl = url;
+        }
+      } catch (err) {
+        console.error("Failed to load authenticated image:", err);
+        if (active) {
+          setImgSrc("/images/cao-dex.png");
+        }
+      }
+    }
+
+    loadImage();
+
+    return () => {
+      active = false;
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
+  }, [animalImagemUrl]);
 
   function toggle() {
     setIsExpanded(!isExpanded);
@@ -89,13 +129,11 @@ export default function StatusBar({
       <div className="flex justify-between items-center flex-1">
         <div className="flex items-center gap-3">
           <div className="w-[50px] h-[50px] rounded-full overflow-hidden bg-[var(--color-sand-200)]">
-            <Image
-              src="/images/uno.png"
+            <img
+              src={imgSrc}
               alt="Pet"
-              width={50}
-              height={50}
               className="object-cover w-full h-full"
-              loading="eager"
+              onError={() => setImgSrc("/images/cao-dex.png")}
             />
           </div>
 

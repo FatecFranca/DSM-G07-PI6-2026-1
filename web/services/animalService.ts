@@ -6,6 +6,7 @@ export interface AnimalData {
   nome: string;
   sexo: "M" | "F";
   bpm: number;
+  urlImagem?: string;
 }
 
 export async function getAnimalData(

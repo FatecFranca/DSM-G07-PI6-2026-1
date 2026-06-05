@@ -10,6 +10,7 @@ interface Props {
   isConnected?: boolean;
   animalId?: string;
   animalName?: string;
+  animalImagemUrl?: string | null;
 }
 
 export default function BottomNavWithStatus({
@@ -19,6 +20,7 @@ export default function BottomNavWithStatus({
   isConnected = false,
   animalId,
   animalName = "Pet",
+  animalImagemUrl,
 }: Props) {
   return (
     <>
@@ -29,6 +31,7 @@ export default function BottomNavWithStatus({
           animalName={animalName}
           lastBpm={lastBpm ?? undefined}
           animalId={animalId}
+          animalImagemUrl={animalImagemUrl ?? undefined}
         />
 
         <NavBar
@@ -45,6 +48,7 @@ export default function BottomNavWithStatus({
             animalName={animalName}
             lastBpm={lastBpm ?? undefined}
             animalId={animalId}
+            animalImagemUrl={animalImagemUrl ?? undefined}
           />
         </div>
 

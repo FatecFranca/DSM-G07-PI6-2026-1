@@ -1,7 +1,8 @@
 "use client";
 
 import { GoogleMap, useLoadScript } from "@react-google-maps/api";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
+import { fetchAuthenticatedImage } from "@/services/imageService";
 
 const containerStyle = {
   width: "100%",
@@ -22,6 +23,7 @@ interface Props {
   } | null;
   onMapClick?: (lat: number, lng: number) => void;
   hideMarker?: boolean;
+  animalImagemUrl?: string;
 }
 
 export default function MapView({
@@ -32,10 +34,12 @@ export default function MapView({
   safeArea,
   onMapClick,
   hideMarker = false,
+  animalImagemUrl,
 }: Props) {
   const mapRef = useRef<google.maps.Map | null>(null);
   const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
   const circleRef = useRef<google.maps.Circle | null>(null);
+  const [markerCreated, setMarkerCreated] = useState(false);
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY?.trim() || "",
@@ -66,10 +70,13 @@ export default function MapView({
     pin.style.justifyContent = "center";
 
     const img = document.createElement("img");
-    img.src = "/images/uno.png";
+    img.src = "/images/cao-dex.png";
     img.style.width = "100%";
     img.style.height = "100%";
     img.style.objectFit = "cover";
+    img.onerror = () => {
+      img.src = "/images/cao-dex.png";
+    };
 
     pin.appendChild(img);
 
@@ -78,7 +85,50 @@ export default function MapView({
       position: { lat, lng },
       content: pin,
     });
+    setMarkerCreated(true);
   }
+
+  // 🖼️ Effect to fetch and load authenticated marker image with fallback
+  useEffect(() => {
+    if (!markerRef.current) return;
+
+    let active = true;
+    let objectUrl = "";
+
+    async function updateMarkerImage() {
+      const pinElement = markerRef.current?.content as HTMLElement;
+      const img = pinElement?.querySelector("img") as HTMLImageElement | null;
+      if (!img) return;
+
+      if (!animalImagemUrl) {
+        img.src = "/images/cao-dex.png";
+        return;
+      }
+
+      const imageUrl: string = animalImagemUrl;
+      try {
+        const url = await fetchAuthenticatedImage(imageUrl);
+        if (active) {
+          img.src = url;
+          objectUrl = url;
+        }
+      } catch (err) {
+        console.error("Failed to load authenticated marker image on update:", err);
+        if (active) {
+          img.src = "/images/cao-dex.png";
+        }
+      }
+    }
+
+    updateMarkerImage();
+
+    return () => {
+      active = false;
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
+  }, [animalImagemUrl, markerCreated]);
 
   useEffect(() => {
     if (markerRef.current) {

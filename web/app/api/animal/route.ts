@@ -56,6 +56,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       nome: animal.nome,
       sexo: animal.sexo,
+      urlImagem: animal.urlImagem,
       bpm,
     });
   } catch (e) {

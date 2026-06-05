@@ -128,7 +128,7 @@ class RecomendacaoService:
         if not sugestoes:
             sugestoes = [{
                 "brand": marca_prevista_nome,
-                "name": f"Ração recomendada da marca {marca_prevista_nome}"
+                "name": f"Ração {marca_prevista_nome}"
             }]
 
         if status_corpo == 'Sobrepeso':
@@ -142,7 +142,7 @@ class RecomendacaoService:
         for prod in sugestoes:
             recomendacoes_estruturadas.append({
                 "marca": prod.get("brand") or marca_prevista_nome,
-                "nome": prod.get("name") or f"Ração recomendada da marca {marca_prevista_nome}",
+                "nome": prod.get("name") or f"Ração {marca_prevista_nome}",
                 "motivo": motivo
             })
 

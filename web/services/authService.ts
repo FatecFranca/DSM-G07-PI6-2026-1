@@ -7,6 +7,7 @@ interface AuthResponse {
   nome: string;
   email: string;
   petName: string;
+  animalImagemUrl?: string;
 }
 
 class AuthService {
@@ -81,6 +82,10 @@ class AuthService {
 
   getPetName() {
     return this.authData?.petName;
+  }
+
+  getAnimalImagemUrl() {
+    return this.authData?.animalImagemUrl;
   }
 
   isAuthenticated() {
