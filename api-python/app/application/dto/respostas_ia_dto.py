@@ -157,6 +157,12 @@ class RespostaCheckupTesteDTO(BaseModel):
         }
 
 
+class ItemSugestaoRacaoDTO(BaseModel):
+    marca: str = Field(..., example="Royal Canin")
+    nome: str = Field(..., example="Royal Canin® Weight Care Medium Breed Dry Dog Food")
+    motivo: str = Field(..., example="Como o seu animal está acima do peso ideal, é recomendada essa ração para o controle e perda de peso de forma saudável.")
+
+
 class RecomendacaoIADTO(BaseModel):
     """
     Recomendação nutricional gerada pela IA.
@@ -165,7 +171,13 @@ class RecomendacaoIADTO(BaseModel):
     nome: str = Field(..., example="Rex")
     diagnostico: str = Field(..., example="Sobrepeso")
     peso_ideal_esperado: float = Field(..., example=20.0)
-    sugestoes_racao: list[str] = Field(..., example=["Ração Light Plus", "Ração Weight Control"])
+    sugestoes_racao: list[ItemSugestaoRacaoDTO] = Field(..., example=[
+        {
+            "marca": "Royal Canin",
+            "nome": "Royal Canin® Weight Care Medium Breed Dry Dog Food",
+            "motivo": "Como o seu animal está acima do peso ideal, é recomendada essa ração para o controle e perda de peso de forma saudável."
+        }
+    ])
 
     class Config:
         schema_extra = {
@@ -174,6 +186,12 @@ class RecomendacaoIADTO(BaseModel):
                 "nome": "Rex",
                 "diagnostico": "Sobrepeso",
                 "peso_ideal_esperado": 20.0,
-                "sugestoes_racao": ["Ração Light Plus", "Ração Weight Control"]
+                "sugestoes_racao": [
+                    {
+                        "marca": "Royal Canin",
+                        "nome": "Royal Canin® Weight Care Medium Breed Dry Dog Food",
+                        "motivo": "Como o seu animal está acima do peso ideal, é recomendada essa ração para o controle e perda de peso de forma saudável."
+                    }
+                ]
             }
         }

@@ -115,23 +115,41 @@ class RecomendacaoService:
                 match_nutricao = produto.get('condition') in [None, 'Everyday Health']
 
             if match_marca and match_porte and match_nutricao:
-                sugestoes.append(produto['name'])
+                sugestoes.append(produto)
 
         if not sugestoes:
             for produto in self.catalogo:
                 if produto.get('brand') == marca_prevista_nome and (produto.get('animalSize') == "All" or produto.get('animalSize') == porte_busca):
-                    sugestoes.append(produto['name'])
+                    sugestoes.append(produto)
         if not sugestoes:
             for produto in self.catalogo:
                 if produto.get('brand') == marca_prevista_nome:
-                    sugestoes.append(produto['name'])
+                    sugestoes.append(produto)
         if not sugestoes:
-            sugestoes = [f"Ração recomendada da marca {marca_prevista_nome}"]
+            sugestoes = [{
+                "brand": marca_prevista_nome,
+                "name": f"Ração recomendada da marca {marca_prevista_nome}"
+            }]
+
+        if status_corpo == 'Sobrepeso':
+            motivo = "Como o seu animal está acima do peso ideal (Sobrepeso), é recomendada essa ração para o controle e gerenciamento de peso."
+        elif status_corpo == 'Abaixo do Peso':
+            motivo = "Como o seu animal está abaixo do peso ideal, é recomendada essa ração para auxiliar no ganho de peso e fornecer uma nutrição reforçada."
+        else:
+            motivo = "Como o seu animal está na faixa de peso ideal, é recomendada essa ração para a manutenção da sua saúde e nutrição diária."
+
+        recomendacoes_estruturadas = []
+        for prod in sugestoes:
+            recomendacoes_estruturadas.append({
+                "marca": prod.get("brand") or marca_prevista_nome,
+                "nome": prod.get("name") or f"Ração recomendada da marca {marca_prevista_nome}",
+                "motivo": motivo
+            })
 
         return {
             "status_corporal": status_corpo,
             "peso_referencia": peso_ideal,
-            "recomendacoes": sugestoes[:2]
+            "recomendacoes": recomendacoes_estruturadas[:2]
         }
 
     def obter_recomendacao_ia_animal(self, animal_id: str, peso_ideal: float, token: str) -> Dict[str, Any]:
