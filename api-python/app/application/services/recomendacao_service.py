@@ -84,9 +84,9 @@ class RecomendacaoService:
         except Exception as e:
             raise ValueError(f"Não foi possível obter a recomendação da IA devido a uma falha nos modelos: {str(e)}")
 
-        if peso_kg > (peso_ideal * 1.15):
+        if peso_kg > (peso_ideal * 1.10):
             status_corpo = 'Sobrepeso'
-        elif peso_kg < (peso_ideal * 0.85):
+        elif peso_kg < (peso_ideal * 0.90):
             status_corpo = 'Abaixo do Peso'
         else:
             status_corpo = 'Peso Ideal'
