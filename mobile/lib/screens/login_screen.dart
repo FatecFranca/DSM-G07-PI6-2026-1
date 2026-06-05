@@ -1,6 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:PetDex/services/auth_service.dart';
 import '/theme/app_theme.dart';
 import '/main.dart';
 import '/screens/app_shell.dart';
@@ -46,6 +45,12 @@ class _LoginScreenState extends State<LoginScreen> {
         });
       }
     }
+  }
+
+  void _doTestLogin() {
+    _emailController.text = 'henriquealmeidaflorentino@gmail.com';
+    _passwordController.text = 'senha123';
+    _doLogin();
   }
 
   @override
@@ -183,7 +188,29 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 300),
+                const SizedBox(height: 16),
+
+                // --- BOTÃO DE USUÁRIO TESTE ---
+                OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: AppColors.orange900, width: 2),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                  ),
+                  onPressed: _doTestLogin,
+                  child: Text(
+                    'Entrar com usuário teste',
+                    style: GoogleFonts.poppins(
+                      color: AppColors.orange900,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 100),
               ],
             ),
           ),
