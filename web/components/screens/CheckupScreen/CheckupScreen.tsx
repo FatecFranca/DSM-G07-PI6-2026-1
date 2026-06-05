@@ -61,7 +61,7 @@ interface RecData {
   nome: string;
   diagnostico: string;
   peso_ideal_esperado: number;
-  sugestoes_racao: string[];
+  sugestoes_racao: any[];
 }
 
 export default function CheckupScreen({ animalId, animalName }: Props) {
@@ -352,7 +352,20 @@ export default function CheckupScreen({ animalId, animalName }: Props) {
   };
 
   // Mapeamento de nome de ração para imagens
-  const getRacaoImage = (racaoName: string): string => {
+  const getRacaoImage = (racaoInput: any): string => {
+    if (!racaoInput) {
+      return "/images/racao-generica.png";
+    }
+
+    let racaoName = "";
+    if (typeof racaoInput === "string") {
+      racaoName = racaoInput;
+    } else if (typeof racaoInput === "object" && racaoInput !== null) {
+      racaoName = racaoInput.nome || racaoInput.marca || "";
+    } else {
+      return "/images/racao-generica.png";
+    }
+
     // 1. Tenta encontrar no catálogo de rações pelo nome correspondente
     const matchedFood = foodCatalog.find(
       (item) => item.name?.toLowerCase() === racaoName.toLowerCase()
@@ -373,6 +386,20 @@ export default function CheckupScreen({ animalId, animalName }: Props) {
       return "/images/racao-nutrience.png";
     } else if (name.includes("authority")) {
       return "/images/racao-authority.png";
+    } else if (name.includes("iams")) {
+      return "/images/racao-iams.png";
+    } else if (name.includes("nutro")) {
+      return "/images/racao-nutro.png";
+    } else if (name.includes("pedigree")) {
+      return "/images/racao-pedigree.png";
+    } else if (name.includes("purina")) {
+      return "/images/racao-purina.png";
+    } else if (name.includes("special")) {
+      return "/images/racao-special.png";
+    } else if (name.includes("wellness")) {
+      return "/images/racao-wellness.png";
+    } else if (name.includes("natural balance")) {
+      return "/images/racao-natural-balance.png";
     }
     return "/images/racao-generica.png";
   };
@@ -482,28 +509,51 @@ export default function CheckupScreen({ animalId, animalName }: Props) {
               style={{ backgroundColor: "var(--color-sand-900)" }}
             >
               {recData && recData.sugestoes_racao && recData.sugestoes_racao.length > 0 ? (
-                <div className="flex items-center gap-4">
-                  {/* Imagem da Ração mapeada */}
-                  <img 
-                    src={getRacaoImage(recData.sugestoes_racao[0])} 
-                    alt={recData.sugestoes_racao[0]} 
-                    className="w-[100px] h-[100px] object-contain shrink-0 drop-shadow-md"
-                  />
-                  {/* Nome da Ração */}
-                  <div className="flex flex-col gap-1">
-                    <span className="text-[10px] text-[var(--color-orange-900)] font-black uppercase tracking-wider">
-                      Recomendada ({recData.diagnostico})
-                    </span>
-                    <h4 className="font-bold text-[14px] text-[var(--color-brown)] leading-snug">
-                      {recData.sugestoes_racao[0]}
-                    </h4>
-                    {recData.sugestoes_racao[1] && (
-                      <span className="text-[11px] text-[var(--color-brown)] opacity-75 mt-1">
-                        Alternativa: {recData.sugestoes_racao[1]}
-                      </span>
-                    )}
-                  </div>
-                </div>
+                (() => {
+                  const firstRacao = recData.sugestoes_racao[0];
+                  const alternativeRacao = recData.sugestoes_racao[1];
+
+                  const firstRacaoName = typeof firstRacao === "object" && firstRacao !== null
+                    ? firstRacao.nome || firstRacao.marca || "Ração Recomendada"
+                    : (firstRacao || "Ração Recomendada");
+
+                  const alternativeRacaoName = typeof alternativeRacao === "object" && alternativeRacao !== null
+                    ? alternativeRacao.nome || alternativeRacao.marca
+                    : alternativeRacao;
+
+                  const altText = typeof firstRacaoName === "string" ? firstRacaoName : "Ração Recomendada";
+                  const imageUrl = getRacaoImage(firstRacao);
+
+                  return (
+                    <div className="flex items-center gap-4">
+                      {/* Imagem da Ração mapeada */}
+                      <img 
+                        src={imageUrl} 
+                        alt={altText} 
+                        className="w-[100px] h-[100px] object-contain shrink-0 drop-shadow-md"
+                      />
+                      {/* Nome da Ração */}
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[10px] text-[var(--color-orange-900)] font-black uppercase tracking-wider">
+                          Recomendada ({recData.diagnostico})
+                        </span>
+                        <h4 className="font-bold text-[14px] text-[var(--color-brown)] leading-snug">
+                          {firstRacaoName}
+                        </h4>
+                        {alternativeRacaoName && (
+                          <span className="text-[11px] text-[var(--color-brown)] opacity-75 mt-1">
+                            Alternativa: {alternativeRacaoName}
+                          </span>
+                        )}
+                        {typeof firstRacao === "object" && firstRacao !== null && firstRacao.motivo && (
+                          <span className="text-[11px] text-[var(--color-orange-900)] font-semibold italic mt-0.5">
+                            Motivo: {firstRacao.motivo}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()
               ) : (
                 <div className="flex items-center gap-4">
                   <img 
