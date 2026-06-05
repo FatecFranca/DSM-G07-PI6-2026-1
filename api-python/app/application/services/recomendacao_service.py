@@ -91,12 +91,24 @@ class RecomendacaoService:
         else:
             status_corpo = 'Peso Ideal'
 
-        if peso_kg <= 10:
-            porte_pet_original = 'Pequeno'
-        elif peso_kg <= 25:
-            porte_pet_original = 'Médio'
-        else:
-            porte_pet_original = 'Grande'
+        porte_val = dados_animal.get("porte") or dados_animal.get("porteAnimal")
+        porte_pet_original = None
+        if porte_val is not None:
+            porte_val_str = str(porte_val).lower().strip()
+            if porte_val_str in ['pequeno', 'small']:
+                porte_pet_original = 'Pequeno'
+            elif porte_val_str in ['medio', 'médio', 'medium']:
+                porte_pet_original = 'Médio'
+            elif porte_val_str in ['grande', 'large', 'giant']:
+                porte_pet_original = 'Grande'
+
+        if porte_pet_original is None:
+            if peso_kg <= 10:
+                porte_pet_original = 'Pequeno'
+            elif peso_kg <= 25:
+                porte_pet_original = 'Médio'
+            else:
+                porte_pet_original = 'Grande'
 
         mapa_porte = {'Pequeno': 'Small', 'Médio': 'Medium', 'Grande': 'Large'}
         porte_busca = mapa_porte.get(porte_pet_original, 'All')

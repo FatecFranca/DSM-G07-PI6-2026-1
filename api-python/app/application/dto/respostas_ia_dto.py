@@ -195,3 +195,27 @@ class RecomendacaoIADTO(BaseModel):
                 ]
             }
         }
+
+
+class SimulacaoRecomendacaoInputDTO(BaseModel):
+    """
+    Modelo para entrada de dados de simulação de recomendação nutricional.
+    """
+    peso: float = Field(..., description="Peso atual do animal em kg", example=20.0)
+    dataNascimento: str = Field(..., description="Data de nascimento do animal (AAAA-MM-DD)", example="2020-01-01")
+    caminhada_diaria_km: float = Field(..., description="Distância percorrida em caminhada diária (km)", example=1.5)
+    peso_ideal: float = Field(..., description="Peso ideal recomendado para o animal em kg", example=18.0)
+    porte: Optional[str] = Field(None, description="Porte do animal (pequeno, medio, grande)", example="medio")
+    raca: Optional[str] = Field(None, description="Raça do animal", example="Golden Retriever")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "peso": 20.0,
+                "dataNascimento": "2020-01-01",
+                "caminhada_diaria_km": 1.5,
+                "peso_ideal": 18.0,
+                "porte": "medio",
+                "raca": "Golden Retriever"
+            }
+        }
