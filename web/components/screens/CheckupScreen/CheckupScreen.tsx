@@ -463,7 +463,7 @@ export default function CheckupScreen({ animalId, animalName }: Props) {
               <div 
                 className="w-full h-[26px] rounded-full relative overflow-hidden shadow-inner border border-[#d8c292]/30 flex items-center justify-between px-4 text-white text-[11px] font-bold"
                 style={{
-                  background: "linear-gradient(to right, #D32F2F 0%, #F39200 25%, #388E3C 50%, #F39200 75%, #D32F2F 100%)"
+                  background: "linear-gradient(to right, #D32F2F 0%, #F39200 15%, #388E3C 35%, #388E3C 65%, #F39200 85%, #D32F2F 100%)"
                 }}
               >
                 <span>{weightData.peso_minimo}kg</span>
@@ -530,43 +530,39 @@ export default function CheckupScreen({ animalId, animalName }: Props) {
                       <img 
                         src={imageUrl} 
                         alt={altText} 
-                        className="w-[90px] h-[90px] object-contain shrink-0 drop-shadow-md bg-white rounded-xl p-1 border border-[var(--color-brown)]/10"
+                        className="w-[115px] h-[115px] object-contain shrink-0 drop-shadow-md bg-white rounded-xl p-1.5 border border-[var(--color-brown)]/10"
                       />
                       {/* Detalhes da Ração */}
                       <div className="flex flex-col gap-1.5 min-w-0 flex-1">
-                        <span className="text-[10px] text-[var(--color-orange-900)] font-black uppercase tracking-wider">
-                          Recomendada ({recData.diagnostico})
-                        </span>
-
                         {typeof firstRacao === "object" && firstRacao !== null ? (
                           <>
                             {firstRacao.marca && (
-                              <div className="text-[12px] text-[var(--color-brown)]">
+                              <div className="text-[14px] text-[var(--color-brown)]">
                                 <span className="font-extrabold text-[var(--color-orange-900)]">Marca: </span>
                                 <span className="font-semibold">{firstRacao.marca}</span>
                               </div>
                             )}
                             {firstRacao.nome && (
-                              <div className="text-[12px] text-[var(--color-brown)] leading-snug">
+                              <div className="text-[14px] text-[var(--color-brown)] leading-snug">
                                 <span className="font-extrabold text-[var(--color-orange-900)]">Nome: </span>
                                 <span className="font-semibold">{firstRacao.nome}</span>
                               </div>
                             )}
                             {firstRacao.motivo && (
-                              <div className="text-[11px] text-[var(--color-brown)] opacity-90 leading-relaxed border-t border-[var(--color-brown)]/10 pt-1.5 mt-1">
+                              <div className="text-[12px] text-[var(--color-brown)] opacity-90 leading-relaxed border-t border-[var(--color-brown)]/10 pt-1.5 mt-1">
                                 <span className="font-extrabold text-[var(--color-orange-900)]">Motivo: </span>
                                 <span className="font-medium italic">{firstRacao.motivo}</span>
                               </div>
                             )}
                           </>
                         ) : (
-                          <h4 className="font-bold text-[13px] text-[var(--color-brown)] leading-snug">
+                          <h4 className="font-bold text-[14px] text-[var(--color-brown)] leading-snug">
                             {firstRacaoName}
                           </h4>
                         )}
 
                         {alternativeRacaoName && (
-                          <span className="text-[11px] text-[var(--color-brown)] opacity-75 mt-1 border-t border-[var(--color-brown)]/5 pt-1">
+                          <span className="text-[12px] text-[var(--color-brown)] opacity-75 mt-1 border-t border-[var(--color-brown)]/5 pt-1">
                             Alternativa: {alternativeRacaoName}
                           </span>
                         )}
