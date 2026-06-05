@@ -29,6 +29,7 @@ interface MapScreenProps {
   setLastBpm: (bpm: number | null) => void;
   animalId: string;
   animalName: string;
+  animalImagemUrl?: string | null;
   onLogout?: () => void;
 }
 
@@ -36,6 +37,7 @@ export default function MapScreen({
   setLastBpm,
   animalId,
   animalName,
+  animalImagemUrl,
   onLogout,
 }: MapScreenProps) {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -183,6 +185,7 @@ export default function MapScreen({
         <MapView
           lat={lat}
           lng={lng}
+          animalImagemUrl={animalImagemUrl ?? undefined}
           onMapLoaded={() => setIsLoaded(true)}
         />
       )}

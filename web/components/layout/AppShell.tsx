@@ -22,6 +22,7 @@ export default function AppShell() {
 
   const [animalId, setAnimalId] = useState("");
   const [petName, setPetName] = useState("Pet");
+  const [animalImagemUrl, setAnimalImagemUrl] = useState<string | null>(null);
 
   // 🔄 Carrega sessão salva no storage no primeiro render
   useEffect(() => {
@@ -34,6 +35,7 @@ export default function AppShell() {
         if (authenticated) {
           setAnimalId(authService.getAnimalId() || "");
           setPetName(authService.getPetName() || "Pet");
+          setAnimalImagemUrl(authService.getAnimalImagemUrl() || null);
         }
       } catch (err) {
         console.error("[AppShell] Erro ao carregar AuthService:", err);
@@ -47,6 +49,7 @@ export default function AppShell() {
     setIsAuthenticated(true);
     setAnimalId(authService.getAnimalId() || "");
     setPetName(authService.getPetName() || "Pet");
+    setAnimalImagemUrl(authService.getAnimalImagemUrl() || null);
   };
 
   const handleLogout = () => {
@@ -55,6 +58,7 @@ export default function AppShell() {
     setIsAuthenticated(false);
     setAnimalId("");
     setPetName("Pet");
+    setAnimalImagemUrl(null);
     setLastBpm(null);
     setCurrentIndex(0);
   };
@@ -104,6 +108,11 @@ export default function AppShell() {
         } else {
           console.log("❌ BPM veio null/undefined");
         }
+
+        if (animal?.urlImagem) {
+          console.log("🖼️ SETANDO IMAGEM ANIMAL:", animal.urlImagem);
+          setAnimalImagemUrl(animal.urlImagem);
+        }
       } catch (err) {
         console.error("Erro ao carregar dados do pet:", err);
       }
@@ -135,6 +144,7 @@ export default function AppShell() {
       setLastBpm={setLastBpm}
       animalId={animalId}
       animalName={petName}
+      animalImagemUrl={animalImagemUrl}
       onLogout={handleLogout}
     />,
     <HealthScreen
@@ -165,6 +175,7 @@ export default function AppShell() {
         isConnected={isConnected}
         animalId={animalId}
         animalName={petName}
+        animalImagemUrl={animalImagemUrl}
       />
     </div>
   );
