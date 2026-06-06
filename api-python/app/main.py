@@ -130,8 +130,9 @@ async def health_check():
 
 
 # --------------------- Roteadores (DDD Controllers) ---------------------
-from app.view import checkup_router, estatistica_router, recomendacao_router
+from app.view import checkup_router, estatistica_router, recomendacao_router, peso_router
 
 app.include_router(checkup_router)
 app.include_router(estatistica_router)
 app.include_router(recomendacao_router)
+app.include_router(peso_router)
