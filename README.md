@@ -34,6 +34,7 @@ Repositório do **Grupo 07** do Projeto Interdisciplinar do **5º semestre** do 
 * **🎨 FIGMA:** [Protótipo da Interface](https://www.figma.com/design/BZOrhXmiYHgesIZf1Ex3Pw/PetDex.?node-id=0-1&t=8nuIhASiCYaiae4f-1)
 * **🐍 API de Análise (FastAPI - Python):** [http://34.24.9.134:8083/docs](http://34.24.9.134:8083/docs)
 * **☕ API Principal (Java - Spring Boot):** [http://34.24.9.134:8080/swagger](http://34.24.9.134:8080/swagger)
+* **💻 Versão Web (Next.js):** [http://34.24.9.134:8082/](http://34.24.9.134:8082/)
 * **📱 Download do APK (Android):** [Baixar PetDex APK](https://drive.google.com/file/d/1qfmFwAp55BwcIVp8BA7cER1gD2TSqYkW/view?usp=sharing)
 
 ### **🔑 Credenciais de Teste**
@@ -92,7 +93,7 @@ O **aplicativo PetDex**, desenvolvido em **Flutter**, entrega uma experiência c
   <img src="./docs/img/tela1.gif" alt="Tela Inicial do App" width="250px" />
 </p>
 <p align="center">
-  <em><b>Tela Inicial (Figura 9a):</b> mostra a última localização e o batimento cardíaco mais recente do pet, além de um gráfico com as médias das últimas horas.</em>
+  <em><b>Tela Inicial:</b> mostra a última localização e o batimento cardíaco mais recente do pet, além de um gráfico com as médias das últimas horas.</em>
 </p>
 
 ---
@@ -101,7 +102,7 @@ O **aplicativo PetDex**, desenvolvido em **Flutter**, entrega uma experiência c
   <img src="./docs/img/tela2.gif" alt="Tela de Saúde" width="250px" />
 </p>
 <p align="center">
-  <em><b>Tela de Saúde (Figura 9b):</b> exibe a média de batimentos diários, por data e análises estatísticas referente ao último batimento registrado.</em>
+  <em><b>Tela de Saúde:</b> exibe a média de batimentos diários, por data e análises estatísticas referente ao último batimento registrado.</em>
 </p>
 
 ---
@@ -110,7 +111,7 @@ O **aplicativo PetDex**, desenvolvido em **Flutter**, entrega uma experiência c
   <img src="./docs/img/tela3.gif" alt="Tela de Checkup" width="250px" />
 </p>
 <p align="center">
-  <em><b>Tela Checkup Inteligente (Figura 9c):</b> o tutor responde sintomas observados, e a IA da PetDex sugere possíveis condições com base nos dados coletados mas sem emitir diagnósticos, apenas orientações preventivas.</em>
+  <em><b>Tela Checkup Inteligente:</b> o tutor responde sintomas observados, e a IA da PetDex sugere possíveis condições com base nos dados coletados mas sem emitir diagnósticos, apenas orientações preventivas.</em>
 </p>
 
 ---
@@ -119,21 +120,30 @@ O **aplicativo PetDex**, desenvolvido em **Flutter**, entrega uma experiência c
   <img src="./docs/img/tela4.gif" alt="Tela de Localização" width="250px" />
 </p>
 <p align="center">
-  <em><b>Tela de Localização (Figura 9d):</b> mostra o mapa em tempo real e permite configurar uma <b>área segura</b>. O app envia alertas automáticos caso o pet saia ou retorne ao perímetro.</em>
+  <em><b>Tela de Localização: </b> mostra o mapa em tempo real e permite configurar uma <b>área segura</b>. O app envia alertas automáticos caso o pet saia ou retorne ao perímetro.</em>
 </p>
 
 ---
 
-## 📊 Análises Avançadas
+<p align="center">
+  <img src="./docs/img/tela5.jpeg" alt="Tela de Análise de Peso e Recomendação" width="250px" />
+</p>
+<p align="center">
+  <em><b>Tela de Análise de Peso e Recomendação:</b> análise de peso e recomendação de ração para auxiliar no controle de peso e na dieta do animal.</em>
+</p>
 
-A **API analítica (Python/FastAPI)** fornece endpoints que processam e interpretam os dados recebidos da coleira, incluindo:
+---
 
-- Estatísticas descritivas (média, moda, mediana, desvio padrão)
-- Correlações entre movimento e batimentos cardíacos
-- Previsões de batimentos futuros via **modelo de regressão linear**
-- Status geral de saúde e alertas de anomalias
+### **Versão Web**
 
-Esses resultados alimentam os dashboards do aplicativo, oferecendo uma visão clara e personalizada do comportamento e condição do pet.
+A plataforma também conta com um painel administrativo e de usuário **desenvolvido em Next.js**, permitindo o acesso prático e detalhado às informações do pet diretamente pelo navegador.
+
+<p align="center">
+  <img src="./docs/img/web.jpg" alt="Versão Web do PetDex" width="90%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
+</p>
+<p align="center">
+  <em><b>Dashboard Web:</b> interface web do PetDex, permitindo monitoramento contínuo com gráficos em tempo real.</em>
+</p>
 
 ---
 
@@ -153,6 +163,17 @@ A PetDex foi desenvolvida com uma **arquitetura modular e distribuída**, dividi
 
 ---
 
+### **📡 Mensageria e Funcionamento da Coleira**
+
+A coleira inteligente atua como a principal fonte de dados para todo o sistema, coletando métricas dos sensores (batimentos cardíacos, movimentação e localização GPS) de forma contínua. 
+O fluxo de envio de dados e comunicação funciona da seguinte maneira:
+- O microcontrolador (ESP32) coleta e transmite os dados gerados pela coleira para a nuvem utilizando o **Google Pub/Sub**.
+- O **Google Pub/Sub** atua como o serviço central de mensageria, recebendo os dados da coleira de forma escalável e enviando-os para a nossa API Principal para serem cadastrados e processados.
+- Após o salvamento, a API retransmite esses eventos instantaneamente para todos os clientes conectados (App Mobile e Dashboard Web) através de uma conexão **WebSocket**.
+- Esse modelo arquitetural garante que o tutor monitore as métricas de saúde e a posição no mapa de forma contínua, **sem a necessidade de recarregar a tela**, aliando a robustez do Google Pub/Sub para a ingestão dos dados IoT com a baixa latência do WebSocket para o usuário final.
+
+---
+
 ### **2️⃣ Backend e Infraestrutura**
 
 * **API Principal:** Java 21 + Spring Boot
@@ -164,8 +185,17 @@ A PetDex foi desenvolvida com uma **arquitetura modular e distribuída**, dividi
 * **API Analítica:** Python 3.11 + FastAPI
   - Processamento estatístico e aprendizado de máquina
   - Bibliotecas: Pandas, NumPy, SciPy, Scikit-learn
-  - Modelo de classificação **CART (Árvore de Decisão)** em formato PMML
+  - Modelo preditivo **KNN (K-Nearest Neighbors)** em formato `.pkl`
   - Execução assíncrona com **Uvicorn**
+  
+  **📊 Análises Avançadas:**
+  Esta API fornece endpoints que processam e interpretam os dados recebidos, incluindo:
+  - Estatísticas descritivas (média, moda, mediana, desvio padrão)
+  - Correlações entre movimento e batimentos cardíacos
+  - Avaliação de peso ideal e recomendação nutricional via KNN
+  - Status geral de saúde e alertas de anomalias
+  
+  *Esses resultados alimentam os dashboards da plataforma, oferecendo uma visão clara e personalizada da condição do pet.*
 
 * **Hospedagem:** Servidor Google Cloud
   - Sistema Operacional: **Ubuntu**
@@ -328,34 +358,28 @@ Ambas as APIs (Java e Python) compartilham a mesma chave secreta JWT (`JWT_SECRE
 
 ## 🧠 Modelo de Inteligência Artificial
 
-A PetDex utiliza um modelo de **classificação de espécies** treinado com técnicas de aprendizado de máquina para identificar se um animal é um cão ou gato com base em características físicas.
+A PetDex utiliza um modelo de **análise de peso ideal e recomendação nutricional** treinado com técnicas de aprendizado de máquina para analisar o perfil do animal, avaliar seu estado corporal e sugerir a ração mais adequada para o seu bem-estar.
 
-### **O Desafio: Generalista vs. Especialista**
+### **Base de Dados: Canine Wellness Dataset**
 
-Durante o desenvolvimento, enfrentamos uma questão estratégica: treinar um modelo **generalista** capaz de classificar 8 espécies diferentes de animais presentes no dataset, ou um modelo **especialista** focado apenas em cães e gatos?
+Para o treinamento do modelo, foi utilizada a base de dados **[Canine Wellness Dataset (Synthetic 10k Samples)](https://www.kaggle.com/datasets/aaronisomaisom3/canine-wellness-dataset-synthetic-10k-samples)**, disponível no Kaggle. Esta base conta com dados simulados de **10.000 cachorros**, contendo informações sobre idade, peso e nível de atividade física, o que permitiu a criação de um modelo focado nas necessidades reais de cada perfil de animal.
 
-### **Processo de Desenvolvimento**
+### **Variáveis Analisadas (Features)**
 
-1. **Treinamento de Múltiplos Modelos:** Foram treinados **12 modelos classificadores diferentes**, incluindo:
-   - SVM (Support Vector Machine)
-   - Logistic Regression
-   - Árvores de Decisão (CART)
-   - Random Forest
-   - E outros algoritmos do Scikit-learn
+O principal objetivo da Inteligência Artificial é prever a melhor categoria e marca de ração com base nas características individuais. O algoritmo recebe como entrada (features):
+- **Idade (Age)**
+- **Peso Ideal e Real (Weight em kg)**
+- **Nível de Atividade (Caminhada diária em km)**
+- **Necessidade de Energia em Repouso (RER - Calorias diárias calculadas a partir do peso)**
 
-2. **Exportação Universal:** Todos os modelos foram exportados para o formato **PMML (Predictive Model Markup Language)**, um padrão universal compatível com a API Python e diversas outras plataformas
+### **Seleção do Modelo: K-Nearest Neighbors (KNN)**
 
-### **Validação e Seleção do Modelo**
+Após a etapa de treinamento e validação, o algoritmo **K-Nearest Neighbors (KNN)** foi selecionado como o modelo oficial para a recomendação de ração.
+- O modelo treinado foi salvo e exportado (`modelo_knn_racao.pkl`) utilizando a biblioteca `joblib` para o Python.
+- Além do KNN, a API implementa uma lógica de **Avaliação de Peso**, que compara o peso real com o ideal para identificar se o pet está **Abaixo do Peso**, no **Peso Ideal** ou em **Sobrepeso**.
+- Cruzando a predição do KNN com a avaliação de peso, o sistema filtra um catálogo interno validado nutricionalmente (`db-food.json`) e devolve opções reais de rações para controle de dieta.
 
-- **Cross-Validation:** Realizamos análise rigorosa com validação cruzada para avaliar a performance de cada modelo
-- **Análise Visual:** Gráficos Boxplot foram gerados para comparar a distribuição de acurácia entre os modelos
-- **Teste Final:** Simulação de uso real com **20 casos reais de cães e gatos**
-
-### **O Vencedor: CART Especialista**
-
-O modelo **CART (Classification and Regression Trees)** treinado **APENAS com dados de cães e gatos** atingiu **100% de acerto** no teste final, superando todos os modelos generalistas.
-
-O arquivo `modelo_CART.pmml` foi escolhido como o **"cérebro" oficial da PetDex** e está integrado à API Python, sendo utilizado pelo aplicativo Flutter para realizar classificações em tempo real.
+Essa inteligência está hospedada na **API Analítica (Python/FastAPI)**, e as recomendações geradas auxiliam ativamente os tutores nas decisões sobre a nutrição diária de seus cães.
 
 ---
 

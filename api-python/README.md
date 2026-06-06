@@ -58,88 +58,46 @@ Esta API **não coleta dados diretamente da coleira**. Seu papel estratégico é
 
 ---
 
-## 🤖 Inteligência Artificial: Modelo CART de Classificação de Espécies
+## 🤖 Inteligência Artificial: Modelo de Análise de Peso e Recomendação Nutricional
 
-A API Python é responsável por carregar e executar o **modelo de classificação de espécies** da PetDex, que identifica se um animal é um cão ou gato com base em características físicas.
+A API Python é o coração analítico da PetDex, responsável por carregar e executar o **modelo de análise de peso ideal e recomendação nutricional** que avalia o perfil do animal e sugere a ração ideal para a sua saúde e controle de peso.
 
-### **O Modelo Escolhido: CART (Árvore de Decisão)**
+### **Base de Dados: Canine Wellness Dataset**
 
-Após um rigoroso processo de desenvolvimento e validação, o modelo **CART (Classification and Regression Trees)** foi selecionado como o "cérebro" oficial da PetDex para classificação de espécies.
+O treinamento do modelo foi fundamentado na base de dados **[Canine Wellness Dataset (Synthetic 10k Samples)](https://www.kaggle.com/datasets/aaronisomaisom3/canine-wellness-dataset-synthetic-10k-samples)**, disponível publicamente no Kaggle.
+Com **10.000 amostras simuladas** de cães, a base oferece um conjunto rico de variáveis que englobam idade, peso, nível de atividade e necessidades calóricas. Isso permitiu o desenvolvimento de uma inteligência focada no perfil fisiológico de cada animal.
 
-### **Processo de Seleção e Desenvolvimento**
+### **O Modelo Escolhido: K-Nearest Neighbors (KNN)**
 
-O desenvolvimento do modelo de IA seguiu uma metodologia científica rigorosa, documentada no relatório **"Analise IA PetDex Oficial.pdf"** (disponível na pasta `Aprendizagem de Maquina`):
+Após uma bateria de testes e validações envolvendo diversos algoritmos clássicos de machine learning (como SVM, Random Forest e Árvores de Decisão), o modelo **K-Nearest Neighbors (KNN)** apresentou a melhor relação entre acurácia e capacidade de generalização para classificar o perfil nutricional do cão e predizer a melhor categoria/marca de ração.
 
-**1. Desafio Inicial:**
-- Decidir entre um modelo **generalista** (8 espécies de animais) ou **especialista** (apenas cães e gatos)
-- Análise de viabilidade e aplicabilidade ao contexto do projeto
+### **Como a Recomendação Funciona?**
 
-**2. Treinamento Extensivo:**
-- Foram treinados **12 modelos classificadores diferentes**, incluindo:
-  - **SVM** (Support Vector Machine)
-  - **Logistic Regression**
-  - **Árvores de Decisão (CART)**
-  - **Random Forest**
-  - **Naive Bayes**
-  - E outros algoritmos do Scikit-learn
+A inteligência da PetDex atua em duas frentes combinadas:
 
-**3. Validação Rigorosa:**
-- Análise com **Cross-Validation** (validação cruzada) para avaliar a performance de cada modelo
-- Gráficos **Boxplot** para comparar a distribuição de acurácia entre os modelos
-- Teste final com **20 casos reais de cães e gatos** para validação prática
+1. **Predição com KNN (Machine Learning):**
+   - A API recebe as métricas do animal (Idade, Peso Ideal, Distância de Caminhada Diária e Necessidade Calórica de Repouso - RER).
+   - Esses dados são normalizados (utilizando o `scaler_knn_brand.pkl`) e submetidos ao algoritmo preditivo KNN (`modelo_knn_racao.pkl`), que avalia as características mais próximas ("vizinhos") na base de treinamento para identificar a ração mais apropriada.
 
-**4. Resultado Final:**
-- O modelo **CART treinado APENAS com cães e gatos** atingiu **100% de acerto** no teste final
-- Demonstrou melhor equilíbrio entre acurácia, interpretabilidade e performance
+2. **Avaliação Fisiológica (Lógica Especialista):**
+   - Paralelamente à predição, a API compara o **peso atual** do animal com o **peso ideal** da raça.
+   - O pet é classificado em três estágios corporais possíveis: **Sobrepeso**, **Peso Ideal** ou **Abaixo do Peso**.
 
-### **Por que o CART?**
+### **Integração com o Catálogo de Rações**
 
-O modelo CART foi escolhido por apresentar:
+O cruzamento entre a categoria de ração predita pelo modelo KNN e o diagnóstico de peso do animal alimenta um motor de busca num **Catálogo Nutricional** (`db-food.json`) validado para o sistema.
+- Se o animal possui **Sobrepeso**, o sistema filtra rações voltadas para o controle de calorias (Weight Management).
+- O resultado prático é entregue via API para o Aplicativo e Dashboard Web, oferecendo ao tutor sugestões reais de ração e a fundamentação do porquê aquela dieta é recomendada (ex: ganho, perda ou manutenção de peso).
 
-- ✅ **Alta Acurácia**: 100% de acerto nos testes finais
-- ✅ **Interpretabilidade**: Árvores de decisão são fáceis de entender e explicar
-- ✅ **Performance**: Rápido para treinamento e predição
-- ✅ **Robustez**: Funciona bem com dados categóricos e numéricos
-- ✅ **Especialização**: Focado em cães e gatos, os principais pets domésticos
+### **Formatos e Persistência**
 
-### **Formato PMML: Portabilidade Universal**
-
-Todos os modelos foram exportados para o formato **PMML (Predictive Model Markup Language)**, um padrão universal que permite:
-
-- ✅ **Compatibilidade** com múltiplas plataformas e linguagens de programação
-- ✅ **Independência** do framework de treinamento (Scikit-learn)
-- ✅ **Fácil integração** com a API Python via biblioteca PyPMML
-- ✅ **Portabilidade** para outros sistemas futuros sem necessidade de retreinamento
-
-O arquivo `modelo_CART.pmml` está localizado na raiz do projeto da API Python e é carregado automaticamente na inicialização da aplicação.
-
-### **Integração com o Aplicativo**
-
-<p align="center">
-  <img src="../docs/img/tela3.gif" alt="Checkup Inteligente no App" width="250px" />
-</p>
-<p align="center">
-  <em><b>Tela Checkup Inteligente:</b> O tutor responde sintomas observados, e a IA da PetDex sugere possíveis condições com base nos dados coletados, fornecendo orientações preventivas.</em>
-</p>
-
-O aplicativo Flutter consome os endpoints da API Python que utilizam o modelo CART para:
-
-- 🔍 **Identificar a espécie** do animal durante o cadastro
-- 🩺 **Realizar checkups inteligentes** baseados em sintomas e dados da coleira
-- 📊 **Fornecer análises personalizadas** de acordo com a espécie identificada
+Diferente de iterações passadas (que utilizavam o padrão PMML para modelos em Java), a arquitetura atual é 100% nativa em Python.
+- Os modelos e ferramentas de normalização foram exportados utilizando a biblioteca **`joblib`** (`.pkl`), garantindo máxima compatibilidade, velocidade de inferência e integração perfeita com o ecossistema `scikit-learn` / `pandas` da nossa API.
 
 ### **Documentação Completa**
 
-Para mais detalhes sobre o processo de desenvolvimento, treinamento e validação do modelo de IA, consulte:
-
-📄 **[Analise IA PetDex Oficial.pdf](../Aprendizagem%20de%20Maquina/Analise%20IA%20PetDex%20Oficial.pdf)**
-
-Este documento contém:
-- Análise completa dos dados
-- Metodologia de treino da IA
-- Comparação entre todos os modelos testados
-- Resultados e métricas de performance
-- Conclusões e justificativas da escolha do CART
+Para mais detalhes sobre o processo de desenvolvimento, análise de dados e treinamento da IA, consulte os notebooks e arquivos na pasta principal:
+📄 **[Aprendizagem de Maquina](../Aprendizagem%20de%20Maquina)**
 
 ---
 
@@ -191,6 +149,17 @@ Ao identificar um batimento com baixa probabilidade de ocorrência, o tutor é a
 </p>
 <p align="center">
   <em><b>Tela Inicial:</b> Mostra a última localização e o batimento cardíaco mais recente do pet, além de um gráfico com as médias das últimas horas registradas.</em>
+</p>
+
+### **Controle de Peso e Recomendação de Ração: Dieta Sob Medida**
+
+Para auxiliar no bem-estar do animal, a API analisa o peso e as necessidades calóricas do pet, fornecendo recomendações de ração para o controle do peso.
+
+<p align="center">
+  <img src="../docs/img/tela5.jpeg" alt="Tela de Análise de Peso e Recomendação no App" width="250px" />
+</p>
+<p align="center">
+  <em><b>Tela de Análise de Peso e Recomendação:</b> Exibe a análise de peso e sugere opções e a quantidade de ração adequada para manter a saúde do animal.</em>
 </p>
 
 ---

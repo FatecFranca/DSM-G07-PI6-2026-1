@@ -6,6 +6,12 @@
 
 Dashboard administrativo e de usuário desenvolvido em **Next.js** e **React** para monitoramento em tempo real da saúde, localização e segurança de cães e gatos através da coleira inteligente PetDex.
 
+🔗 **Acesso à Aplicação:** [http://34.24.9.134:8082/](http://34.24.9.134:8082/)
+
+<p align="center">
+  <img src="../docs/img/web.jpg" alt="Versão Web do PetDex" width="90%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
+</p>
+
 ---
 
 ## 📋 Pré-requisitos
