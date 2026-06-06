@@ -27,7 +27,7 @@ export async function GET(
 
     // Tenta primeiro chamar a API Python (caso já esteja implementada no servidor)
     try {
-      const pythonRes = await fetch(`${PYTHON_API}/ia/peso-ideal/animal/${animalId}`, {
+      const pythonRes = await fetch(`${PYTHON_API}/peso/animal/${animalId}/analise-ideal`, {
         headers: {
           Authorization: authHeader,
         },

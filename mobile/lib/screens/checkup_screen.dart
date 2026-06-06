@@ -31,6 +31,7 @@ class _CheckupScreenState extends State<CheckupScreen> {
   bool _exibindoCheckupGeral = true;
   Animal? _animal;
   Map<String, dynamic>? _recomendacao;
+  Map<String, dynamic>? _pesoIdealData;
   bool _carregandoAnimal = true;
   bool _carregandoRecomendacao = true;
   String? _erroCarregamento;
@@ -66,15 +67,22 @@ class _CheckupScreenState extends State<CheckupScreen> {
 
     try {
       final animal = await _animalService.getAnimalInfo(animalId);
-      final pesoIdeal = calcularPesoIdeal(animal.peso);
       
       setState(() {
         _animal = animal;
         _carregandoAnimal = false;
       });
 
-      // Carrega recomendação em segundo plano
-      final rec = await _animalService.getIaRecomendacao(animalId, pesoIdeal);
+      // 1. Carrega dados de Peso Ideal primeiro
+      final pesoIdealMap = await _animalService.getPesoIdeal(animalId);
+      setState(() {
+        _pesoIdealData = pesoIdealMap;
+      });
+
+      final double pesoIdealVal = (pesoIdealMap['peso_ideal'] as num).toDouble();
+
+      // 2. Carrega recomendação com base no peso ideal obtido
+      final rec = await _animalService.getIaRecomendacao(animalId, pesoIdealVal);
       setState(() {
         _recomendacao = rec;
         _carregandoRecomendacao = false;
@@ -1147,10 +1155,10 @@ class _CheckupScreenState extends State<CheckupScreen> {
     }
 
     final animal = _animal!;
-    final pesoIdeal = calcularPesoIdeal(animal.peso);
-    final pesoMinimo = calcularPesoMinimo(pesoIdeal);
-    final pesoMaximo = calcularPesoMaximo(pesoIdeal);
-    final currentW = animal.peso;
+    final pesoIdeal = (_pesoIdealData?['peso_ideal'] as num?)?.toDouble() ?? calcularPesoIdeal(animal.peso);
+    final pesoMinimo = (_pesoIdealData?['peso_minimo'] as num?)?.toDouble() ?? calcularPesoMinimo(pesoIdeal);
+    final pesoMaximo = (_pesoIdealData?['peso_maximo'] as num?)?.toDouble() ?? calcularPesoMaximo(pesoIdeal);
+    final currentW = (_pesoIdealData?['peso_atual'] as num?)?.toDouble() ?? animal.peso;
 
     // Calcula a posição proporcional
     double range = pesoMaximo - pesoMinimo;

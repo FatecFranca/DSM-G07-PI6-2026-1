@@ -105,4 +105,15 @@ class AnimalService {
       throw Exception('Falha ao carregar recomendação de IA. Status: ${response.statusCode}');
     }
   }
+
+  Future<Map<String, dynamic>> getPesoIdeal(String animalId) async {
+    final uri = Uri.parse('$_pythonApiBaseUrl/peso/animal/$animalId/analise-ideal');
+    final response = await _httpClient.get(uri);
+    if (response.statusCode == 200) {
+      final decodedBody = utf8.decode(response.bodyBytes);
+      return jsonDecode(decodedBody) as Map<String, dynamic>;
+    } else {
+      throw Exception('Falha ao obter peso ideal do animal. Status: ${response.statusCode}');
+    }
+  }
 }
