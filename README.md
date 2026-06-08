@@ -11,7 +11,7 @@ Repositório do **Grupo 07** do Projeto Interdisciplinar do **6º semestre** do 
 ## 🎬 Veja o vídeo do projeto
 
 <p align="center">
-  <a href="https://www.youtube.com/watch?v=9IwRMAMUHo0">
+  <a href="https://www.youtube.com/watch?v=F8Gm2hsWero">
     <img src="https://img.youtube.com/vi/9IwRMAMUHo0/0.jpg" alt="Assista ao vídeo no YouTube" width="560" />
   </a>
 </p>
