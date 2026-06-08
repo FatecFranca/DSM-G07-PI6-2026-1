@@ -4,7 +4,7 @@
 
 # 🐾 PetDex
 
-Repositório do **Grupo 07** do Projeto Interdisciplinar do **5º semestre** do curso de **Desenvolvimento de Software Multiplataforma - DSM** (Turma 2025/2).
+Repositório do **Grupo 07** do Projeto Interdisciplinar do **6º semestre** do curso de **Desenvolvimento de Software Multiplataforma - DSM** (Turma 2026/1).
 
 ---
 
@@ -16,7 +16,7 @@ Repositório do **Grupo 07** do Projeto Interdisciplinar do **5º semestre** do 
   </a>
 </p>
 
-📺 [Clique aqui para assistir ao vídeo](https://www.youtube.com/watch?v=9IwRMAMUHo0)
+📺 [Clique aqui para assistir ao vídeo](https://www.youtube.com/watch?v=F8Gm2hsWero)
 
 ---
 
@@ -35,7 +35,7 @@ Repositório do **Grupo 07** do Projeto Interdisciplinar do **5º semestre** do 
 * **🐍 API de Análise (FastAPI - Python):** [http://34.24.9.134:8083/docs](http://34.24.9.134:8083/docs)
 * **☕ API Principal (Java - Spring Boot):** [http://34.24.9.134:8080/swagger](http://34.24.9.134:8080/swagger)
 * **💻 Versão Web (Next.js):** [http://34.24.9.134:8082/](http://34.24.9.134:8082/)
-* **📱 Download do APK (Android):** [Baixar PetDex APK](https://drive.google.com/file/d/1qfmFwAp55BwcIVp8BA7cER1gD2TSqYkW/view?usp=sharing)
+* **📱 Download do APK (Android):** [Baixar PetDex APK](https://drive.google.com/file/d/1oVPhQ0UZMHlqy-Ly_-yCvLB77epoD-RW/view?usp=sharing)
 
 ### **🔑 Credenciais de Teste**
 
@@ -64,7 +64,7 @@ Utilize as credenciais acima (`henriquealmeidaflorentino@gmail.com` / `senha123`
 
 ## 📖 Sobre o Projeto
 
-O **PetDex** é uma solução **IoT + Mobile + IA** desenvolvida para o **monitoramento em tempo real da saúde e segurança de cães e gatos**.
+A **PetDex** é uma solução **IoT + Mobile + IA** desenvolvida para o **monitoramento em tempo real da saúde e segurança de cães e gatos**.
 
 A plataforma combina uma **coleira inteligente** equipada com sensores de batimentos cardíacos, movimentação e localização GPS com um **aplicativo móvel multiplataforma**, permitindo que o tutor acompanhe o bem-estar do animal 24h por dia.
 
