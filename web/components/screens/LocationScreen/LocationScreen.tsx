@@ -29,9 +29,10 @@ import { subscribe } from "@/services/websocketService";
 interface Props {
   animalId: string;
   animalName: string;
+  animalImagemUrl?: string | null;
 }
 
-export default function LocationScreen({ animalId, animalName }: Props) {
+export default function LocationScreen({ animalId, animalName, animalImagemUrl }: Props) {
   const [currentLocation, setCurrentLocation] = useState<LocationData | null>(null);
   const [safeArea, setSafeArea] = useState<SafeArea | null>(null);
   const [address, setAddress] = useState<string | null>(null);
@@ -154,6 +155,7 @@ export default function LocationScreen({ animalId, animalName }: Props) {
                 }
               : null
           }
+          animalImagemUrl={animalImagemUrl || undefined}
         />
       ) : (
         <div className="w-full h-full bg-gray-100 flex items-center justify-center">

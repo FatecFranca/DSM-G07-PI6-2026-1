@@ -161,6 +161,7 @@ export default function AppShell() {
       key="location"
       animalId={animalId}
       animalName={petName}
+      animalImagemUrl={animalImagemUrl}
     />,
   ];
 
